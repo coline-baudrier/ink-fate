@@ -1,57 +1,59 @@
 # World Simulation Engine
 
-## Rôle
+Le world simulation engine gere ce qui se passe lorsque le joueur n'est pas directement implique dans une scene.
 
-Le moteur de simulation sociale décide ce qui se passe lorsque le joueur n'est pas directement impliqué dans une scène.
+Cette fonctionnalite est importante pour la vision finale, mais elle doit rester limitee dans le MVP.
 
-Par exemple :
-
-```
-Elina va dormir.
-Elina part en cours.
-Elina passe l’après-midi à la bibliothèque.
-Elina laisse passer trois jours.
-```
-
-Pendant ce temps les autres personnages continuent d'exister.
-
----
-
-## Principe central
+## Role
 
 Le monde ne doit pas attendre le joueur.
 
-Les personnages peuvent :
+Quand le joueur laisse passer du temps, les personnages peuvent :
 
 - parler entre eux ;
 - envoyer des messages ;
-- organiser des évènements ;
+- organiser un evenement ;
 - se disputer ;
-- cacher des informations ;
-- développer des sentiments ;
-- éviter quelqu'un ;
-- prendre une décision importante.
+- cacher une information ;
+- developper un sentiment ;
+- eviter quelqu'un ;
+- prendre une decision importante.
 
----
+## Declencheurs
 
-## Boucle de simulation
+La simulation hors champ se declenche quand le joueur indique une ellipse.
 
-Quand le temps avance, le moteur fait :
+Exemples :
 
-1. Lire l’état actuel du monde
-2. Identifier les personnages disponibles
-3. Lire leurs objectifs, émotions et relations
-4. Générer des événements plausibles
-5. Enregistrer les événements
-6. Créer les souvenirs associés
-7. Mettre à jour les relations
-8. Avancer l’horloge du monde
+```md
+Je vais dormir.
+Je passe l'apres-midi en cours.
+Je rentre au dortoir.
+Je laisse passer deux jours.
+```
 
----
+Pour le MVP, il ne doit pas y avoir de simulation permanente. La simulation se produit seulement sur ellipse explicite.
 
-# Exemple
+## Boucle Cible
 
-Elina va dormir à 23h. Le moteur simule la nuit :
+```md
+1. Lire l'etat actuel du monde.
+2. Detecter une ellipse.
+3. Identifier la duree.
+4. Identifier les personnages disponibles.
+5. Lire leurs objectifs, relations et souvenirs.
+6. Generer des evenements plausibles.
+7. Creer les souvenirs associes.
+8. Mettre a jour les relations.
+9. Avancer l'horloge du monde.
+10. Sauvegarder le nouvel etat.
+```
+
+## Exemple
+
+Elina va dormir a 23h.
+
+Le moteur simule la nuit :
 
 ```json
 {
@@ -74,64 +76,72 @@ Elina va dormir à 23h. Le moteur simule la nuit :
 }
 ```
 
----
+## Types D'Evenements Hors Champ
 
-## Types d'évènements hors champ
+### conversation
 
-### Conversation
-
-Deux ou plusieurs personnages discutent :
+Deux ou plusieurs personnages discutent.
 
 ```json
+{
   "type": "conversation",
   "participants": ["dean", "beau"],
   "summary": "Beau warned Dean about Elina."
+}
 ```
 
-### Text Message
+### text_message
 
-Un personnage envoie un message :
+Un personnage envoie un message.
 
 ```json
+{
   "type": "text_message",
   "sender": "dean",
   "receiver": "garrett",
   "content": "Did Beau ever mention he had a sister?"
-```
-
-### Private reflection
-
-Un personnage pense à quelque chose :
-
-```json
-  "type": "social_plan",
-  "organizer": "beau",
-  "summary": "Beau plans to introduce Elina to a few friends."
-```
-
-### Conflict
-
-Une tension apparaît ou augmente :
-
-```json
-  "type": "conflict",
-  "participants": ["beau", "dean"],
-  "summary": "Beau dislikes how Dean joked about Elina."
-```
-
----
-
-# Règle importante
-
-Tous les évènements hors champ ne doivent pas être immédiatement révélés au joueur, certains évènements restent secrets :
-
-```json
-{
-  "visibility": "hidden"
 }
 ```
 
-ou visibles plus tard :
+### private_reflection
+
+Un personnage reflechit seul.
+
+```json
+{
+  "type": "private_reflection",
+  "participants": ["dean"],
+  "summary": "Dean thinks about Elina's arrival."
+}
+```
+
+### social_plan
+
+Un personnage prepare une action sociale.
+
+```json
+{
+  "type": "social_plan",
+  "organizer": "beau",
+  "summary": "Beau plans to introduce Elina to a few friends."
+}
+```
+
+### conflict
+
+Une tension apparait ou augmente.
+
+```json
+{
+  "type": "conflict",
+  "participants": ["beau", "dean"],
+  "summary": "Beau dislikes how Dean joked about Elina."
+}
+```
+
+## Visibilite
+
+Tous les evenements hors champ ne doivent pas etre reveles immediatement au joueur.
 
 ```json
 {
@@ -139,17 +149,13 @@ ou visibles plus tard :
 }
 ```
 
----
+Valeurs :
 
-## Visibilité des évènements
+- `visible` : le joueur l'apprend immediatement ;
+- `discoverable` : le joueur peut l'apprendre plus tard ;
+- `hidden` : seulement connu des personnages concernes.
 
-- visible → le joueur l’apprend immédiatement
-- discoverable → le joueur peut l’apprendre plus tard
-- hidden → uniquement connu des personnages concernés
-
---
-
-# Exemple concret
+## Exemple Complet
 
 ```json
 {
@@ -186,3 +192,15 @@ ou visibles plus tard :
   }
 }
 ```
+
+## MVP
+
+Pour le MVP 1, cette fonctionnalite peut rester minimale :
+
+- detecter quelques ellipses explicites ;
+- avancer l'heure ;
+- generer au maximum quelques evenements hors champ ;
+- sauvegarder ces evenements ;
+- creer des souvenirs simples.
+
+La simulation sociale avancee viendra plus tard.

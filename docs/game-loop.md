@@ -1,117 +1,104 @@
 # Game Loop
 
-La game loop définit ce qui se passe à chaque interaction entre le joueur et Ink & Fate. Elle transforme une action du joueur en :
+La game loop definit ce qui se passe a chaque interaction entre le joueur et Ink & Fate.
 
-- scène narrative ;
-- évènements ;
+Elle transforme une action joueur en :
+
+- scene narrative ;
+- dialogues ;
+- actions objectives ;
+- evenements ;
 - souvenirs ;
 - changements relationnels ;
-- mise à jour du monde.
+- mise a jour du monde.
 
-La boucle principale :
+## Boucle MVP
 
-1. Charger le WorldState
-2. Lire la scène active
-3. Lire l’action du joueur
-4. Récupérer les personnages concernés
-5. Récupérer les souvenirs pertinents
-6. Construire le prompt
-7. Envoyer au LLM
-8. Recevoir un SceneResult
-9. Valider le JSON
-10. Appliquer les mises à jour
-11. Sauvegarder le nouvel état du monde
-12. Afficher la scène au joueur
-
----
-
-## Entrée du joueur
-
-Il peut écrire librement :
-
-```
-"Je souris à Dean."
+```md
+1. Charger le WorldState.
+2. Lire la scene active.
+3. Charger les personnages participants.
+4. Afficher la scene actuelle.
+5. Lire l'action du joueur.
+6. Recuperer les souvenirs pertinents.
+7. Construire le prompt.
+8. Envoyer au LLM.
+9. Recevoir un SceneResult.
+10. Parser le JSON.
+11. Valider le SceneResult.
+12. Afficher la scene au joueur.
+13. Appliquer les updates autorises.
+14. Sauvegarder le nouvel etat du monde.
+15. Attendre la prochaine action.
 ```
 
-```
-*Je récupère ma valise et je lève les yeux au ciel.*
-```
+## Entree Joueur
 
-```
--- Dean, tu es où ?
-```
+Le joueur peut ecrire librement.
 
-Le moteur pourra interpréter la syntaxe :
+Exemples :
 
-- "..." → parole
-- _..._ → action
-- -- ... → texto
-- texte libre → intention narrative
-
-## Traitement normal
-
-```
-PlayerInput
-↓
-PromptBuilder
-↓
-LLM
-↓
-SceneResult
-↓
-WorldUpdateEngine
-↓
-Renderer
+```md
+Je souris a Dean.
 ```
 
-## Traitement des ellipses
-
-Certaines entrées déclenchent une simulation hors champ. Par exemple :
-
-```
-Je vais dormir.
-Je passe l’après-midi en cours.
-Je laisse passer deux jours.
+```md
+Je recupere ma valise et je leve les yeux au ciel.
 ```
 
-Dans ce cas :
-
-```
-PlayerInput
-↓
-TimeSkipDetector
-↓
-WorldSimulationEngine
-↓
-OffscreenEvents
-↓
-MemoryUpdates
-↓
-RelationshipUpdates
-↓
-NewScene
+```md
+Dean, tu es ou ?
 ```
 
----
+Pour le MVP, l'entree peut etre traitee comme une intention narrative simple.
 
-# Validation du SceneResult
+Plus tard, le moteur pourra classer :
 
-Le moteur ne doit jamais appliqué aveuglément la sortie du LLM. Il doit vérfier :
+- parole ;
+- action ;
+- texto ;
+- intention narrative ;
+- ellipse.
+
+## Prompt
+
+Le prompt builder recoit :
+
+- l'etat du monde ;
+- la scene active ;
+- les personnages presents ;
+- les relations utiles ;
+- les souvenirs pertinents ;
+- l'action joueur ;
+- les regles narratives ;
+- le format `SceneResult`.
+
+Il doit rappeler que le LLM ne controle jamais le personnage joueur.
+
+## SceneResult
+
+Le LLM doit retourner un JSON.
+
+Le moteur doit ensuite verifier :
 
 - JSON valide ;
-- champs obligatoires présents ;
+- champs obligatoires presents ;
 - personnages existants ;
 - lieux existants ;
+- pas de dialogue joueur ;
+- pas de pensees joueur ;
 - changements relationnels acceptables ;
-- évènements cohérents.
+- evenements coherents.
 
----
+Voir [scene-result.md](scene-result.md).
 
-# Règle importante
+## Application Des Updates
 
-Le LLM propose et le moteur dispose.
+Le LLM propose.
 
-Le LLM peut proposer :
+Le moteur dispose.
+
+Exemple de sortie LLM :
 
 ```json
 {
@@ -127,48 +114,81 @@ Le LLM peut proposer :
 }
 ```
 
-Le moteur doit refuser ou limiter : `+ 200 attraction -> refusé ou clampé à +10`.
+Le moteur doit refuser ou limiter cette valeur.
 
----
+Pour le MVP :
 
-# Sortie vers le joueur
-
-Le Renderer transforme le SceneResult en affichage.
-
-- **Mode roman** :
-
-```
-Dean s’approche avec un sourire insolent.
-
-« Alors, c’est toi la fameuse petite sœur de Beau ? »
+```md
+attraction +200 -> refuse ou limite
+attraction +10 -> acceptable si justifie par la scene
 ```
 
-- **Mode dialogue** :
+## Renderer
 
-```
+Le renderer transforme le `SceneResult` en affichage.
+
+### Mode Roman
+
+```md
+Dean s'approche avec un sourire insolent.
+
 Dean :
-Alors, c’est toi la fameuse petite sœur de Beau ?
+Alors, c'est toi la fameuse petite soeur de Beau ?
 ```
 
-- **Mode texto** :
+### Mode Dialogue
 
+```md
+Dean :
+Alors, c'est toi la fameuse petite soeur de Beau ?
 ```
+
+### Mode Texto
+
+```md
 [Dean]
-Tu es rentrée ?
+Tu es rentree ?
 ```
 
----
+Pour le MVP, seul un rendu roman simple est necessaire.
 
-# Objectifs de la première boucle jouable
+## Ellipses
 
-Obtenir ceci :
+Certaines entrees peuvent faire avancer le temps.
 
+Exemples :
+
+```md
+Je vais dormir.
+Je passe l'apres-midi en cours.
+Je laisse passer deux jours.
 ```
-Ink & Fate démarre.
+
+Dans ce cas, le flux cible devient :
+
+```md
+PlayerInput
+-> TimeSkipDetector
+-> WorldSimulationEngine
+-> OffscreenEvents
+-> MemoryUpdates
+-> RelationshipUpdates
+-> NewScene
+```
+
+Pour le MVP, les ellipses peuvent rester tres simples.
+
+## Objectif De La Premiere Boucle Jouable
+
+La premiere boucle doit permettre ceci :
+
+```md
+Ink & Fate demarre.
 Le moteur charge Off Campus.
 Le moteur charge Elina, Beau et Dean.
-Le moteur génère la scène d’arrivée.
-Le joueur répond.
-Le moteur génère la suite.
-Les relations et souvenirs sont mis à jour.
+Le moteur genere la scene d'arrivee.
+Le joueur repond.
+Le moteur genere la suite.
+Les relations et souvenirs sont mis a jour.
+Le nouvel etat est sauvegarde.
 ```

@@ -1,8 +1,12 @@
 # Memory System
 
-Les personnages ne se souviennent pas des évènements, mais ils se souviennent de leur interprétation des évènements.
+La memoire permet aux personnages de rester coherents sur le long terme.
 
-- Evènement objectif :
+Un personnage ne se souvient pas seulement d'un evenement objectif. Il se souvient de son interpretation personnelle de cet evenement.
+
+## Principe
+
+Evenement objectif :
 
 ```json
 {
@@ -11,33 +15,57 @@ Les personnages ne se souviennent pas des évènements, mais ils se souviennent 
 }
 ```
 
-- Mémoire de Dean :
+Souvenir de Dean :
 
 ```json
 {
-  "content": "Elina was surprisingly confident."
+  "owner": "dean",
+  "content": "Elina was more confident than I expected."
 }
 ```
 
-- Mémoire d'Elina
+Souvenir d'Elina :
 
 ```json
 {
+  "owner": "elina",
   "content": "Dean was annoyingly charming."
 }
 ```
 
-On est sur le même évènement mais deux souvenirs différents, ce qui crée des personnages crédibles.
+Le meme evenement peut donc produire plusieurs souvenirs differents.
 
----
+## Structure
 
-# 4 types de mémoire
+Structure cible :
 
-On va séparer les souvenirs dès le début.
+```json
+{
+  "id": "memory_001",
+  "owner": "dean",
+  "type": "episodic",
+  "importance": 40,
+  "content": "Elina seemed confident during their first meeting.",
+  "tags": ["elina", "first_meeting"],
+  "created_at": "2026-09-01 10:15"
+}
+```
 
-## Core Memory
+Champs :
 
-Ne change presque jamais :
+- `id` : identifiant stable.
+- `owner` : personnage qui possede le souvenir.
+- `type` : categorie du souvenir.
+- `importance` : valeur de 1 a 100.
+- `content` : interpretation subjective.
+- `tags` : aide a la recuperation.
+- `created_at` : date de creation.
+
+## Types De Memoire
+
+### Core Memory
+
+Souvenir fondamental qui change rarement.
 
 ```json
 {
@@ -46,20 +74,9 @@ Ne change presque jamais :
 }
 ```
 
-ou
+### Episodic Memory
 
-```json
-{
-  "type": "core",
-  "content": "Dean is Beau's best friend."
-}
-```
-
-Ce sont ces souvenirs qui vont **définir le personnage**.
-
-## Episodic Memory
-
-Ce sont les évènements vécus :
+Souvenir d'un evenement vecu.
 
 ```json
 {
@@ -68,54 +85,34 @@ Ce sont les évènements vécus :
 }
 ```
 
-C'est-à-dire la majorité des souvenirs.
+### Emotional Memory
 
-## Emotionnal Memory
-
-Ce sera très important pour les romances :
+Souvenir centre sur une emotion.
 
 ```json
 {
   "type": "emotional",
   "emotion": "attraction",
-  "content": "I felt unusually comfortable around Dean."
+  "content": "I felt unexpectedly comfortable around Dean."
 }
 ```
 
-ou
+### Secret Memory
 
-```json
-{
-  "type": "emotional",
-  "emotion": "anger",
-  "content": "Dean embarrassed me in front of everyone."
-}
-```
-
-## Secret Memory
-
-Concerne le personnage uniquement, ce n'est jamais révélé directement.
+Souvenir ou pensee qui ne doit pas etre revele directement.
 
 ```json
 {
   "type": "secret",
-  "content": "I think I'm starting to fall for Elina."
+  "content": "I think I might be starting to like Elina."
 }
 ```
 
----
+## Importance
 
-# Importance
+Chaque souvenir a une importance entre `1` et `100`.
 
-Chaque souvenir doit avoir :
-
-```json
-{
-  "importance": 0
-}
-```
-
-entre 1 (oubliable) et 100 (marquant).
+Exemples :
 
 ```json
 {
@@ -124,8 +121,6 @@ entre 1 (oubliable) et 100 (marquant).
 }
 ```
 
-ou
-
 ```json
 {
   "importance": 10,
@@ -133,17 +128,9 @@ ou
 }
 ```
 
----
+## Tags
 
-# Tags
-
-```json
-{
-  "tags": []
-}
-```
-
-Par exemple :
+Les tags permettent de retrouver les souvenirs pertinents.
 
 ```json
 {
@@ -151,46 +138,59 @@ Par exemple :
 }
 ```
 
-Cela permettra pluys tard de faire des recherches en fonction du personnage et du tag défini dessus.
+## Recuperation Contextuelle
 
----
+Le moteur ne doit jamais envoyer toute la memoire d'un personnage au LLM.
 
-# Décroissance
+Il doit recuperer seulement les souvenirs pertinents selon :
 
-Un souvenir perd naturellement de son importance :
+- les personnages presents ;
+- les tags ;
+- l'importance ;
+- la recence ;
+- le type de scene ;
+- les objectifs actuels.
 
-```
-95
-↓
-90
-↓
-85
-↓
-80
-```
+Pour le MVP, une recuperation simple suffit :
 
-au fil du temps.
-
-Sauf si :
-
-- on y repense ;
-- il est renforcé ;
-- il est lié à une émotion forte ;
-
----
-
-# Récupération contextuelle
-
-Le personnage ne consulte pas toutes ses mémoires, il va seulement consulter :
-
-- sa mémoire active ;
-
-```json
-["first_meeting", "last_argument", "last_text_message"]
+```md
+prendre les souvenirs du personnage qui mentionnent un participant de la scene.
 ```
 
-- sa mémoire pertinente : si Dean voit Elina, le moteur cherche les mémoires tagguées elina, romance et attraction ;
+Plus tard, la recuperation pourra devenir plus avancee.
 
-Et c'est seulement ça qui sera envoyé au LLM.
+## Decroissance
 
-Ce qui fait qu'après un temps de jeu énorme où la mémoire peut être constituée de 5000 souvenirs, le prompt en contiendra seulement 10 à 20 de pertinents.
+Un souvenir peut perdre de l'importance avec le temps.
+
+Exemple :
+
+```md
+95 -> 90 -> 85 -> 80
+```
+
+Exceptions :
+
+- le personnage y repense ;
+- un evenement le renforce ;
+- il est lie a une emotion forte ;
+- il est lie a une relation importante.
+
+Cette decroissance est une fonctionnalite future, pas obligatoire pour le MVP 1.
+
+## MVP
+
+Pour le MVP 1, le systeme de memoire doit seulement :
+
+- accepter des `memory_updates` dans le `SceneResult` ;
+- verifier que le proprietaire existe ;
+- verifier que l'importance est entre 1 et 100 ;
+- sauvegarder les souvenirs ;
+- pouvoir reinjecter quelques souvenirs pertinents dans le prompt.
+
+## Regles
+
+- Un souvenir est subjectif.
+- Un evenement est objectif.
+- Un secret ne doit pas etre revele directement au joueur.
+- Le LLM peut proposer un souvenir, mais le moteur le valide.

@@ -1,92 +1,107 @@
-# Prompt builder
+# Prompt Builder
 
-Son but est de construire le contexte parfait pour le LLM. Il ne doit jamais recevoir "Continue l'histoire", il doit plutôt recevoir :
+Le prompt builder construit le contexte envoye au LLM.
 
-- l'état du mode ;
-- les personnages concernés ;
-- leurs relations ;
-- leurs souvenirs pertinents ;
-- la scène actuelle ;
-- la réponse du joueur ;
-- les règles narratives ;
-- le format JSON attendu.
-  La pipeline générale :
+Il ne doit jamais envoyer une demande vague comme :
 
-```
-WorldState
-↓
-Scene
-↓
-Relevant Characters
-↓
-Relevant Memories
-↓
-Player Input
-↓
-Prompt Builder
-↓
-LLM
-↓
-SceneResult
+```md
+Continue l'histoire.
 ```
 
-Le but est qu'il transforme :
+Il doit envoyer un contexte structure qui permet au LLM de generer une scene coherente et exploitable.
+
+## Objectif
+
+Transformer :
 
 ```json
 {
   "world_state": {},
-  "scene": {},
-  "player_input": ""
+  "scene_context": {},
+  "player_input": "",
+  "relevant_memories": []
 }
 ```
 
-en un prompte narratif propre et cohérent.
+en prompt narratif clair, stable et complet.
 
----
+## Pipeline
 
-# System Promt
-
-Le rôle fondamental du LLM :
-
+```md
+WorldState
+-> Active Scene
+-> Relevant Characters
+-> Relevant Relationships
+-> Relevant Memories
+-> Player Input
+-> Narrative Rules
+-> Expected SceneResult Format
+-> LLM
 ```
+
+## Contenu Du Prompt
+
+Le prompt doit contenir :
+
+- role du LLM ;
+- univers ;
+- date et heure ;
+- lieu actuel ;
+- description du lieu ;
+- personnages presents ;
+- objectifs actuels des personnages ;
+- relations utiles ;
+- souvenirs pertinents ;
+- action du joueur ;
+- regles narratives ;
+- format JSON attendu.
+
+## Regle De Cout Et De Clarte
+
+Le prompt builder ne doit jamais envoyer toute la base.
+
+Il doit selectionner uniquement :
+
+- les personnages presents ;
+- les relations pertinentes ;
+- les souvenirs pertinents ;
+- les evenements utiles a la scene.
+
+Envoyer trop d'informations augmente les couts, brouille le contexte et augmente les incoherences.
+
+## Regles Narratives
+
+Le prompt doit rappeler au LLM :
+
+```md
+- Ecrire en francais.
+- Respecter la personnalite des personnages.
+- Garder des emotions credibles.
+- Ne pas forcer la romance.
+- Ne pas inventer de lore majeur.
+- Ne pas controler le personnage joueur.
+- Ne pas narrer les pensees du joueur.
+- Ne pas ecrire de dialogue pour le joueur.
+- Retourner uniquement un JSON valide.
+```
+
+## Role Systemique Du LLM
+
+Le role de base :
+
+```md
 You are the narrative engine of Ink & Fate.
 
 Your role is to generate coherent, emotionally believable and character-consistent scenes inside a living narrative world.
 
-Characters must behave according to:
-- their personality
-- their memories
-- their goals
-- their emotions
-- their relationships
-
-The world continues to evolve even outside the player's presence.
+Characters must behave according to their personality, memories, goals, emotions and relationships.
 
 You must always return a valid JSON SceneResult object.
 ```
 
----
+## Etat Courant
 
-# Narrative Rules
-
-Par exemple :
-
-```
-Rules:
-- Stay consistent with character personalities
-- Avoid sudden emotional changes
-- Relationships evolve gradually
-- Do not force romance
-- Characters may disagree, avoid, lie or misunderstand
-- Keep scenes emotionally believable
-- Only generate important events
-```
-
----
-
-# Current State World
-
-Par exemple :
+Exemple :
 
 ```json
 {
@@ -96,9 +111,9 @@ Par exemple :
 }
 ```
 
----
+## Scene Active
 
-# Active Scene
+Exemple :
 
 ```json
 {
@@ -106,67 +121,74 @@ Par exemple :
 }
 ```
 
----
+## Contexte Personnage
 
-# Character Context
+Le prompt doit contenir seulement les personnages utiles a la scene.
 
-Seulement les personnages présents, c'est important pour les coûts :
+Exemple :
 
 ```json
 {
   "id": "dean",
-
+  "identity": {
+    "first_name": "Dean",
+    "last_name": "Di Laurentis"
+  },
   "personality": {
     "charisma": 95,
-    "humor": 90,
+    "humor": 95,
     "loyalty": 90
   },
-
   "current_goals": ["tease_beau"]
 }
 ```
 
----
+## Souvenirs Pertinents
 
-# Relevant Memories
-
-Seulement les souvenirs pertinents :
+Exemple :
 
 ```json
 [
   {
     "owner": "dean",
-    "content": "Beau is protective of Elina."
+    "content": "Beau is protective of Elina.",
+    "tags": ["beau", "elina"]
   }
 ]
 ```
 
----
+Pour le MVP, la recuperation peut rester simple.
 
-# IMPORTANT
+Plus tard, elle devra tenir compte :
 
-Le prompt builder **ne doit jamais renvoyer toute la base**. Sinon les coûts seront énormes, le contexte sera brouillon, il y aura des incohérences.
+- du personnage present ;
+- des tags ;
+- de l'importance ;
+- de la recence ;
+- du type de souvenir.
 
----
-
-# Player Input
+## Action Joueur
 
 Exemple :
 
-```
+```md
 Player action:
-"I take my suitcase back and roll my eyes at Dean."
+Je reprends ma valise et je leve les yeux au ciel.
 ```
 
----
+Le LLM peut decrire les actions visibles du joueur, mais il ne doit pas ajouter de pensees, emotions ou dialogues non fournis.
 
-# Expected Output Format
+## Format Attendu
 
-Très important, le LLM doit voir :
+Le prompt doit inclure le format `SceneResult`.
 
 ```json
 {
-  "scene": {},
+  "scene": {
+    "location": "",
+    "time": "",
+    "participants": []
+  },
   "narration": [],
   "dialogues": [],
   "actions": [],
@@ -178,19 +200,8 @@ Très important, le LLM doit voir :
 }
 ```
 
-## Narrative Prompt
+## Determinisme
 
-```
-Off Campus universe.
-Contemporary college romance.
-Emotionally grounded interactions.
-```
+Le prompt builder doit etre aussi deterministe que possible.
 
-## Engine Prompt
-
-```
-Always return valid JSON.
-Never skip required fields.
-```
-
-Le prompt builder doit devenir **déterministe**, même entrée -> même structure logique, sinon le moteur devient impossible à stabiliser.
+Pour un meme etat du monde et une meme action joueur, la structure logique du prompt doit rester stable. Cela rend le moteur plus facile a tester, valider et corriger.

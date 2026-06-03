@@ -1,24 +1,28 @@
 from pathlib import Path
-# Permet d'indiquer qu'une fonction retourne un dictionnaire
-from typing import Dict, Any
+from typing import Any, Dict
+
 from app.core.json_loader import load_json
 
-# Fonction permettant de charger un seul personnage
+
 def load_character(character_path: Path) -> Dict[str, Any]:
+    """Charge un personnage depuis un fichier JSON."""
+
     return load_json(character_path)
 
-# Fonction permettant de charger plusieurs personnages
-def load_characters(characters_path: Path, character_ids: list[str]) -> Dict[str, Dict[str, Any]]:
 
-    # Dictionnaire final avec tous les personnages
-    characters = {}
+def load_characters(
+    characters_path: Path,
+    character_ids: list[str],
+) -> Dict[str, Dict[str, Any]]:
+    """Charge plusieurs personnages a partir de leurs identifiants."""
 
-    # Boucle sur chaque id
+    characters: Dict[str, Dict[str, Any]] = {}
+
+    # Chaque identifiant correspond a un fichier JSON du meme nom.
     for character_id in character_ids:
-        character_file = (characters_path / f"{character_id}.json")
+        character_file = characters_path / f"{character_id}.json"
         character_data = load_character(character_file)
 
-        # Stocke le personnage dans le dictionnaire
-        characters[character_id] = (character_data)
-    
+        characters[character_id] = character_data
+
     return characters

@@ -3,8 +3,14 @@ from typing import Any, Dict
 
 def build_structured_scene_prompt(
     world: Dict[str, Any],
-    scene_context: Dict[str, Any]
+    scene_context: Dict[str, Any],
 ) -> str:
+    """
+    Construit le prompt envoye au LLM pour generer une scene structuree.
+
+    Le LLM doit retourner un objet JSON SceneResult exploitable par le moteur.
+    """
+
     universe_name = world["universe"]["name"]
 
     location = scene_context["location"]
@@ -14,16 +20,18 @@ def build_structured_scene_prompt(
     date = scene_context["date"]
     time = scene_context["time"]
 
-    participant_names = []
+    participant_lines = []
 
     for character in scene_context["participants"]:
+        character_id = character["id"]
         first_name = character["identity"]["first_name"]
         last_name = character["identity"]["last_name"]
 
-        participant_names.append(
-            f"{first_name} {last_name}"
+        participant_lines.append(
+            f"- {character_id} = {first_name} {last_name}"
         )
 
+    # Ce bloc montre au LLM la structure JSON attendue.
     expected_json_format = """
 {
   "scene": {
@@ -73,8 +81,8 @@ Location description: {location_description}
 Date: {date}
 Time: {time}
 
-Active participants:
-{chr(10).join(f"- {name}" for name in participant_names)}
+Active participants and IDs:
+{chr(10).join(participant_lines)}
 
 Generate a SceneResult JSON object.
 
@@ -87,6 +95,8 @@ Rules:
 - The player character must remain fully controllable by the player.
 - Only describe the player character's visible actions.
 - Do not write dialogue for the player character.
+- Always use character IDs in JSON fields.
+- Never use full names inside JSON structures.
 
 Canon and consistency rules:
 - Do not invent another university name.
@@ -99,11 +109,15 @@ Canon and consistency rules:
 - Dean should feel charismatic, teasing and socially confident.
 - Beau should feel protective and familiar with Dean's behavior.
 - Keep dialogue natural and modern.
-- Avoid clichés and overly dramatic narration.
+- Avoid cliches and overly dramatic narration.
 
-You MUST return valid JSON only.
-Do not wrap the JSON in markdown.
-Do not add explanations before or after the JSON.
+JSON rules:
+- You MUST return valid JSON only.
+- Do not wrap the JSON in markdown.
+- Do not add explanations before or after the JSON.
+- Use character IDs for speakers, characters, sources, targets and participants.
+- Use the location ID or location name consistently.
+- Relationship changes must be small integers between -5 and 5.
 
 Expected JSON format:
 {expected_json_format}

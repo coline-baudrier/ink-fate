@@ -1,2 +1,26 @@
-.vscode/
+# Environnement
 .env
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Virtual environments
+venv/
+.venv/
+
+# VSCode
+.vscode/
+
+# JetBrains
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Runtime saves
+saves/
+
+# Logs
+logs/

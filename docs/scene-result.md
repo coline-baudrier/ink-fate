@@ -1,31 +1,26 @@
-# Scene Result
+# SceneResult
 
-Le LLM ne doit jamais répondre avec un simple bloc de texte libre.
+Le `SceneResult` est le contrat de sortie du LLM.
 
-Il doit produire une structure exploitable par le moteur.
+Le LLM ne doit pas repondre avec du texte libre. Il doit produire un JSON exploitable par le moteur.
 
-Cette structure contient :
+## Philosophie
 
-- la narration ;
-- les dialogues ;
-- les actions ;
-- les événements ;
-- les conséquences ;
-- les mises à jour du monde.
+Le LLM met en scene.
 
----
+Le moteur decide ce qui devient vrai.
 
-# Philosophie
+Le `SceneResult` est donc une proposition structuree. Avant application, il doit etre parse, valide, puis transforme en updates autorises.
 
-Le moteur **décide ce qui est vrai**, le LLM **met en scène ce qu'il se passe**.
-
----
-
-# Structure V1
+## Structure Cible MVP
 
 ```json
 {
-  "scene": {},
+  "scene": {
+    "location": "",
+    "time": "",
+    "participants": []
+  },
   "narration": [],
   "dialogues": [],
   "actions": [],
@@ -37,9 +32,9 @@ Le moteur **décide ce qui est vrai**, le LLM **met en scène ce qu'il se passe*
 }
 ```
 
-## Scene
+## scene
 
-Contexte de la scène actuelle :
+Contexte de la scene generee.
 
 ```json
 {
@@ -49,54 +44,71 @@ Contexte de la scène actuelle :
 }
 ```
 
-## Narration
+Regles :
 
-Texte narratif pur, ce que le joueur lit comment dans un roman :
+- `location` doit exister dans `world.json`.
+- `participants` doit contenir uniquement des personnages existants.
+- `time` doit rester coherent avec la timeline.
+
+## narration
+
+Fragments narratifs lus par le joueur.
 
 ```json
-["Dean notices Elina immediately.", "A grin slowly appears on his face."]
+[
+  "Dean remarque Elina presque aussitot.",
+  "Un sourire amusé traverse son visage."
+]
 ```
 
-## Dialogue
+Regles :
 
-Dialogues séparés :
+- la narration peut decrire le monde, les PNJ et les actions visibles du joueur ;
+- elle ne doit jamais decrire les pensees, emotions ou decisions internes du joueur ;
+- elle doit rester coherente avec le ton de l'univers.
+
+## dialogues
+
+Dialogues separes de la narration.
 
 ```json
 [
   {
     "speaker": "dean",
-    "text": "So you're Beau's little sister?"
+    "text": "Alors, c'est toi la fameuse petite soeur de Beau ?"
   }
 ]
 ```
 
-On sépare la narration et le dialogue pour prévoir la suite :
+Regles :
 
-- mode roman ;
-- mode NV ;
-- mode messagerie ;
-- doublage ;
-- animation.
+- `speaker` doit etre un personnage existant ;
+- le LLM ne doit pas ecrire de dialogue pour le personnage joueur ;
+- le texte doit rester naturel et compatible avec le personnage.
 
-## Actions
+## actions
 
-Ce sont les actions objectives :
+Actions objectives qui peuvent etre comprises par le moteur.
 
 ```json
 [
   {
     "character": "dean",
-    "type": "take_luggage",
+    "type": "notice",
     "target": "elina"
   }
 ]
 ```
 
-Parce que "Dean grabs the suitcase" est joli pour un humain mais inutilisable proprement pour le moteur.
+Regles :
 
-## Events
+- `character` doit exister ;
+- `target` doit etre vide ou correspondre a une entite existante ;
+- `type` doit decrire une action objective, pas une emotion.
 
-Les évènements réellement enregistrés :
+## events
+
+Evenements importants a enregistrer.
 
 ```json
 [
@@ -107,25 +119,34 @@ Les évènements réellement enregistrés :
 ]
 ```
 
-Tous les dialogues ne sont pas des évènements, sinon on va créer 20000 évènements inutiles, alors que l'évènement doit **être narrativement utile**.
+Regles :
 
-## World updates
+- tous les dialogues ne sont pas des evenements ;
+- un evenement doit etre narrativement utile ;
+- les participants doivent exister.
 
-Ce qui change dans le monde :
+## world_updates
+
+Changements proposes sur l'etat du monde.
 
 ```json
 {
   "time_advanced_minutes": 10,
-
   "new_scene_state": {
     "location": "campus"
   }
 }
 ```
 
-## Memory updates
+Regles :
 
-Ce sont les souvenirs créés, ils sont très importants :
+- le moteur peut refuser une avancee de temps trop grande ;
+- un changement de lieu doit pointer vers un lieu existant ;
+- le LLM ne modifie pas directement `world.json`.
+
+## memory_updates
+
+Souvenirs proposes pour les personnages.
 
 ```json
 [
@@ -133,22 +154,28 @@ Ce sont les souvenirs créés, ils sont très importants :
     "owner": "dean",
     "type": "episodic",
     "importance": 40,
-    "content": "Elina seemed confident.",
+    "content": "Elina seemed confident during their first meeting.",
     "tags": ["elina", "first_meeting"]
   }
 ]
 ```
 
-## Relationship updates
+Regles :
 
-Les modifications relationnelles :
+- `owner` doit exister ;
+- `importance` doit etre entre 1 et 100 ;
+- le contenu doit etre subjectif ;
+- les tags doivent aider la recuperation future.
+
+## relationship_updates
+
+Changements relationnels proposes.
 
 ```json
 [
   {
     "source": "dean",
     "target": "elina",
-
     "changes": {
       "attraction": 10,
       "respect": 5
@@ -157,68 +184,48 @@ Les modifications relationnelles :
 ]
 ```
 
-Le LLM ne renvoie pas `"attraction": 70` mais `"attraction": +10`, le moteur garde la vérité.
+Regles :
 
-## Next hooks
+- les valeurs sont des deltas, pas des valeurs absolues ;
+- `source` et `target` doivent exister ;
+- le moteur limite les deltas ;
+- une relation reste asymetrique.
 
-Les possibilités narratives ouvertes :
+Exemple :
+
+```md
+attraction: 200
+```
+
+doit etre refuse ou limite par le moteur.
+
+## next_hooks
+
+Pistes narratives ouvertes.
 
 ```json
 [
   "Dean may try to see Elina again later.",
-  "Beau noticed Dean's interest.",
-  "Elina can choose how to react to Dean."
+  "Beau noticed Dean's interest."
 ]
 ```
 
-Ces hooks servent à :
+Regles :
 
-- guider le moteur ;
-- maintenir les arcs narratifs ;
-- aider la génération future.
+- un hook n'est pas une verite obligatoire ;
+- il sert a guider les generations futures ;
+- il ne doit pas forcer une romance ou une decision joueur.
 
----
+## Validation Minimale
 
-# Exemple concret
+Avant application, le moteur doit verifier :
 
-```json
-{
-  "scene": {
-    "location": "campus",
-    "time": "10:15",
-    "participants": ["dean", "beau", "elina"]
-  },
-  "narration": ["Dean notices Elina immediately."],
-  "dialogues": [
-    {
-      "speaker": "dean",
-      "text": "So you're Beau's little sister?"
-    }
-  ],
-  "actions": [
-    {
-      "character": "dean",
-      "type": "take_luggage",
-      "target": "elina"
-    }
-  ],
-  "events": [
-    {
-      "type": "first_meeting",
-      "participants": ["dean", "elina"]
-    }
-  ],
-  "relationship_updates": [
-    {
-      "source": "dean",
-      "target": "elina",
-      "changes": {
-        "attraction": 10,
-        "curiosity": 15
-      }
-    }
-  ]
-}
-```
-
----
+- JSON valide ;
+- champs obligatoires presents ;
+- types corrects ;
+- personnages existants ;
+- lieux existants ;
+- pas de dialogue joueur ;
+- pas de pensees joueur ;
+- deltas relationnels acceptables ;
+- souvenirs avec importance valide.

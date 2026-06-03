@@ -1,320 +1,134 @@
-# Projet : Moteur de Roman Interactif IA
+# Vision
 
-## Vision générale
+Ink & Fate est une application personnelle de roman interactif IA.
 
-Créer une application personnelle permettant de vivre des histoires interactives au sein d'univers existants (Off-Campus, Harry Potter, ACOTAR, Fourth Wing, etc) ou d'univers originaux.
+Le joueur ne discute pas avec un chatbot. Il vit une histoire dans un monde narratif ou les personnages existent avec leur propre personnalite, leurs objectifs, leurs peurs, leurs relations et leurs souvenirs.
 
-Le joueur incarne son propre personnage et interagit librement avec un monde peublé de personnages autonomes.
-
-L'objectif n'est pas de discuter avec un chatbot mais de vivre une histoire dont le jouer est le héros.
-
----
-
-# Expérience recherchée
+## Experience Cible
 
 L'utilisateur ouvre l'application et choisit :
 
-- un univers
-- son personnage
-- un scénario de départ
+- un univers ;
+- son personnage ;
+- un scenario de depart.
 
-Exemple
+Exemple :
 
 ```md
 Univers : Off Campus
-
-Personnage :
-Elina Maxwell
-
-Contexte :
-Petite soeur de Beau Maxwell
-Arrive sur le campus de Briar pour la rentrée
+Personnage : Elina Maxwell
+Contexte : petite soeur de Beau Maxwell, arrive a Briar University pour la rentree.
 ```
 
-Le moteur génère ensuite le premier chapitre :
+Le moteur genere ensuite une premiere scene, puis le joueur peut :
 
-```md
-Campus de Briar
+- parler ;
+- agir ;
+- ignorer quelqu'un ;
+- quitter une scene ;
+- envoyer un texto ;
+- dormir ;
+- laisser passer plusieurs heures ou plusieurs jours.
 
-Beau referme le coffre de sa voiture tandis que tu récpuères ta valise.
+## Philosophie
 
-Quelques mètres plus loin, Dean Di Laurentis s'approche avec son sourire habituel...
-```
-
-L'utilisateur peur ensuite :
-
-- parler
-- agir
-- ignorer quelqu'un
-- quitter une scène
-- changer de sujet
-- dormir
-- envoyer un texto
-- partir plusieurs jours
-
----
-
-## Philosophie du moteur
-
-Le moteur ne suit pas un scénario imposé.
+Le moteur ne suit pas un scenario impose.
 
 Il simule :
 
-- des personnages
-- des relations
-- des émotions
-- des objectifs
-- des souvenirs
+- des personnages ;
+- des relations ;
+- des emotions ;
+- des objectifs ;
+- des souvenirs ;
+- des evenements.
 
-et laisse l'histoire émerger naturellement.
+La romance, l'amitie, la rivalite ou le conflit ne sont pas garantis. Ils doivent emerger naturellement des interactions.
 
-Ainsi :
+Par exemple :
 
-- Dean peut tomber amoureux
-- Logan peut tomber amoureux à sa place
-- personne ne peut tomber amoureux
-- une rivalité peut apparaître
-- une amitié peut naître
+- Dean peut tomber amoureux d'Elina ;
+- Elina peut ne pas etre interessee ;
+- Beau peut creer une tension involontaire ;
+- une amitie peut devenir plus importante que la romance ;
+- un evenement hors champ peut changer la dynamique.
 
-Aucun résultat n'est garanti.
+## Monde Vivant
 
----
+Le monde ne doit pas attendre le joueur.
 
-# Fonctionnalités principales
+Quand le joueur dort, part en cours ou laisse passer du temps, les autres personnages peuvent continuer a agir :
 
-## Narration hybride
+- discuter entre eux ;
+- prendre des decisions ;
+- se disputer ;
+- cacher une information ;
+- developper un sentiment ;
+- organiser un evenement.
 
-L'IA doit pouvoir alterner entre :
+Ces evenements peuvent etre visibles, decouvrables plus tard, ou rester caches.
 
-- **Narration roman**
+## Personnages Autonomes
 
-```
-Dean s'appuie contre le mur et croise les bras.
-"Tu es toujours aussi têtue ?"
-```
+Chaque personnage doit posseder :
 
-- **Dialogue**
+- une identite ;
+- une personnalite ;
+- des objectifs ;
+- des peurs ;
+- des desirs ;
+- des relations ;
+- des souvenirs ;
+- un etat emotionnel.
 
-```
-Dean :
-Tu es toujours aussi têtue ?
-```
+Le moteur doit s'appuyer sur ces donnees pour garder des comportements coherents sur le long terme.
 
-- **Textos**
-
-```
-[Dean]
-Tu es rentrée ?
-```
-
----
-
-## Monde vivant
-
-Les personnages continuent à vivre même lorsque le joueur n'est pas présent.
-
-Exemple :
-
-Pendant que Elina dort :
-
-- Dean parle à Garrett
-- Beau organise une sortie
-- Logan apprend une information
-- une fête se prépare
-
-Ces évènements sont enregistrés.
-
-Le monde évolue sans le joueur.
-
----
-
-## Evènement hors caméra
-
-Le moteur doit être capable de générer :
-
-```
-Dean et Garrett ont discuté d'Elina.
-
-Beau demande à Dean de garder ses distances.
-```
-
-sans que le joueur soit présent.
-
----
-
-## Gestion du temps
-
-Système hybride :
-
-- **Temps réel narratif** : les scènes avancent naturellement.
-- **Ellipses** : Le joueur peut décider :
-
-```
-Je vais dormir.
-
-Je passe l'après-midi à travailler.
-
-Je laisse passer trois jours.
-```
-
-Le moteur simule alors les évènements intermédiaires.
-
----
-
-## Personnages
-
-Chaque personnage possède :
-
-- identité
-- personnalité
-- histoire
-- relations
-- souvenirs
-- objectifs
-- peurs
-- désirs
-- état émotionnel
-
-Exemple pour Dean :
-
-- humour
-- charme
-- impulsivité
-- loyauté
-- peur de l'engagement
-
----
-
-## Systèmes de relations
+## Relations Dynamiques
 
 Les relations ne sont pas binaires.
 
-On ne stocke pas :
+Le moteur ne stocke pas seulement :
 
-```
-Amoureux : oui / non
-```
-
-mais plusieurs dimensions.
-
-Exemple :
-
-```
-Attraction
-Confiance
-Respect
-Attachement
-Jalousie
-Affection
-Admiration
+```md
+amoureux : oui / non
 ```
 
-Ces valeurs évoluent selon les évènements.
+Il suit plusieurs dimensions :
 
----
+- attraction ;
+- confiance ;
+- respect ;
+- attachement ;
+- amitie ;
+- jalousie.
 
-## Mémoire
+Ces dimensions evoluent progressivement selon les scenes, les evenements et les souvenirs.
 
-Chaque personnage dispose :
+## Univers Independants
 
-- **Lore permanent** : informations immuables
+Le moteur doit etre separe de l'univers.
 
-```
-Dean joue au hockey
-Dean est riche
-Dean est le meilleur ami de Beau
-```
+Un univers est defini par des donnees :
 
-- **Souvenirs** : évènements vécus
+- personnages ;
+- lieux ;
+- contexte ;
+- regles narratives ;
+- scenario de depart.
 
-```
-Elina lui a tenu tête.
-```
+Ainsi, le meme moteur pourra fonctionner avec un univers original, une romance universitaire, de la fantasy ou de la science-fiction.
 
-- **Etat actuel** : évènements temporaires
+## MVP Et Vision Future
 
-```
-Dean est jaloux
-Dean est contrarié
-Dans est blessé
-```
-
----
-
-## Univers
-
-Le moteur doit être indépendant de l'univers.
-L'univers est défini par :
-
-- personnages
-- lieux
-- règles
-- contexte
-
-Ainsi le même moteur pourra fonctionner avec des univers différents et des univers originaux.
-
----
-
-# Architecture technique envisagée
-
-- **Backend**
-  - Python
-  - FastAPI
-- **Base de données**
-  - SQLIte
-- **IA** : IA OpenAI dans un premier temps, mais évolution possible vers des modèles locaux ou autres fournisseurs
-- **Frontend** : React ou Vue
-
----
-
-# MVP 1
-
-Objectif :
-
-- Créer une histoire avec seulement :
-  - Elina
-  - Beau
-  - Dean
-- Fonctionnalités :
-  - chargement des personnages
-  - génération des scènes
-  - mémoire persistante
-  - évolution des relations
-  - sauvegarde
-- Pas encore :
-  - SMS
-  - évènements complexes
-  - 10 personnages simultanés
-  - simulation avancée
-
-Pour le MVP, le moteur ne simule pas toute une journée en détail. Il va seulement simuler lors des ellipses explicites :
-
-- Je vais dormir.
-- Je passe l’après-midi en cours.
-- Je rentre au dortoir.
-- Je laisse passer deux jours.
-
-Pas de simulation permanente, c'est beaucoup plus simple.
-
-Pour la première version :
+Le MVP 1 reste volontairement simple :
 
 - pas de frontend ;
 - pas de FastAPI ;
-- pas de vraie base SQLite ;
+- pas de base SQLite ;
 - stockage JSON local ;
 - interface CLI ;
-- une scène active ;
-- trois personnages ;
 - un seul univers ;
-- un seul scénario de départ.
+- une seule scene active ;
+- trois personnages.
 
----
-
-# Objectif final
-
-Obtenir un système capable de générer des histoires longues, plusieurs semaines ou mois, cohérentes, émotionnelles et dynamiques, dans lesquelles :
-
-- les personnages restent fidèles à leur personnalités ;
-- les relations évoluent naturellement ;
-- les évènements continuent à se produits même en l'absence du joueur ;
-- l'utilisateur a réellement l'impression de vivre dans un roman dont il est le héros ;
+La vision finale est un systeme capable de generer des histoires longues, sur plusieurs semaines ou mois, ou les personnages restent coherents et ou les relations evoluent naturellement.

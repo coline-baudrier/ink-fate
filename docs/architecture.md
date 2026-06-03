@@ -1,152 +1,276 @@
 # Architecture
 
-- **Character** : un personnage du monde, avec une identité, une personnalité, des relations, des souvenirs, des objectifs, des décisions ;
-- **Relationship** : ce qu'un personnage ressent envers un autre, avec des relations séparés pour faire des updates et des évènements ;
-- **Memory** : partie la plus importante parce que les souvenirs vont s'accumuler, on ne pourra pas tout envoyer à l'IA mais on pourra aller chercher les souvenirs les plus importants ;
-- **Event** : un fait qui s'est réellement produit, c'est à dire un objectif, pas un sentiment ;
-- **Scene** : ce qui est actuellement joué, c'est temporaire, elle existe pendant plusieurs minutes du jeu, mais disparaît ensuite ;
-- **Location** : un lieu ;
-- **World State** : c'est le coeur du système, il contient la date, l'heure, les personnages en action, la scène en cours, les évènements actifs ;
-- **Story Arc** : on veut par exemple de la romance, rivalité, amitié, conflit mais sans les imposer ;
+Cette documentation decrit l'architecture actuelle du prototype et l'architecture cible du MVP 1.
 
----
+## Principe Central
 
-# Exemples d'architecture
+Le moteur garde la verite.
 
-## Character
+Le LLM genere des propositions narratives structurees, mais le moteur decide ce qui est valide, ce qui est applique et ce qui est sauvegarde.
+
+```md
+WorldState
+-> SceneContext
+-> PromptBuilder
+-> LLM
+-> SceneResult
+-> Validator
+-> WorldUpdateEngine
+-> Renderer
+-> New WorldState
+```
+
+## Architecture Actuelle
+
+Le projet actuel est un prototype CLI.
+
+```md
+backend/
+  main.py
+  app/
+    core/
+      json_loader.py
+      character_loader.py
+      scene_context.py
+      prompt_builder.py
+      openai_client.py
+      scene_result_parser.py
+      renderer.py
+
+data/
+  universes/
+    off-campus/
+      world.json
+      scenario.json
+      characters/
+```
+
+## Modules Actuels
+
+### backend/main.py
+
+Point d'entree CLI du prototype.
+
+Responsabilites actuelles :
+
+- charger `world.json` ;
+- charger les personnages ;
+- construire le contexte de scene ;
+- construire le prompt ;
+- appeler OpenAI ;
+- parser la reponse ;
+- afficher les resultats de debug.
+
+### app/core/json_loader.py
+
+Charge et sauvegarde des fichiers JSON.
+
+Responsabilites :
+
+- verifier qu'un fichier existe ;
+- charger du JSON ;
+- sauvegarder du JSON lisible.
+
+### app/core/character_loader.py
+
+Charge un ou plusieurs personnages depuis le dossier `characters`.
+
+Responsabilites :
+
+- convertir un identifiant personnage en chemin de fichier ;
+- retourner un dictionnaire de personnages charges.
+
+### app/core/scene_context.py
+
+Construit le contexte utile pour la scene active.
+
+Responsabilites :
+
+- lire `active_scene` ;
+- trouver le lieu courant ;
+- recuperer les participants ;
+- ajouter la date et l'heure courantes.
+
+### app/core/prompt_builder.py
+
+Construit le prompt envoye au LLM.
+
+Responsabilites :
+
+- injecter l'univers ;
+- injecter le lieu ;
+- injecter les participants ;
+- rappeler les regles narratives ;
+- demander un JSON `SceneResult`.
+
+### app/core/openai_client.py
+
+Appelle l'API OpenAI.
+
+Responsabilites :
+
+- charger la cle API ;
+- creer le client ;
+- envoyer le prompt ;
+- retourner le texte genere.
+
+### app/core/scene_result_parser.py
+
+Transforme la reponse texte du LLM en dictionnaire Python.
+
+Responsabilites actuelles :
+
+- parser du JSON.
+
+Responsabilites futures :
+
+- deleguer la validation a un validateur dedie.
+
+### app/core/renderer.py
+
+Module prevu pour transformer un `SceneResult` en texte lisible.
+
+Statut actuel :
+
+- fichier vide.
+
+## Concepts Du Domaine
+
+### WorldState
+
+Etat global du monde :
+
+- univers ;
+- date ;
+- heure ;
+- lieux ;
+- personnages ;
+- evenements actifs ;
+- scene active.
+
+### Character
+
+Personnage du monde :
+
+- identite ;
+- personnalite ;
+- objectifs ;
+- peurs ;
+- desirs ;
+- relations ;
+- souvenirs ;
+- pensees privees.
+
+### Scene
+
+Moment actuellement joue.
+
+Une scene est temporaire. Elle contient :
+
+- un lieu ;
+- une date ;
+- une heure ;
+- des participants ;
+- un contexte narratif.
+
+### Event
+
+Fait objectif qui s'est produit dans le monde.
+
+Un evenement n'est pas une emotion. Exemple :
 
 ```json
 {
-  "id": "dean",
-  "identity": {},
-  "personality": {},
-  "goals": [],
-  "current_goals": [],
-  "fears": [],
-  "desires": [],
-  "relationships": {},
-  "memories": [],
-  "private_thoughts": []
+  "type": "first_meeting",
+  "participants": ["dean", "elina"]
 }
 ```
 
-## Relationship
+### Memory
+
+Interpretation subjective d'un evenement par un personnage.
+
+Deux personnages peuvent vivre le meme evenement et creer deux souvenirs differents.
+
+### Relationship
+
+Etat emotionnel asymetrique d'un personnage envers un autre.
+
+Exemple :
 
 ```json
 {
   "source": "dean",
   "target": "elina",
-
-  "friendship": 20,
-  "trust": 5,
-  "respect": 15,
   "attraction": 30,
-  "attachment": 0,
-  "jealousy": 0
+  "trust": 5
 }
 ```
 
-## Memory
+## Flux Actuel
 
-```json
-  "id": "memory_001",
-  "owner": "dean",
-  "date": "2026-09-01",
-  "importance": 80,
-  "content": "Elina stood up to him during their first meeting."
+```md
+1. main.py charge world.json.
+2. main.py charge les personnages.
+3. scene_context construit la scene active.
+4. prompt_builder construit un prompt.
+5. openai_client appelle le LLM.
+6. scene_result_parser parse la reponse.
+7. main.py affiche le resultat.
 ```
 
-## Event
+## Flux Cible MVP
 
-```json
-  "id": "event_001",
-  "type": "first_meeting",
-  "participants": [
-    "dean",
-    "elina"
-  ],
-  "date": "2026-09-01"
+```md
+1. Charger le WorldState.
+2. Charger les personnages pertinents.
+3. Afficher la scene actuelle.
+4. Lire l'action du joueur.
+5. Construire le prompt avec l'action joueur.
+6. Appeler le LLM.
+7. Parser le SceneResult.
+8. Valider le SceneResult.
+9. Rendre la scene au joueur.
+10. Appliquer les updates autorises.
+11. Sauvegarder le nouvel etat.
+12. Recommencer.
 ```
 
-## Scene
+## Modules A Ajouter
 
-```json
-  "id": "scene_001",
-  "location": "campus",
-  "participants": [
-    "dean",
-    "beau",
-    "elina"
-  ],
-  "date": "2026-09-01",
-  "time": "10:00"
-```
+### scene_result_validator.py
 
-## Location
+Valide la structure et les valeurs du `SceneResult`.
 
-```json
-  "id": "campus",
-  "name": "Briar Campus",
-  "description": "..."
-```
+### world_update_engine.py
 
-## World State
+Applique les changements autorises :
 
-```json
-{
-  "current_date": "",
-  "current_time": "",
-  "characters": [],
-  "active_scene": {},
-  "active_events": []
-}
-```
+- temps ;
+- scene active ;
+- evenements ;
+- souvenirs ;
+- relations.
 
-```
-WorldState
-↓
-Prompt Builder
-↓
-LLM
-↓
-Scene Result
-↓
-World Update
-↓
-New WorldState
-```
+### player_input.py
 
-## Story Arc
+Lit et classe l'entree joueur :
 
-```json
-{
-  "id": "arc_001",
-  "type": "romance",
-  "characters": ["dean", "elina"],
-  "status": "potential"
-}
-```
+- parole ;
+- action ;
+- texto ;
+- intention narrative ;
+- ellipse.
 
-puis :
+### memory_retriever.py
 
-```json
-{
-  "status": "active"
-}
-```
+Selectionne uniquement les souvenirs pertinents a envoyer au prompt.
 
-puis :
+## Regles Techniques
 
-```json
-{
-  "status": "completed"
-}
-```
-
-ou :
-
-```json
-{
-  "status": "failed"
-}
-```
+- Le moteur ne doit jamais appliquer une sortie LLM non valide.
+- Les identifiants de personnages et de lieux doivent exister.
+- Les updates relationnelles doivent etre limitees.
+- Le joueur ne doit jamais etre controle par le LLM.
+- Les donnees d'univers doivent rester separees du moteur.
+- Le prompt builder doit rester deterministe a structure equivalente.

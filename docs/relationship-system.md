@@ -1,6 +1,12 @@
 # Relationship System
 
-Chaque relation entre deux personnages possède plusieurs dimensions :
+Le relationship system suit ce qu'un personnage ressent envers un autre.
+
+Les relations sont asymetriques et multidimensionnelles.
+
+## Dimensions
+
+Structure cible :
 
 ```json
 {
@@ -13,21 +19,107 @@ Chaque relation entre deux personnages possède plusieurs dimensions :
 }
 ```
 
-- **Attraction** : `Est-ce que cette personne me plaît ?` -> Peut exister sans confiance ;
-- **Trust** : `Est-ce que je crois ce qu'il me dit ?` -> Peut être faible même dans une romance ;
-- **Respect** : `Est-ce que je la considère ?` -> Très important dans les conflits ;
-- **Attachment** : `Est-ce qu'elle me manquerait ?` -> C'est souvent ce qui précède l'amour ;
-- **Friendship** : `Est-ce que j'apprecie passer du temps avec elle ?` ;
-- **Jealousy** : `Suis-je affecté par ses interactions avec les autres ?` ;
+## Definitions
 
-## Exemple concret
+- `attraction` : est-ce que cette personne me plait ?
+- `trust` : est-ce que je lui fais confiance ?
+- `respect` : est-ce que je la considere ?
+- `attachment` : est-ce qu'elle me manquerait ?
+- `friendship` : est-ce que j'aime passer du temps avec elle ?
+- `jealousy` : est-ce que ses interactions avec les autres m'affectent ?
 
-- Quand Dean rencontre Elina :
+## Asymetrie
+
+Une relation est stockee du point de vue d'un personnage.
+
+Exemple :
+
+```json
+{
+  "dean": {
+    "relationships": {
+      "elina": {
+        "attraction": 70,
+        "trust": 20
+      }
+    }
+  },
+  "elina": {
+    "relationships": {
+      "dean": {
+        "attraction": 25,
+        "trust": 10
+      }
+    }
+  }
+}
+```
+
+Dean peut etre tres attire par Elina sans que l'inverse soit vrai.
+
+## Valeurs
+
+Pour le MVP, chaque dimension devrait rester entre `0` et `100`.
+
+Interpretation indicative :
+
+- `0` : absent ou nul ;
+- `25` : faible ;
+- `50` : notable ;
+- `75` : fort ;
+- `100` : maximum.
+
+## Updates
+
+Le LLM propose des deltas.
+
+```json
+{
+  "source": "dean",
+  "target": "elina",
+  "changes": {
+    "attraction": 10,
+    "respect": 5
+  }
+}
+```
+
+Le moteur applique seulement apres validation.
+
+Regles :
+
+- les updates sont des deltas ;
+- les valeurs finales sont limitees entre 0 et 100 ;
+- les deltas trop grands sont refuses ou limites ;
+- une update doit etre justifiee par la scene.
+
+## Limites MVP
+
+Pour eviter les changements trop brutaux :
+
+```md
+delta normal : -10 a +10
+delta fort : -20 a +20, seulement pour evenement important
+delta extreme : refuse par defaut
+```
+
+Exemple a refuser ou limiter :
+
+```json
+{
+  "changes": {
+    "attraction": 200
+  }
+}
+```
+
+## Exemples
+
+Premiere rencontre :
 
 ```json
 {
   "target_id": "elina",
-
   "attraction": 20,
   "trust": 0,
   "respect": 10,
@@ -37,12 +129,11 @@ Chaque relation entre deux personnages possède plusieurs dimensions :
 }
 ```
 
-- Quelques semaines plus tard :
+Quelques semaines plus tard :
 
 ```json
 {
   "target_id": "elina",
-
   "attraction": 70,
   "trust": 60,
   "respect": 75,
@@ -52,54 +143,11 @@ Chaque relation entre deux personnages possède plusieurs dimensions :
 }
 ```
 
----
+## Regles Narratives
 
-# Relations asymétriques
-
-Les relations doivent être asymétriques :
-
-- Dean -> Elina
-
-```json
-{
-  "attraction": 70
-}
-```
-
-- Elina -> Dean
-
-```json
-{
-  "attraction": 25
-}
-```
-
-Les deux ne ressentent pas forcément la même chose.
-
-Et c'est précisément ce qui crée des histoires intéressantes.
-
----
-
-# Structure des fichiers
-
-On ne met pas les relations dans un fichier séparé, mais plutôt directement _dans les personnages_ :
-
-```json
-{
-  "id": "dean",
-
-  "relationships": {
-    "beau": {
-      "friendship": 95,
-      "trust": 90,
-      "respect": 85
-    },
-
-    "elina": {
-      "attraction": 20,
-      "trust": 0,
-      "respect": 10
-    }
-  }
-}
-```
+- Une romance ne doit pas etre forcee.
+- La confiance monte lentement.
+- L'attraction peut monter plus vite que l'attachement.
+- Le respect peut exister meme dans un conflit.
+- La jalousie ne signifie pas automatiquement amour.
+- Les relations doivent evoluer grace aux scenes et aux souvenirs.
