@@ -1,28 +1,26 @@
 # Architecture
 
-Cette documentation decrit l'architecture actuelle du prototype et l'architecture cible du MVP 1.
+Cette documentation decrit l'architecture actuelle du prototype Ink & Fate.
 
 ## Principe Central
 
 Le moteur garde la verite.
 
-Le LLM genere des propositions narratives structurees, mais le moteur decide ce qui est valide, ce qui est applique et ce qui est sauvegarde.
+Le LLM genere des propositions narratives structurees. Le moteur parse, valide, filtre, applique seulement ce qui est autorise, puis sauvegarde les donnees modifiees.
 
 ```md
 WorldState
 -> SceneContext
 -> PromptBuilder
 -> LLM
--> SceneResult
--> Validator
--> WorldUpdateEngine
+-> SceneResultParser
+-> SceneValidator
 -> Renderer
--> New WorldState
+-> RelationshipEngine
+-> JSON Save
 ```
 
 ## Architecture Actuelle
-
-Le projet actuel est un prototype CLI.
 
 ```md
 backend/
@@ -35,7 +33,9 @@ backend/
       prompt_builder.py
       openai_client.py
       scene_result_parser.py
+      scene_validator.py
       renderer.py
+      relationship_engine.py
 
 data/
   universes/
@@ -43,9 +43,12 @@ data/
       world.json
       scenario.json
       characters/
+        elina.json
+        beau.json
+        dean.json
 ```
 
-## Modules Actuels
+## Modules
 
 ### backend/main.py
 
@@ -55,11 +58,14 @@ Responsabilites actuelles :
 
 - charger `world.json` ;
 - charger les personnages ;
-- construire le contexte de scene ;
-- construire le prompt ;
-- appeler OpenAI ;
-- parser la reponse ;
-- afficher les resultats de debug.
+- construire la scene active ;
+- generer la scene d'ouverture ;
+- lire les actions joueur dans une boucle ;
+- envoyer l'historique au prompt ;
+- valider partiellement le `SceneResult` ;
+- afficher le rendu ;
+- appliquer les updates relationnels ;
+- sauvegarder les personnages modifies.
 
 ### app/core/json_loader.py
 
@@ -73,12 +79,13 @@ Responsabilites :
 
 ### app/core/character_loader.py
 
-Charge un ou plusieurs personnages depuis le dossier `characters`.
+Charge et sauvegarde les personnages.
 
 Responsabilites :
 
-- convertir un identifiant personnage en chemin de fichier ;
-- retourner un dictionnaire de personnages charges.
+- charger un personnage depuis son fichier JSON ;
+- charger plusieurs personnages a partir de leurs ids ;
+- sauvegarder chaque personnage dans son fichier.
 
 ### app/core/scene_context.py
 
@@ -100,6 +107,8 @@ Responsabilites :
 - injecter l'univers ;
 - injecter le lieu ;
 - injecter les participants ;
+- injecter l'historique de scene ;
+- injecter l'action joueur ;
 - rappeler les regles narratives ;
 - demander un JSON `SceneResult`.
 
@@ -118,21 +127,64 @@ Responsabilites :
 
 Transforme la reponse texte du LLM en dictionnaire Python.
 
+Responsabilites :
+
+- parser du JSON ;
+- afficher l'erreur si la reponse n'est pas un JSON valide.
+
+### app/core/scene_validator.py
+
+Filtre le `SceneResult` avant application.
+
 Responsabilites actuelles :
 
-- parser du JSON.
-
-Responsabilites futures :
-
-- deleguer la validation a un validateur dedie.
+- proteger contre les champs qui ne sont pas des listes ou dictionnaires ;
+- supprimer les dialogues invalides ;
+- supprimer les dialogues du personnage joueur ;
+- supprimer les actions invalides ;
+- supprimer les evenements invalides ou vides ;
+- supprimer les updates relationnels avec personnages invalides ;
+- limiter les deltas relationnels entre `-5` et `5`.
 
 ### app/core/renderer.py
 
-Module prevu pour transformer un `SceneResult` en texte lisible.
+Transforme un `SceneResult` en texte lisible pour la CLI.
 
-Statut actuel :
+Responsabilites :
 
-- fichier vide.
+- afficher les blocs de narration ;
+- afficher les dialogues des PNJ.
+
+### app/core/relationship_engine.py
+
+Applique les changements relationnels valides aux personnages.
+
+Responsabilites actuelles :
+
+- lire `relationship_updates` ;
+- trouver la relation `source -> target` ;
+- ajouter les deltas ;
+- limiter les valeurs finales entre `0` et `100`.
+
+## Flux Actuel
+
+```md
+1. Charger world.json.
+2. Charger les personnages.
+3. Construire le contexte de scene.
+4. Generer la scene d'ouverture.
+5. Afficher la scene.
+6. Lire une action joueur.
+7. Construire un prompt avec l'historique.
+8. Appeler le LLM.
+9. Parser le SceneResult.
+10. Filtrer le SceneResult.
+11. Appliquer les updates relationnels.
+12. Sauvegarder les personnages.
+13. Afficher la suite.
+14. Ajouter la suite a l'historique.
+15. Recommencer.
+```
 
 ## Concepts Du Domaine
 
@@ -158,103 +210,45 @@ Personnage du monde :
 - peurs ;
 - desirs ;
 - relations ;
-- souvenirs ;
+- souvenirs futurs ;
 - pensees privees.
 
-### Scene
+### SceneResult
 
-Moment actuellement joue.
+Sortie structuree proposee par le LLM.
 
-Une scene est temporaire. Elle contient :
+Elle contient notamment :
 
-- un lieu ;
-- une date ;
-- une heure ;
-- des participants ;
-- un contexte narratif.
-
-### Event
-
-Fait objectif qui s'est produit dans le monde.
-
-Un evenement n'est pas une emotion. Exemple :
-
-```json
-{
-  "type": "first_meeting",
-  "participants": ["dean", "elina"]
-}
-```
-
-### Memory
-
-Interpretation subjective d'un evenement par un personnage.
-
-Deux personnages peuvent vivre le meme evenement et creer deux souvenirs differents.
+- narration ;
+- dialogues ;
+- actions ;
+- evenements ;
+- relationship updates.
 
 ### Relationship
 
 Etat emotionnel asymetrique d'un personnage envers un autre.
 
-Exemple :
+Le moteur applique uniquement les deltas valides et limite les valeurs finales.
 
-```json
-{
-  "source": "dean",
-  "target": "elina",
-  "attraction": 30,
-  "trust": 5
-}
-```
-
-## Flux Actuel
-
-```md
-1. main.py charge world.json.
-2. main.py charge les personnages.
-3. scene_context construit la scene active.
-4. prompt_builder construit un prompt.
-5. openai_client appelle le LLM.
-6. scene_result_parser parse la reponse.
-7. main.py affiche le resultat.
-```
-
-## Flux Cible MVP
-
-```md
-1. Charger le WorldState.
-2. Charger les personnages pertinents.
-3. Afficher la scene actuelle.
-4. Lire l'action du joueur.
-5. Construire le prompt avec l'action joueur.
-6. Appeler le LLM.
-7. Parser le SceneResult.
-8. Valider le SceneResult.
-9. Rendre la scene au joueur.
-10. Appliquer les updates autorises.
-11. Sauvegarder le nouvel etat.
-12. Recommencer.
-```
-
-## Modules A Ajouter
-
-### scene_result_validator.py
-
-Valide la structure et les valeurs du `SceneResult`.
+## Modules A Ajouter Plus Tard
 
 ### world_update_engine.py
 
-Applique les changements autorises :
+Appliquera les changements de monde :
 
 - temps ;
 - scene active ;
-- evenements ;
-- souvenirs ;
-- relations.
+- lieux ;
+- evenements actifs.
+
+### memory_engine.py
+
+Creera, sauvegardera et recuperera les souvenirs pertinents.
 
 ### player_input.py
 
-Lit et classe l'entree joueur :
+Classera l'entree joueur :
 
 - parole ;
 - action ;
@@ -262,15 +256,12 @@ Lit et classe l'entree joueur :
 - intention narrative ;
 - ellipse.
 
-### memory_retriever.py
-
-Selectionne uniquement les souvenirs pertinents a envoyer au prompt.
-
 ## Regles Techniques
 
-- Le moteur ne doit jamais appliquer une sortie LLM non valide.
-- Les identifiants de personnages et de lieux doivent exister.
-- Les updates relationnelles doivent etre limitees.
+- Le moteur ne doit jamais appliquer une sortie LLM brute.
+- Les identifiants de personnages doivent exister.
+- Les updates relationnels sont des deltas, pas des valeurs absolues.
+- Les deltas sont limites avant application.
+- Les valeurs finales de relation sont limitees entre `0` et `100`.
 - Le joueur ne doit jamais etre controle par le LLM.
 - Les donnees d'univers doivent rester separees du moteur.
-- Le prompt builder doit rester deterministe a structure equivalente.

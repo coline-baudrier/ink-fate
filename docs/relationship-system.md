@@ -2,20 +2,20 @@
 
 Le relationship system suit ce qu'un personnage ressent envers un autre.
 
-Les relations sont asymetriques et multidimensionnelles.
+Les relations sont asymetriques, multidimensionnelles et stockees directement dans les fichiers personnages.
 
 ## Dimensions
 
-Structure cible :
+Structure actuelle :
 
 ```json
 {
-  "attraction": 0,
+  "friendship": 0,
   "trust": 0,
   "respect": 0,
   "attachment": 0,
-  "friendship": 0,
-  "jealousy": 0
+  "jealousy": 0,
+  "attraction": 0
 }
 ```
 
@@ -39,27 +39,27 @@ Exemple :
   "dean": {
     "relationships": {
       "elina": {
-        "attraction": 70,
-        "trust": 20
+        "attraction": 10,
+        "trust": 0
       }
     }
   },
   "elina": {
     "relationships": {
       "dean": {
-        "attraction": 25,
-        "trust": 10
+        "attraction": 2,
+        "trust": 0
       }
     }
   }
 }
 ```
 
-Dean peut etre tres attire par Elina sans que l'inverse soit vrai.
+Dean peut etre attire par Elina sans que l'inverse soit vrai.
 
 ## Valeurs
 
-Pour le MVP, chaque dimension devrait rester entre `0` et `100`.
+Chaque dimension doit rester entre `0` et `100`.
 
 Interpretation indicative :
 
@@ -69,79 +69,78 @@ Interpretation indicative :
 - `75` : fort ;
 - `100` : maximum.
 
-## Updates
+## Updates Actuels
 
-Le LLM propose des deltas.
+Le LLM propose des deltas dans `relationship_updates`.
 
 ```json
 {
   "source": "dean",
   "target": "elina",
   "changes": {
-    "attraction": 10,
-    "respect": 5
+    "attraction": 3,
+    "respect": 1
   }
 }
 ```
 
-Le moteur applique seulement apres validation.
-
-Regles :
-
-- les updates sont des deltas ;
-- les valeurs finales sont limitees entre 0 et 100 ;
-- les deltas trop grands sont refuses ou limites ;
-- une update doit etre justifiee par la scene.
-
-## Limites MVP
-
-Pour eviter les changements trop brutaux :
+Le moteur applique ce flux :
 
 ```md
-delta normal : -10 a +10
-delta fort : -20 a +20, seulement pour evenement important
-delta extreme : refuse par defaut
+SceneResult
+-> remove_invalid_relationship_updates
+-> clamp_relationship_updates
+-> apply_relationship_updates
+-> save_characters
 ```
 
-Exemple a refuser ou limiter :
+Regles actuelles :
+
+- les updates sont des deltas ;
+- les deltas non entiers sont ignores ;
+- les deltas sont limites entre `-5` et `5` ;
+- `source` et `target` doivent etre des personnages existants ;
+- la relation `source -> target` doit deja exister ;
+- la valeur finale est limitee entre `0` et `100` ;
+- les personnages modifies sont sauvegardes en JSON.
+
+## Exemple
+
+Etat initial :
+
+```json
+{
+  "attraction": 0,
+  "respect": 0
+}
+```
+
+Update valide :
 
 ```json
 {
   "changes": {
-    "attraction": 200
+    "attraction": 3,
+    "respect": 1
   }
 }
 ```
 
-## Exemples
-
-Premiere rencontre :
+Etat apres application :
 
 ```json
 {
-  "target_id": "elina",
-  "attraction": 20,
-  "trust": 0,
-  "respect": 10,
-  "attachment": 0,
-  "friendship": 0,
-  "jealousy": 0
+  "attraction": 3,
+  "respect": 1
 }
 ```
 
-Quelques semaines plus tard :
+## Limites Actuelles
 
-```json
-{
-  "target_id": "elina",
-  "attraction": 70,
-  "trust": 60,
-  "respect": 75,
-  "attachment": 55,
-  "friendship": 80,
-  "jealousy": 20
-}
-```
+- Le moteur ne cree pas encore une relation manquante.
+- Le moteur n'affiche pas encore un resume joli des changements.
+- Les changements sont sauvegardes directement dans les fichiers personnages.
+- Il n'y a pas encore de sauvegarde de partie separee.
 
 ## Regles Narratives
 
@@ -150,4 +149,4 @@ Quelques semaines plus tard :
 - L'attraction peut monter plus vite que l'attachement.
 - Le respect peut exister meme dans un conflit.
 - La jalousie ne signifie pas automatiquement amour.
-- Les relations doivent evoluer grace aux scenes et aux souvenirs.
+- Les relations doivent evoluer grace aux scenes, aux choix du joueur et aux souvenirs futurs.

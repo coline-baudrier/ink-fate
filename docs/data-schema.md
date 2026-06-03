@@ -55,7 +55,7 @@ Champs :
 
 ## Location
 
-Un lieu doit avoir au minimum :
+Un lieu doit avoir :
 
 ```json
 {
@@ -71,7 +71,7 @@ Champs :
 - `name` : nom affiche ou envoye au prompt.
 - `description` : contexte narratif du lieu.
 
-Pour le MVP, `description` devrait etre present sur tous les lieux utilises dans une scene.
+Important : le prompt builder lit actuellement `location["description"]`. Tout lieu pouvant devenir actif doit donc avoir une description.
 
 ## active_scene
 
@@ -109,11 +109,13 @@ Champs :
 - `initial_state` : ce que les personnages savent deja.
 - `initial_tensions` : tensions narratives de depart.
 
+Le prompt n'utilise pas encore directement `scenario.json`. Les regles canon sont encore ecrites dans `prompt_builder.py`.
+
 ## character.json
 
 Un personnage represente une entite narrative autonome.
 
-Structure cible minimale :
+Structure actuelle :
 
 ```json
 {
@@ -126,8 +128,7 @@ Structure cible minimale :
   "desires": [],
   "relationships": {},
   "current_goals": [],
-  "private_thoughts": [],
-  "memories": []
+  "private_thoughts": []
 }
 ```
 
@@ -143,7 +144,10 @@ Champs :
 - `relationships` : relations asymetriques vers les autres personnages.
 - `current_goals` : objectifs actifs dans la scene ou la journee.
 - `private_thoughts` : informations internes a utiliser avec prudence.
-- `memories` : souvenirs persistants, a ajouter progressivement.
+
+Champ futur :
+
+- `memories` : souvenirs persistants.
 
 ## relationship
 
@@ -154,20 +158,24 @@ Une relation est stockee du point de vue d'un personnage vers un autre.
   "friendship": 20,
   "trust": 10,
   "respect": 15,
-  "attraction": 30,
   "attachment": 0,
-  "jealousy": 0
+  "jealousy": 0,
+  "attraction": 30
 }
 ```
 
-Les relations sont asymetriques :
+Regles actuelles :
 
-- `dean -> elina` peut avoir une attraction forte ;
-- `elina -> dean` peut avoir une attraction faible.
+- les relations sont asymetriques ;
+- les valeurs sont entre `0` et `100` ;
+- les updates du LLM sont des deltas ;
+- les personnages sont sauvegardes apres application des updates.
 
 ## memory
 
-Un souvenir represente l'interpretation personnelle d'un evenement.
+Les souvenirs ne sont pas encore implementes dans les fichiers personnages.
+
+Structure cible :
 
 ```json
 {
@@ -179,15 +187,6 @@ Un souvenir represente l'interpretation personnelle d'un evenement.
   "tags": ["elina", "first_meeting"]
 }
 ```
-
-Champs :
-
-- `id` : identifiant du souvenir.
-- `owner` : personnage qui possede le souvenir.
-- `type` : `core`, `episodic`, `emotional` ou `secret`.
-- `importance` : valeur entre 1 et 100.
-- `content` : formulation subjective du souvenir.
-- `tags` : aide a la recuperation contextuelle.
 
 ## Regle Generale
 

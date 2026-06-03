@@ -19,5 +19,23 @@
   "fears": ["emotional_commitment"],
   "desires": ["freedom"],
   "current_goals": ["tease_beau"],
-  "private_thoughts": ["Elina seems more interesting than expected."]
+  "private_thoughts": ["Elina seems more interesting than expected."],
+  "relationships": {
+    "beau": {
+      "friendship": 95,
+      "trust": 90,
+      "respect": 90,
+      "attachment": 80,
+      "jealousy": 0,
+      "attraction": 0
+    },
+    "elina": {
+      "friendship": 0,
+      "trust": 0,
+      "respect": 0,
+      "attachment": 0,
+      "jealousy": 0,
+      "attraction": 0
+    }
+  }
 }

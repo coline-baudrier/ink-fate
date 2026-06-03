@@ -1,36 +1,43 @@
 # Ink & Fate
 
-Ink & Fate est un moteur de roman interactif alimente par l'intelligence artificielle.
+Ink & Fate est un prototype Python de moteur narratif IA pour roman interactif.
 
-Le but n'est pas de creer un simple chatbot de roleplay, mais un moteur narratif capable de faire vivre une histoire dans un univers peuple de personnages autonomes. Le joueur incarne son propre personnage, agit librement, et le monde reagit en fonction des personnages, de leurs objectifs, de leurs souvenirs, de leurs relations et du temps qui passe.
+Le but n'est pas de creer un simple chatbot de roleplay, mais un moteur capable de faire vivre une histoire dans un univers peuple de personnages autonomes. Le joueur incarne son propre personnage, agit librement, et le moteur genere la suite en tenant compte du contexte, de l'historique de scene et des relations entre personnages.
 
 ## Statut Actuel
 
-Le projet est actuellement un prototype CLI en Python.
+Le projet est actuellement un prototype CLI jouable.
 
 Ce qui existe deja :
 
 - chargement d'un univers depuis des fichiers JSON ;
-- chargement des personnages ;
-- construction d'un contexte de scene ;
+- chargement et sauvegarde des personnages ;
+- construction du contexte de scene active ;
 - generation d'un prompt structure pour le LLM ;
 - appel a l'API OpenAI ;
-- parsing d'une reponse JSON `SceneResult`.
+- parsing d'une reponse JSON `SceneResult` ;
+- boucle CLI avec entree joueur ;
+- historique de scene envoye au prompt ;
+- rendu texte simple ;
+- validation minimale du `SceneResult` ;
+- filtrage des dialogues/actions/evenements invalides ;
+- suppression des dialogues du personnage joueur ;
+- limitation des deltas relationnels ;
+- application et sauvegarde des mises a jour relationnelles.
 
 Ce qui n'existe pas encore :
 
-- boucle interactive avec entree joueur ;
-- validation complete du `SceneResult` ;
-- application des mises a jour du monde ;
-- sauvegarde de partie ;
-- memoire persistante ;
-- evolution effective des relations ;
+- validation complete de tous les champs du `SceneResult` ;
+- application des updates de temps et de scene ;
+- creation et sauvegarde de souvenirs ;
+- simulation hors champ ;
+- sauvegarde de partie separee ;
 - interface frontend ;
 - API FastAPI.
 
 ## MVP 1
 
-Le premier objectif jouable est volontairement limite :
+Le MVP 1 vise une boucle jouable simple :
 
 - un seul univers : `off-campus` ;
 - trois personnages : Elina, Beau et Dean ;
@@ -38,9 +45,10 @@ Le premier objectif jouable est volontairement limite :
 - stockage local en JSON ;
 - interface CLI ;
 - generation de scene par LLM ;
-- validation minimale du JSON ;
-- rendu lisible de la scene ;
-- mise a jour simple des relations, souvenirs et etat du monde.
+- validation minimale ;
+- rendu texte ;
+- evolution simple des relations ;
+- sauvegarde des personnages modifies.
 
 Voir [docs/mvp.md](docs/mvp.md) pour le perimetre exact.
 
@@ -66,7 +74,7 @@ Chaque partie doit pouvoir produire une histoire unique.
 - [MVP](docs/mvp.md) : perimetre de la premiere version jouable.
 - [Architecture](docs/architecture.md) : modules, flux actuel et flux cible.
 - [Schema de donnees](docs/data-schema.md) : structure des fichiers JSON.
-- [Game loop](docs/game-loop.md) : boucle de jeu attendue.
+- [Game loop](docs/game-loop.md) : boucle de jeu actuelle et cible.
 - [SceneResult](docs/scene-result.md) : contrat de sortie du LLM.
 - [Prompt builder](docs/prompt-builder.md) : construction du prompt narratif.
 - [Character system](docs/character-system.md) : structure des personnages.
@@ -81,7 +89,8 @@ Actuel :
 
 - Python ;
 - JSON local ;
-- OpenAI API.
+- OpenAI API ;
+- CLI.
 
 Prevues plus tard :
 
@@ -95,7 +104,7 @@ Prevues plus tard :
 Depuis la racine du projet :
 
 ```powershell
-python backend/main.py
+py .\backend\main.py
 ```
 
-Le prototype charge l'univers `off-campus`, construit une scene d'arrivee, demande une generation au LLM, puis affiche le prompt, la reponse brute et le `SceneResult` parse.
+Le prototype charge l'univers `off-campus`, genere une scene d'ouverture, attend une action du joueur, genere la suite, valide partiellement la reponse, applique les mises a jour relationnelles, puis sauvegarde les personnages.

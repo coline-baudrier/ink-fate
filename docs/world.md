@@ -10,52 +10,27 @@ Il ne doit pas decrire tout l'univers en detail. Il doit contenir seulement les 
 - quels evenements sont actifs ;
 - quelle scene est actuellement jouee.
 
-## Structure
-
-Structure actuelle :
+## Structure Actuelle
 
 ```json
 {
   "universe": {
-    "id": "",
-    "name": ""
+    "id": "off-campus",
+    "name": "Off Campus"
   },
   "timeline": {
-    "current_date": "",
-    "current_time": "",
-    "current_day": null
+    "current_date": "2026-09-01",
+    "current_time": "10:00",
+    "current_day": 1
   },
-  "player_character": "",
-  "locations": [
-    {
-      "id": "",
-      "name": "",
-      "description": ""
-    }
-  ],
-  "characters": [],
-  "active_events": [
-    {
-      "id": "",
-      "title": "",
-      "status": ""
-    }
-  ],
+  "player_character": "elina",
+  "locations": [],
+  "characters": ["dean", "beau", "elina"],
+  "active_events": [],
   "active_scene": {
-    "location": "",
-    "participants": []
+    "location": "campus",
+    "participants": ["beau", "elina", "dean"]
   }
-}
-```
-
-## universe
-
-Identifie l'univers charge.
-
-```json
-{
-  "id": "off-campus",
-  "name": "Off Campus"
 }
 ```
 
@@ -63,15 +38,7 @@ Identifie l'univers charge.
 
 Contient la date et l'heure courantes.
 
-```json
-{
-  "current_date": "2026-09-01",
-  "current_time": "10:00",
-  "current_day": 1
-}
-```
-
-Le moteur peut faire avancer le temps apres une scene ou une ellipse.
+Le moteur ne met pas encore a jour la timeline apres les scenes. Cette fonctionnalite appartient au futur `world_update_engine`.
 
 ## player_character
 
@@ -85,6 +52,8 @@ Regle importante :
 
 - le LLM ne doit pas controler les pensees, emotions, decisions ou dialogues de ce personnage.
 
+Le validator supprime aussi les dialogues generes pour ce personnage.
+
 ## locations
 
 Liste des lieux connus de l'univers.
@@ -97,7 +66,7 @@ Liste des lieux connus de l'univers.
 }
 ```
 
-Pour le MVP, chaque lieu utilise dans une scene devrait avoir une description.
+Pour le MVP, tout lieu utilise comme scene active doit avoir une `description`, car le prompt builder la lit directement.
 
 ## characters
 
@@ -123,7 +92,7 @@ Evenements importants en cours.
 ]
 ```
 
-Un evenement actif aide le prompt a comprendre la situation actuelle.
+Ces evenements ne sont pas encore injectes explicitement dans le prompt, mais ils font partie du world state cible.
 
 ## active_scene
 
@@ -138,18 +107,21 @@ Scene actuellement jouee.
 
 Le moteur utilise cette section pour construire le `SceneContext`.
 
-## Ce Que Le World State Ne Contient Pas
+La scene active n'est pas encore modifiee apres une generation.
 
-Pour le MVP, le world state ne gere pas :
+## Ce Que Le World State Ne Contient Pas Encore
+
+Pour le MVP actuel, le world state ne gere pas :
 
 - meteo detaillee ;
 - economie ;
 - inventaire ;
 - systeme de quetes ;
 - carte complete ;
-- simulation permanente.
-
-Ces elements pourront etre ajoutes plus tard seulement s'ils servent vraiment la narration.
+- simulation permanente ;
+- historique de partie sauvegarde ;
+- souvenirs persistants ;
+- updates de temps appliquees.
 
 ## Scenario
 
@@ -180,19 +152,4 @@ Exemple :
 }
 ```
 
-## Scenarios Futurs
-
-Plus tard, un univers pourra avoir plusieurs scenarios.
-
-```md
-off-campus/
-  characters/
-  world.json
-  scenarios/
-    arrival.json
-    summer_break.json
-    graduation.json
-    rival_team.json
-```
-
-Pour le MVP, un seul fichier `scenario.json` suffit.
+Pour l'instant, ce fichier sert surtout de reference de conception. Le prompt builder ne le consomme pas encore directement.

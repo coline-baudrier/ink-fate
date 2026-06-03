@@ -1,3 +1,9 @@
+"""Client OpenAI utilise par le prototype.
+
+Ce module charge la cle API depuis `.env`, cree le client OpenAI,
+puis expose une fonction simple pour envoyer un prompt et recuperer du texte.
+"""
+
 import os
 
 from dotenv import load_dotenv

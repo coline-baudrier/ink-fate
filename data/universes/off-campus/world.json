@@ -17,15 +17,18 @@
     },
     {
       "id": "dormitory",
-      "name": "Student Dormitory"
+      "name": "Briar Dormitory",
+      "description": "La résidence universitaire principale de Briar University, animée par les allées et venues constantes des étudiants, les soirées improvisées et les discussions tard dans la nuit."
     },
     {
       "id": "hockey_house",
-      "name": "Hockey House"
+      "name": "Hockey House",
+      "description": "La maison partagée par plusieurs joueurs de l'équipe de hockey de Briar University, connue pour son ambiance chaotique, ses fêtes fréquentes et la musique qui résonne presque en permanence."
     },
     {
       "id": "library",
-      "name": "University Library"
+      "name": "University Library",
+      "description": "La bibliothèque universitaire de Briar, calme et studieuse."
     }
   ],
   "characters": ["dean", "beau", "elina"],

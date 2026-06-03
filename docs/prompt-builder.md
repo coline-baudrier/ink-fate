@@ -16,171 +16,96 @@ Transformer :
 
 ```json
 {
-  "world_state": {},
+  "world": {},
   "scene_context": {},
   "player_input": "",
-  "relevant_memories": []
+  "scene_history": ""
 }
 ```
 
 en prompt narratif clair, stable et complet.
 
-## Pipeline
+## Pipeline Actuel
 
 ```md
-WorldState
--> Active Scene
--> Relevant Characters
--> Relevant Relationships
--> Relevant Memories
+World
+-> SceneContext
+-> Active Participants
+-> Scene History
 -> Player Input
 -> Narrative Rules
+-> Canon Rules
+-> JSON Rules
 -> Expected SceneResult Format
 -> LLM
 ```
 
-## Contenu Du Prompt
+## Contenu Du Prompt Actuel
 
-Le prompt doit contenir :
+Le prompt contient :
 
 - role du LLM ;
 - univers ;
 - date et heure ;
 - lieu actuel ;
 - description du lieu ;
+- personnage joueur ;
 - personnages presents ;
-- objectifs actuels des personnages ;
-- relations utiles ;
-- souvenirs pertinents ;
+- historique de scene ;
 - action du joueur ;
 - regles narratives ;
+- regles canon du scenario actuel ;
+- regles JSON ;
 - format JSON attendu.
 
-## Regle De Cout Et De Clarte
+## Historique
 
-Le prompt builder ne doit jamais envoyer toute la base.
+Le prompt recoit l'historique de scene.
 
-Il doit selectionner uniquement :
-
-- les personnages presents ;
-- les relations pertinentes ;
-- les souvenirs pertinents ;
-- les evenements utiles a la scene.
-
-Envoyer trop d'informations augmente les couts, brouille le contexte et augmente les incoherences.
-
-## Regles Narratives
-
-Le prompt doit rappeler au LLM :
+Cela permet au LLM de repondre a la suite de ce qui vient de se passer, au lieu de recommencer la scene depuis le debut.
 
 ```md
-- Ecrire en francais.
-- Respecter la personnalite des personnages.
-- Garder des emotions credibles.
-- Ne pas forcer la romance.
-- Ne pas inventer de lore majeur.
-- Ne pas controler le personnage joueur.
-- Ne pas narrer les pensees du joueur.
-- Ne pas ecrire de dialogue pour le joueur.
-- Retourner uniquement un JSON valide.
+SCENE HISTORY
+Previous scene:
+...
 ```
-
-## Role Systemique Du LLM
-
-Le role de base :
-
-```md
-You are the narrative engine of Ink & Fate.
-
-Your role is to generate coherent, emotionally believable and character-consistent scenes inside a living narrative world.
-
-Characters must behave according to their personality, memories, goals, emotions and relationships.
-
-You must always return a valid JSON SceneResult object.
-```
-
-## Etat Courant
-
-Exemple :
-
-```json
-{
-  "date": "2026-09-01",
-  "time": "10:00",
-  "location": "campus"
-}
-```
-
-## Scene Active
-
-Exemple :
-
-```json
-{
-  "participants": ["dean", "beau", "elina"]
-}
-```
-
-## Contexte Personnage
-
-Le prompt doit contenir seulement les personnages utiles a la scene.
-
-Exemple :
-
-```json
-{
-  "id": "dean",
-  "identity": {
-    "first_name": "Dean",
-    "last_name": "Di Laurentis"
-  },
-  "personality": {
-    "charisma": 95,
-    "humor": 95,
-    "loyalty": 90
-  },
-  "current_goals": ["tease_beau"]
-}
-```
-
-## Souvenirs Pertinents
-
-Exemple :
-
-```json
-[
-  {
-    "owner": "dean",
-    "content": "Beau is protective of Elina.",
-    "tags": ["beau", "elina"]
-  }
-]
-```
-
-Pour le MVP, la recuperation peut rester simple.
-
-Plus tard, elle devra tenir compte :
-
-- du personnage present ;
-- des tags ;
-- de l'importance ;
-- de la recence ;
-- du type de souvenir.
 
 ## Action Joueur
 
-Exemple :
+Si le joueur ecrit une action, elle est injectee dans le prompt :
 
 ```md
-Player action:
-Je reprends ma valise et je leve les yeux au ciel.
+The player wrote:
+Je leve les yeux au ciel.
+
+Continue the scene from this input.
 ```
 
-Le LLM peut decrire les actions visibles du joueur, mais il ne doit pas ajouter de pensees, emotions ou dialogues non fournis.
+Si aucune action n'est fournie, le prompt genere la scene d'ouverture.
+
+## Regles Joueur
+
+Le prompt rappelle que :
+
+- le joueur controle `elina` ;
+- le LLM ne doit pas ecrire de dialogue pour `elina` ;
+- le LLM ne doit pas decider les pensees, emotions ou choix de `elina` ;
+- si le joueur ecrit du dialogue, il est considere comme deja prononce par `elina`.
+
+## Regles Narratives Actuelles
+
+Le prompt donne aussi des consignes specifiques pour eviter que toutes les reponses passent par Beau :
+
+- Dean doit pouvoir repondre directement a Elina ;
+- le LLM doit suivre qui le joueur adresse ;
+- si Elina challenge Dean, Dean doit repondre a Elina ;
+- Dean peut taquiner Beau, mais la reaction principale doit viser Elina.
+
+Ces regles sont utiles pour le MVP, mais elles sont encore tres liees a l'univers `off-campus`.
 
 ## Format Attendu
 
-Le prompt doit inclure le format `SceneResult`.
+Le prompt demande actuellement :
 
 ```json
 {
@@ -190,18 +115,51 @@ Le prompt doit inclure le format `SceneResult`.
     "participants": []
   },
   "narration": [],
-  "dialogues": [],
-  "actions": [],
-  "events": [],
-  "world_updates": {},
-  "memory_updates": [],
-  "relationship_updates": [],
-  "next_hooks": []
+  "dialogues": [
+    {
+      "speaker": "",
+      "text": ""
+    }
+  ],
+  "actions": [
+    {
+      "character": "",
+      "type": "",
+      "target": ""
+    }
+  ],
+  "events": [
+    {
+      "type": "",
+      "participants": []
+    }
+  ],
+  "relationship_updates": [
+    {
+      "source": "",
+      "target": "",
+      "changes": {
+        "attraction": 0,
+        "respect": 0
+      }
+    }
+  ]
 }
 ```
 
-## Determinisme
+## Limites Actuelles
 
-Le prompt builder doit etre aussi deterministe que possible.
+- Les regles canon sont encore ecrites en dur dans `prompt_builder.py`.
+- Les relations existantes ne sont pas encore injectees dans le prompt.
+- Les souvenirs ne sont pas encore injectes.
+- Les descriptions de lieux doivent exister dans `world.json`.
 
-Pour un meme etat du monde et une meme action joueur, la structure logique du prompt doit rester stable. Cela rend le moteur plus facile a tester, valider et corriger.
+## Direction Future
+
+Plus tard, le prompt builder devrait lire davantage de donnees depuis :
+
+- `scenario.json` ;
+- les personnages ;
+- les relations ;
+- les souvenirs pertinents ;
+- les evenements actifs.

@@ -1,12 +1,12 @@
 # Roadmap
 
-La roadmap separe le prototype actuel, le MVP jouable et les extensions futures.
+La roadmap separe ce qui existe deja, ce qui est partiel et les extensions futures.
 
-## Phase 0 - Prototype Actuel
+## Phase 0 - Prototype De Base
 
-Statut : en cours.
+Statut : fait.
 
-Objectif :
+Livrables :
 
 - charger un univers ;
 - charger des personnages ;
@@ -15,44 +15,61 @@ Objectif :
 - appeler le LLM ;
 - parser un `SceneResult`.
 
-Travail restant dans cette phase :
-
-- stabiliser le parsing JSON ;
-- harmoniser le format attendu du `SceneResult` ;
-- ajouter un rendu texte simple.
-
 ## Phase 1 - Boucle Joueur CLI
 
-Objectif :
-
-- afficher la scene ;
-- lire une action joueur ;
-- regenerer la suite ;
-- continuer tant que le joueur joue.
+Statut : fait.
 
 Livrables :
 
-- boucle CLI ;
-- renderer texte ;
-- prompt incluant l'action joueur ;
-- interdiction explicite de controler le joueur.
+- afficher une scene d'ouverture ;
+- lire une action joueur ;
+- regenerer la suite ;
+- garder un historique de scene ;
+- continuer tant que le joueur joue ;
+- quitter avec `quit` ou `exit`.
 
 ## Phase 2 - Validation SceneResult
 
-Objectif :
+Statut : partiellement fait.
 
-- ne jamais appliquer aveuglement la sortie LLM.
+Deja fait :
 
-Livrables :
+- verification des listes/dictionnaires de base ;
+- suppression des dialogues invalides ;
+- suppression des dialogues du joueur ;
+- suppression des actions invalides ;
+- suppression des evenements invalides ou vides ;
+- suppression des updates relationnels invalides ;
+- limitation des deltas relationnels.
 
-- schema de validation ;
-- verification des champs obligatoires ;
-- verification des personnages ;
-- verification des lieux ;
-- limites sur les updates relationnelles ;
-- rejet ou correction des valeurs invalides.
+Reste a faire :
 
-## Phase 3 - Updates Du Monde
+- verifier les champs obligatoires de `scene` ;
+- verifier les lieux ;
+- verifier les types de chaque champ ;
+- gerer proprement un JSON incomplet ;
+- produire un rapport de validation lisible.
+
+## Phase 3 - Relations Persistantes
+
+Statut : partiellement fait.
+
+Deja fait :
+
+- appliquer les `relationship_updates` ;
+- limiter les valeurs finales entre `0` et `100` ;
+- sauvegarder les personnages modifies en JSON.
+
+Reste a faire :
+
+- creer une relation manquante si elle n'existe pas ;
+- afficher les changements relationnels de facon plus lisible ;
+- eviter de sauvegarder si aucune relation n'a change ;
+- tester les cas limites.
+
+## Phase 4 - Updates Du Monde
+
+Statut : a faire.
 
 Objectif :
 
@@ -62,12 +79,13 @@ Livrables :
 
 - avancee du temps ;
 - mise a jour de la scene active ;
+- changement de lieu ;
 - creation d'evenements ;
-- creation de souvenirs ;
-- application limitee des relations ;
-- sauvegarde JSON.
+- sauvegarde d'un etat de partie.
 
-## Phase 4 - Memoire Simple
+## Phase 5 - Memoire Simple
+
+Statut : a faire.
 
 Objectif :
 
@@ -78,10 +96,13 @@ Livrables :
 - souvenirs par personnage ;
 - importance de 1 a 100 ;
 - tags ;
+- sauvegarde JSON ;
 - recuperation simple par personnage present ;
 - injection selective dans le prompt.
 
-## Phase 5 - Ellipses Et Simulation Hors Champ
+## Phase 6 - Ellipses Et Simulation Hors Champ
+
+Statut : a faire.
 
 Objectif :
 
@@ -94,11 +115,9 @@ Livrables :
 - souvenirs hors champ ;
 - visibilite `visible`, `discoverable`, `hidden`.
 
-## Phase 6 - API Et Interface
+## Phase 7 - API Et Interface
 
-Objectif :
-
-- sortir du prototype CLI.
+Statut : futur.
 
 Livrables possibles :
 
@@ -109,11 +128,9 @@ Livrables possibles :
 - selection d'univers ;
 - historique de scenes.
 
-## Phase 7 - Systeme Narratif Avance
+## Phase 8 - Systeme Narratif Avance
 
-Objectif :
-
-- soutenir des histoires longues et complexes.
+Statut : futur.
 
 Livrables possibles :
 

@@ -10,9 +10,11 @@ Le LLM met en scene.
 
 Le moteur decide ce qui devient vrai.
 
-Le `SceneResult` est donc une proposition structuree. Avant application, il doit etre parse, valide, puis transforme en updates autorises.
+Le `SceneResult` est une proposition structuree. Avant application, il est parse, filtre, puis transforme en updates autorises.
 
-## Structure Cible MVP
+## Structure Actuelle MVP
+
+Le prompt demande actuellement ce format :
 
 ```json
 {
@@ -22,44 +24,41 @@ Le `SceneResult` est donc une proposition structuree. Avant application, il doit
     "participants": []
   },
   "narration": [],
-  "dialogues": [],
-  "actions": [],
-  "events": [],
-  "world_updates": {},
-  "memory_updates": [],
-  "relationship_updates": [],
-  "next_hooks": []
+  "dialogues": [
+    {
+      "speaker": "",
+      "text": ""
+    }
+  ],
+  "actions": [
+    {
+      "character": "",
+      "type": "",
+      "target": ""
+    }
+  ],
+  "events": [
+    {
+      "type": "",
+      "participants": []
+    }
+  ],
+  "relationship_updates": [
+    {
+      "source": "",
+      "target": "",
+      "changes": {
+        "attraction": 0,
+        "respect": 0
+      }
+    }
+  ]
 }
 ```
-
-## scene
-
-Contexte de la scene generee.
-
-```json
-{
-  "location": "campus",
-  "time": "10:15",
-  "participants": ["dean", "beau", "elina"]
-}
-```
-
-Regles :
-
-- `location` doit exister dans `world.json`.
-- `participants` doit contenir uniquement des personnages existants.
-- `time` doit rester coherent avec la timeline.
 
 ## narration
 
 Fragments narratifs lus par le joueur.
-
-```json
-[
-  "Dean remarque Elina presque aussitot.",
-  "Un sourire amusé traverse son visage."
-]
-```
 
 Regles :
 
@@ -84,7 +83,8 @@ Regles :
 
 - `speaker` doit etre un personnage existant ;
 - le LLM ne doit pas ecrire de dialogue pour le personnage joueur ;
-- le texte doit rester naturel et compatible avec le personnage.
+- le validator supprime tout dialogue dont le speaker est invalide ;
+- le validator supprime tout dialogue du personnage joueur.
 
 ## actions
 
@@ -103,12 +103,12 @@ Actions objectives qui peuvent etre comprises par le moteur.
 Regles :
 
 - `character` doit exister ;
-- `target` doit etre vide ou correspondre a une entite existante ;
-- `type` doit decrire une action objective, pas une emotion.
+- une action mal formee est ignoree ;
+- une action avec personnage invalide est supprimee.
 
 ## events
 
-Evenements importants a enregistrer.
+Evenements importants proposes par le LLM.
 
 ```json
 [
@@ -121,51 +121,10 @@ Evenements importants a enregistrer.
 
 Regles :
 
-- tous les dialogues ne sont pas des evenements ;
-- un evenement doit etre narrativement utile ;
-- les participants doivent exister.
-
-## world_updates
-
-Changements proposes sur l'etat du monde.
-
-```json
-{
-  "time_advanced_minutes": 10,
-  "new_scene_state": {
-    "location": "campus"
-  }
-}
-```
-
-Regles :
-
-- le moteur peut refuser une avancee de temps trop grande ;
-- un changement de lieu doit pointer vers un lieu existant ;
-- le LLM ne modifie pas directement `world.json`.
-
-## memory_updates
-
-Souvenirs proposes pour les personnages.
-
-```json
-[
-  {
-    "owner": "dean",
-    "type": "episodic",
-    "importance": 40,
-    "content": "Elina seemed confident during their first meeting.",
-    "tags": ["elina", "first_meeting"]
-  }
-]
-```
-
-Regles :
-
-- `owner` doit exister ;
-- `importance` doit etre entre 1 et 100 ;
-- le contenu doit etre subjectif ;
-- les tags doivent aider la recuperation future.
+- les participants doivent exister ;
+- les participants invalides sont retires ;
+- un evenement sans participant valide est supprime ;
+- les evenements ne sont pas encore sauvegardes dans un historique persistant.
 
 ## relationship_updates
 
@@ -177,8 +136,8 @@ Changements relationnels proposes.
     "source": "dean",
     "target": "elina",
     "changes": {
-      "attraction": 10,
-      "respect": 5
+      "attraction": 3,
+      "respect": 1
     }
   }
 ]
@@ -188,44 +147,37 @@ Regles :
 
 - les valeurs sont des deltas, pas des valeurs absolues ;
 - `source` et `target` doivent exister ;
-- le moteur limite les deltas ;
-- une relation reste asymetrique.
+- les deltas non numeriques sont ignores ;
+- les deltas sont limites entre `-5` et `5` ;
+- les valeurs finales de relation sont limitees entre `0` et `100` ;
+- les changements valides sont sauvegardes dans les fichiers personnages.
 
-Exemple :
+## Champs Futurs
 
-```md
-attraction: 200
-```
+Ces champs sont prevus dans la vision, mais pas encore utilises par le code actuel :
 
-doit etre refuse ou limite par le moteur.
+- `world_updates` ;
+- `memory_updates` ;
+- `next_hooks`.
 
-## next_hooks
+Ils pourront etre ajoutes quand le moteur aura un `world_update_engine` et un `memory_engine`.
 
-Pistes narratives ouvertes.
+## Validation Actuelle
 
-```json
-[
-  "Dean may try to see Elina again later.",
-  "Beau noticed Dean's interest."
-]
-```
+Avant application, le moteur verifie actuellement :
 
-Regles :
-
-- un hook n'est pas une verite obligatoire ;
-- il sert a guider les generations futures ;
-- il ne doit pas forcer une romance ou une decision joueur.
-
-## Validation Minimale
-
-Avant application, le moteur doit verifier :
-
-- JSON valide ;
-- champs obligatoires presents ;
-- types corrects ;
-- personnages existants ;
-- lieux existants ;
+- listes et dictionnaires de base ;
+- dialogues valides ;
 - pas de dialogue joueur ;
-- pas de pensees joueur ;
-- deltas relationnels acceptables ;
-- souvenirs avec importance valide.
+- actions valides ;
+- evenements valides ;
+- updates relationnels avec personnages valides ;
+- deltas relationnels limites.
+
+Validation restante a ajouter :
+
+- champs obligatoires de `scene` ;
+- lieux existants ;
+- types exacts de chaque champ ;
+- rapport d'erreur ou de nettoyage ;
+- validation des futurs souvenirs.

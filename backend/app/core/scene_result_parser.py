@@ -1,3 +1,9 @@
+"""Parsing de la reponse du LLM.
+
+Le LLM doit renvoyer du JSON sous forme de texte.
+Ce module transforme ce texte en dictionnaire Python.
+"""
+
 import json
 from typing import Any, Dict
 
