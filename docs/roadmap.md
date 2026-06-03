@@ -6,8 +6,6 @@ La roadmap separe ce qui existe deja, ce qui est partiel et les extensions futur
 
 Statut : fait.
 
-Livrables :
-
 - charger un univers ;
 - charger des personnages ;
 - construire un contexte de scene ;
@@ -19,14 +17,11 @@ Livrables :
 
 Statut : fait.
 
-Livrables :
-
-- afficher une scene d'ouverture ;
-- lire une action joueur ;
-- regenerer la suite ;
-- garder un historique de scene ;
-- continuer tant que le joueur joue ;
-- quitter avec `quit` ou `exit`.
+- scene d'ouverture ;
+- entree joueur ;
+- generation de suite ;
+- historique de scene ;
+- commande `quit` ou `exit`.
 
 ## Phase 2 - Validation SceneResult
 
@@ -40,104 +35,95 @@ Deja fait :
 - suppression des actions invalides ;
 - suppression des evenements invalides ou vides ;
 - suppression des updates relationnels invalides ;
-- limitation des deltas relationnels.
+- suppression des updates memoire invalides ;
+- limitation des deltas relationnels ;
+- limitation de l'importance des souvenirs.
 
 Reste a faire :
 
 - verifier les champs obligatoires de `scene` ;
 - verifier les lieux ;
 - verifier les types de chaque champ ;
-- gerer proprement un JSON incomplet ;
 - produire un rapport de validation lisible.
 
 ## Phase 3 - Relations Persistantes
 
-Statut : partiellement fait.
-
-Deja fait :
+Statut : fait pour le MVP.
 
 - appliquer les `relationship_updates` ;
 - limiter les valeurs finales entre `0` et `100` ;
 - sauvegarder les personnages modifies en JSON.
 
-Reste a faire :
+Ameliorations futures :
 
 - creer une relation manquante si elle n'existe pas ;
 - afficher les changements relationnels de facon plus lisible ;
-- eviter de sauvegarder si aucune relation n'a change ;
 - tester les cas limites.
 
-## Phase 4 - Updates Du Monde
+## Phase 4 - Memoire Simple
 
-Statut : a faire.
+Statut : partiellement fait.
 
-Objectif :
+Deja fait :
 
-- transformer un `SceneResult` valide en nouvel etat du monde.
+- demander des `memory_updates` au LLM ;
+- valider proprietaire et contenu ;
+- limiter l'importance ;
+- sauvegarder les souvenirs dans les personnages ;
+- reinjecter quelques souvenirs dans le prompt ;
+- vieillir les souvenirs.
 
-Livrables :
+Reste a faire :
 
-- avancee du temps ;
-- mise a jour de la scene active ;
-- changement de lieu ;
-- creation d'evenements ;
-- sauvegarde d'un etat de partie.
+- eviter de vieillir les souvenirs tout juste crees ;
+- mieux choisir les souvenirs pertinents ;
+- eviter les doublons ;
+- ajouter des types de souvenirs plus stricts.
 
-## Phase 5 - Memoire Simple
+## Phase 5 - Updates Du Monde
 
-Statut : a faire.
+Statut : partiellement fait.
 
-Objectif :
+Deja fait :
 
-- permettre aux personnages de se souvenir des evenements importants.
+- avancer l'heure ;
+- sauvegarder `world.json` ;
+- reconstruire le contexte de scene.
 
-Livrables :
+Reste a faire :
 
-- souvenirs par personnage ;
-- importance de 1 a 100 ;
-- tags ;
-- sauvegarde JSON ;
-- recuperation simple par personnage present ;
-- injection selective dans le prompt.
+- changer `active_scene` ;
+- changer de lieu ;
+- appliquer des `world_updates` depuis le `SceneResult` ;
+- gerer les jours quand minuit est depasse ;
+- enregistrer les evenements.
 
 ## Phase 6 - Ellipses Et Simulation Hors Champ
 
 Statut : a faire.
-
-Objectif :
-
-- simuler ce qui se passe quand le joueur laisse passer du temps.
-
-Livrables :
 
 - detection d'ellipses simples ;
 - evenements hors champ ;
 - souvenirs hors champ ;
 - visibilite `visible`, `discoverable`, `hidden`.
 
-## Phase 7 - API Et Interface
+## Phase 7 - Nettoyage Et Tests
+
+Statut : a faire.
+
+- tests unitaires du validator ;
+- tests du relationship engine ;
+- tests du memory engine ;
+- tests du time engine ;
+- nettoyage des accents dans les JSON ;
+- documentation a jour.
+
+## Phase 8 - API Et Interface
 
 Statut : futur.
-
-Livrables possibles :
 
 - API FastAPI ;
 - base SQLite ;
 - frontend React ou Vue ;
 - sauvegardes multiples ;
-- selection d'univers ;
-- historique de scenes.
-
-## Phase 8 - Systeme Narratif Avance
-
-Statut : futur.
-
-Livrables possibles :
-
-- arcs narratifs ;
-- systeme de secrets ;
-- messagerie ;
-- recherche avancee de souvenirs ;
-- simulation sociale plus riche ;
-- plusieurs univers ;
-- plusieurs personnages simultanes.
+- selection d'univers.

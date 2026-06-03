@@ -38,7 +38,9 @@ Il ne doit pas decrire tout l'univers en detail. Il doit contenir seulement les 
 
 Contient la date et l'heure courantes.
 
-Le moteur ne met pas encore a jour la timeline apres les scenes. Cette fonctionnalite appartient au futur `world_update_engine`.
+Le moteur met actuellement a jour l'heure apres chaque tour via `world_engine.py` et `time_engine.py`.
+
+La mise a jour reste simple : elle avance l'heure, mais ne gere pas encore les changements de jour complexes ou les ellipses longues.
 
 ## player_character
 

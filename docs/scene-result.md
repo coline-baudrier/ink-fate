@@ -1,20 +1,10 @@
 # SceneResult
 
-Le `SceneResult` est le contrat de sortie du LLM.
+Le `SceneResult` est le JSON produit par le LLM.
 
-Le LLM ne doit pas repondre avec du texte libre. Il doit produire un JSON exploitable par le moteur.
+Le LLM propose. Le moteur decide.
 
-## Philosophie
-
-Le LLM met en scene.
-
-Le moteur decide ce qui devient vrai.
-
-Le `SceneResult` est une proposition structuree. Avant application, il est parse, filtre, puis transforme en updates autorises.
-
-## Structure Actuelle MVP
-
-Le prompt demande actuellement ce format :
+## Structure Actuelle
 
 ```json
 {
@@ -24,160 +14,120 @@ Le prompt demande actuellement ce format :
     "participants": []
   },
   "narration": [],
-  "dialogues": [
-    {
-      "speaker": "",
-      "text": ""
-    }
-  ],
-  "actions": [
-    {
-      "character": "",
-      "type": "",
-      "target": ""
-    }
-  ],
-  "events": [
-    {
-      "type": "",
-      "participants": []
-    }
-  ],
-  "relationship_updates": [
-    {
-      "source": "",
-      "target": "",
-      "changes": {
-        "attraction": 0,
-        "respect": 0
-      }
-    }
-  ]
+  "dialogues": [],
+  "actions": [],
+  "events": [],
+  "relationship_updates": [],
+  "memory_updates": []
 }
 ```
 
 ## narration
 
-Fragments narratifs lus par le joueur.
+Texte narratif lu par le joueur.
 
-Regles :
-
-- la narration peut decrire le monde, les PNJ et les actions visibles du joueur ;
-- elle ne doit jamais decrire les pensees, emotions ou decisions internes du joueur ;
-- elle doit rester coherente avec le ton de l'univers.
+Le moteur l'affiche avec `renderer.py`.
 
 ## dialogues
 
-Dialogues separes de la narration.
+Dialogues des PNJ.
 
 ```json
-[
-  {
-    "speaker": "dean",
-    "text": "Alors, c'est toi la fameuse petite soeur de Beau ?"
-  }
-]
+{
+  "speaker": "dean",
+  "text": "Alors, tu comptes me provoquer toute la journee ?"
+}
 ```
 
-Regles :
+Regles actuelles :
 
-- `speaker` doit etre un personnage existant ;
-- le LLM ne doit pas ecrire de dialogue pour le personnage joueur ;
-- le validator supprime tout dialogue dont le speaker est invalide ;
-- le validator supprime tout dialogue du personnage joueur.
+- le speaker doit etre un personnage existant ;
+- le speaker ne doit pas etre le personnage joueur ;
+- les dialogues invalides sont supprimes.
 
 ## actions
 
-Actions objectives qui peuvent etre comprises par le moteur.
+Actions objectives proposees par le LLM.
 
 ```json
-[
-  {
-    "character": "dean",
-    "type": "notice",
-    "target": "elina"
-  }
-]
+{
+  "character": "dean",
+  "type": "tease",
+  "target": "elina"
+}
 ```
 
-Regles :
+Regle actuelle :
 
-- `character` doit exister ;
-- une action mal formee est ignoree ;
-- une action avec personnage invalide est supprimee.
+- `character` doit etre un personnage existant.
 
 ## events
 
-Evenements importants proposes par le LLM.
+Evenements importants proposes.
 
 ```json
-[
-  {
-    "type": "first_meeting",
-    "participants": ["dean", "elina"]
-  }
-]
+{
+  "type": "first_meeting",
+  "participants": ["dean", "elina"]
+}
 ```
 
-Regles :
+Regles actuelles :
 
-- les participants doivent exister ;
 - les participants invalides sont retires ;
 - un evenement sans participant valide est supprime ;
-- les evenements ne sont pas encore sauvegardes dans un historique persistant.
+- les evenements ne sont pas encore sauvegardes dans un journal.
 
 ## relationship_updates
 
-Changements relationnels proposes.
+Deltas relationnels proposes.
 
 ```json
-[
-  {
-    "source": "dean",
-    "target": "elina",
-    "changes": {
-      "attraction": 3,
-      "respect": 1
-    }
+{
+  "source": "dean",
+  "target": "elina",
+  "changes": {
+    "attraction": 3,
+    "respect": 1
   }
-]
+}
 ```
 
-Regles :
+Regles actuelles :
 
-- les valeurs sont des deltas, pas des valeurs absolues ;
 - `source` et `target` doivent exister ;
-- les deltas non numeriques sont ignores ;
+- les valeurs doivent etre des entiers ;
 - les deltas sont limites entre `-5` et `5` ;
-- les valeurs finales de relation sont limitees entre `0` et `100` ;
-- les changements valides sont sauvegardes dans les fichiers personnages.
+- les valeurs finales sont limitees entre `0` et `100`.
 
-## Champs Futurs
+## memory_updates
 
-Ces champs sont prevus dans la vision, mais pas encore utilises par le code actuel :
+Souvenirs proposes.
 
+```json
+{
+  "owner": "dean",
+  "type": "memory",
+  "content": "Elina challenged him directly.",
+  "importance": 5,
+  "age": 0,
+  "tags": ["elina", "challenge"]
+}
+```
+
+Regles actuelles :
+
+- `owner` doit etre un personnage existant ;
+- `content` doit etre une chaine non vide ;
+- `importance` est limitee entre `1` et `10`.
+
+## Champs Pas Encore Appliques
+
+Le moteur ne se sert pas encore de :
+
+- `scene.location` pour changer de lieu ;
+- `scene.time` pour regler l'heure ;
 - `world_updates` ;
-- `memory_updates` ;
 - `next_hooks`.
 
-Ils pourront etre ajoutes quand le moteur aura un `world_update_engine` et un `memory_engine`.
-
-## Validation Actuelle
-
-Avant application, le moteur verifie actuellement :
-
-- listes et dictionnaires de base ;
-- dialogues valides ;
-- pas de dialogue joueur ;
-- actions valides ;
-- evenements valides ;
-- updates relationnels avec personnages valides ;
-- deltas relationnels limites.
-
-Validation restante a ajouter :
-
-- champs obligatoires de `scene` ;
-- lieux existants ;
-- types exacts de chaque champ ;
-- rapport d'erreur ou de nettoyage ;
-- validation des futurs souvenirs.
+Ces champs pourront etre ajoutes quand le world engine sera plus avance.

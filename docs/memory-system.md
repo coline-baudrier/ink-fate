@@ -1,196 +1,84 @@
 # Memory System
 
-La memoire permet aux personnages de rester coherents sur le long terme.
+La memoire permet aux personnages de garder une trace subjective de ce qui arrive.
 
-Un personnage ne se souvient pas seulement d'un evenement objectif. Il se souvient de son interpretation personnelle de cet evenement.
+Un souvenir n'est pas seulement un evenement objectif. C'est ce qu'un personnage retient ou ressent a propos d'un moment.
 
-## Principe
+## Etat Actuel
 
-Evenement objectif :
+La memoire existe en version MVP.
 
-```json
-{
-  "type": "first_meeting",
-  "participants": ["dean", "elina"]
-}
-```
+Le moteur peut :
 
-Souvenir de Dean :
+- demander des `memory_updates` au LLM ;
+- verifier que le proprietaire du souvenir existe ;
+- verifier que le contenu est une chaine non vide ;
+- limiter l'importance entre `1` et `10` ;
+- ajouter les souvenirs au personnage concerne ;
+- sauvegarder les souvenirs dans les fichiers personnages ;
+- reinjecter quelques souvenirs importants dans le prompt ;
+- augmenter l'age des souvenirs.
+
+## Structure Actuelle
 
 ```json
 {
   "owner": "dean",
-  "content": "Elina was more confident than I expected."
-}
-```
-
-Souvenir d'Elina :
-
-```json
-{
-  "owner": "elina",
-  "content": "Dean was annoyingly charming."
-}
-```
-
-Le meme evenement peut donc produire plusieurs souvenirs differents.
-
-## Structure
-
-Structure cible :
-
-```json
-{
-  "id": "memory_001",
-  "owner": "dean",
-  "type": "episodic",
-  "importance": 40,
-  "content": "Elina seemed confident during their first meeting.",
-  "tags": ["elina", "first_meeting"],
-  "created_at": "2026-09-01 10:15"
+  "type": "memory",
+  "content": "Elina challenged Dean with confidence.",
+  "importance": 5,
+  "age": 0,
+  "tags": ["elina", "challenge"]
 }
 ```
 
 Champs :
 
-- `id` : identifiant stable.
-- `owner` : personnage qui possede le souvenir.
-- `type` : categorie du souvenir.
-- `importance` : valeur de 1 a 100.
-- `content` : interpretation subjective.
-- `tags` : aide a la recuperation.
-- `created_at` : date de creation.
+- `owner` : id du personnage qui possede le souvenir.
+- `type` : type libre pour l'instant.
+- `content` : souvenir subjectif.
+- `importance` : entier entre `1` et `10`.
+- `age` : age du souvenir.
+- `tags` : mots cles optionnels.
 
-## Types De Memoire
-
-### Core Memory
-
-Souvenir fondamental qui change rarement.
-
-```json
-{
-  "type": "core",
-  "content": "Beau is my brother."
-}
-```
-
-### Episodic Memory
-
-Souvenir d'un evenement vecu.
-
-```json
-{
-  "type": "episodic",
-  "content": "Dean carried my luggage on my first day at Briar."
-}
-```
-
-### Emotional Memory
-
-Souvenir centre sur une emotion.
-
-```json
-{
-  "type": "emotional",
-  "emotion": "attraction",
-  "content": "I felt unexpectedly comfortable around Dean."
-}
-```
-
-### Secret Memory
-
-Souvenir ou pensee qui ne doit pas etre revele directement.
-
-```json
-{
-  "type": "secret",
-  "content": "I think I might be starting to like Elina."
-}
-```
-
-## Importance
-
-Chaque souvenir a une importance entre `1` et `100`.
-
-Exemples :
-
-```json
-{
-  "importance": 95,
-  "content": "First kiss with Elina."
-}
-```
-
-```json
-{
-  "importance": 10,
-  "content": "Ate lunch with Garrett."
-}
-```
-
-## Tags
-
-Les tags permettent de retrouver les souvenirs pertinents.
-
-```json
-{
-  "tags": ["dean", "romance", "first_meeting"]
-}
-```
-
-## Recuperation Contextuelle
-
-Le moteur ne doit jamais envoyer toute la memoire d'un personnage au LLM.
-
-Il doit recuperer seulement les souvenirs pertinents selon :
-
-- les personnages presents ;
-- les tags ;
-- l'importance ;
-- la recence ;
-- le type de scene ;
-- les objectifs actuels.
-
-Pour le MVP, une recuperation simple suffit :
+## Flux Actuel
 
 ```md
-prendre les souvenirs du personnage qui mentionnent un participant de la scene.
+SceneResult
+-> remove_invalid_memory_updates
+-> clamp_memory_importance
+-> apply_memory_updates
+-> increase_memory_age
+-> save_characters
 ```
 
-Plus tard, la recuperation pourra devenir plus avancee.
+## Recuperation Dans Le Prompt
 
-## Decroissance
+`prompt_builder.py` lit les souvenirs des participants de la scene.
 
-Un souvenir peut perdre de l'importance avec le temps.
-
-Exemple :
+Il garde les souvenirs les plus importants et les ajoute dans :
 
 ```md
-95 -> 90 -> 85 -> 80
+RELEVANT MEMORIES
 ```
 
-Exceptions :
+Cela aide le LLM a rester coherent sur plusieurs tours.
 
-- le personnage y repense ;
-- un evenement le renforce ;
-- il est lie a une emotion forte ;
-- il est lie a une relation importante.
+## Limites Actuelles
 
-Cette decroissance est une fonctionnalite future, pas obligatoire pour le MVP 1.
+- Les souvenirs tout juste ajoutes vieillissent actuellement pendant le meme tour.
+- Les doublons ne sont pas encore detectes.
+- La recuperation est simple : elle trie surtout par importance.
+- Les types de souvenirs ne sont pas encore stricts.
+- Il n'y a pas encore d'id unique de souvenir.
 
-## MVP
+## Direction Future
 
-Pour le MVP 1, le systeme de memoire doit seulement :
+Plus tard, le moteur pourra :
 
-- accepter des `memory_updates` dans le `SceneResult` ;
-- verifier que le proprietaire existe ;
-- verifier que l'importance est entre 1 et 100 ;
-- sauvegarder les souvenirs ;
-- pouvoir reinjecter quelques souvenirs pertinents dans le prompt.
-
-## Regles
-
-- Un souvenir est subjectif.
-- Un evenement est objectif.
-- Un secret ne doit pas etre revele directement au joueur.
-- Le LLM peut proposer un souvenir, mais le moteur le valide.
+- creer des souvenirs avec un id stable ;
+- distinguer `core`, `episodic`, `emotional`, `secret` ;
+- eviter les doublons ;
+- recuperer selon les tags, la recence et les personnages presents ;
+- reduire l'importance des vieux souvenirs ;
+- proteger les secrets.

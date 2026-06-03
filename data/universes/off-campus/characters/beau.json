@@ -16,9 +16,19 @@
     "confidence": 80
   },
   "archetype": "protective_brother",
-  "goals": ["succeed_at_college", "protect_elina", "maintain_friendships"],
-  "fears": ["failing_family", "seeing_elina_hurt"],
-  "desires": ["stability", "family_happiness"],
+  "goals": [
+    "succeed_at_college",
+    "protect_elina",
+    "maintain_friendships"
+  ],
+  "fears": [
+    "failing_family",
+    "seeing_elina_hurt"
+  ],
+  "desires": [
+    "stability",
+    "family_happiness"
+  ],
   "relationships": {
     "dean": {
       "friendship": 95,
@@ -37,6 +47,11 @@
       "attraction": 0
     }
   },
-  "current_goals": ["help_elina_settle_in"],
-  "private_thoughts": ["Dean better stay away from my sister."]
+  "current_goals": [
+    "help_elina_settle_in"
+  ],
+  "private_thoughts": [
+    "Dean better stay away from my sister."
+  ],
+  "memories": []
 }

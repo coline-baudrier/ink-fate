@@ -13,75 +13,20 @@ from app.core.character_loader import (
     save_characters,
 )
 from app.core.json_loader import load_json
-from app.core.openai_client import generate_text
-from app.core.prompt_builder import build_structured_scene_prompt
 from app.core.renderer import render_scene_result
 from app.core.scene_context import build_scene_context
-from app.core.scene_result_parser import parse_scene_result
-from app.core.scene_validator import (
-    clamp_relationship_updates,
-    remove_invalid_actions,
-    remove_invalid_dialogues,
-    remove_invalid_events,
-    remove_invalid_relationship_updates,
-    remove_player_dialogues,
-)
 from app.core.relationship_engine import apply_relationship_updates
+from app.core.memory_engine import apply_memory_updates, increase_memory_age
+from app.core.scene_pipeline import generate_scene
+from app.core.world_engine import (
+    rebuild_scene_context,
+    save_world,
+    update_world_after_scene,
+)
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 UNIVERSE_PATH = PROJECT_ROOT / "data" / "universes" / "off-campus"
-
-
-def generate_scene(
-    world: Dict[str, Any],
-    scene_context: Dict[str, Any],
-    player_input: str | None = None,
-    scene_history: str | None = None,
-) -> Dict[str, Any]:
-    """Genere, parse et filtre une scene produite par le LLM."""
-
-    prompt = build_structured_scene_prompt(
-        world,
-        scene_context,
-        player_input,
-        scene_history,
-    )
-
-    scene_response = generate_text(prompt)
-    scene_result = parse_scene_result(scene_response)
-
-    valid_character_ids = world["characters"]
-
-    # Le validator nettoie les morceaux du JSON que le moteur ne doit pas accepter.
-    scene_result = remove_invalid_dialogues(
-        scene_result,
-        valid_character_ids,
-    )
-
-    scene_result = remove_invalid_actions(
-        scene_result,
-        valid_character_ids,
-    )
-
-    scene_result = remove_invalid_events(
-        scene_result,
-        valid_character_ids,
-    )
-
-    scene_result = remove_invalid_relationship_updates(
-        scene_result,
-        valid_character_ids,
-    )
-
-    scene_result = remove_player_dialogues(
-        scene_result,
-        world["player_character"],
-    )
-
-    scene_result = clamp_relationship_updates(scene_result)
-
-    return scene_result
 
 
 def print_project_header(world: Dict[str, Any]) -> None:
@@ -142,6 +87,25 @@ def print_rendered_scene(
     print(rendered_scene)
 
 
+def update_characters_from_scene(
+    scene_result: Dict[str, Any],
+    characters: Dict[str, Dict[str, Any]],
+) -> Dict[str, Dict[str, Any]]:
+    """Applique les effets persistants d'une scene aux personnages."""
+
+    characters = apply_relationship_updates(
+        scene_result,
+        characters,
+    )
+
+    characters = apply_memory_updates(
+        scene_result,
+        characters,
+    )
+
+    return characters
+
+
 def main() -> None:
     """Lance le prototype CLI."""
 
@@ -190,31 +154,34 @@ def main() -> None:
             scene_history,
         )
 
-        characters = apply_relationship_updates(
+        characters = update_characters_from_scene(
             next_scene,
             characters,
         )
 
-        # Les relations modifiees sont sauvegardees directement dans les JSON.
+        characters = increase_memory_age(
+            characters,
+        )
+
+        world = update_world_after_scene(
+            world,
+        )
+
+        save_world(
+            UNIVERSE_PATH / "world.json",
+            world,
+        )
+
+        scene_context = rebuild_scene_context(
+            world,
+            characters,
+        )
+
+        # Les changements persistants sont sauvegardes directement dans les JSON.
         save_characters(
             UNIVERSE_PATH / "characters",
             characters,
         )
-
-        print()
-        print("Updated relationships:")
-        print("----------------------")
-
-        for character_id, character in characters.items():
-            print(character_id)
-
-            relationships = character.get(
-                "relationships",
-                {}
-            )
-
-            print(relationships)
-            print()
 
         print_rendered_scene(
             "Next scene",

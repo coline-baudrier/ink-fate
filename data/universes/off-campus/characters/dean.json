@@ -15,11 +15,21 @@
     "commitment_fear": 85
   },
   "archetype": "charmer",
-  "goals": ["enjoy_college_life"],
-  "fears": ["emotional_commitment"],
-  "desires": ["freedom"],
-  "current_goals": ["tease_beau"],
-  "private_thoughts": ["Elina seems more interesting than expected."],
+  "goals": [
+    "enjoy_college_life"
+  ],
+  "fears": [
+    "emotional_commitment"
+  ],
+  "desires": [
+    "freedom"
+  ],
+  "current_goals": [
+    "tease_beau"
+  ],
+  "private_thoughts": [
+    "Elina seems more interesting than expected."
+  ],
   "relationships": {
     "beau": {
       "friendship": 95,
@@ -32,10 +42,23 @@
     "elina": {
       "friendship": 0,
       "trust": 0,
-      "respect": 0,
+      "respect": 3,
       "attachment": 0,
       "jealousy": 0,
-      "attraction": 0
+      "attraction": 2
     }
-  }
+  },
+  "memories": [
+    {
+      "owner": "dean",
+      "type": "memory",
+      "content": "Elina a exprimé qu'elle lui avait manqué, renforçant leur complicité.",
+      "importance": 5,
+      "tags": [
+        "complicité",
+        "retour"
+      ],
+      "age": 2
+    }
+  ]
 }

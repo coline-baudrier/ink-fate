@@ -33,6 +33,7 @@ def build_structured_scene_prompt(
     player_context = build_player_context(player_input)
     expected_json_format = build_expected_json_format()
     scene_history_context = build_scene_history_context(scene_history)
+    memory_context = build_memory_context(scene_context)
 
     # Le prompt est volontairement separe en sections lisibles.
     prompt = f"""
@@ -60,6 +61,9 @@ ACTIVE PARTICIPANTS
 SCENE HISTORY
 {scene_history_context}
 
+RELEVANT MEMORIES
+{memory_context}
+
 PLAYER INPUT
 {player_context}
 
@@ -82,6 +86,9 @@ NARRATIVE RULES
 - If the player directly addresses Dean, Dean must answer Elina directly.
 - Do not redirect Dean's answer toward Beau unless the player explicitly mentions Beau.
 - Dean can tease Beau briefly, but the main reaction must target Elina.
+- Characters should remember emotionally or socially significant moments.
+- When a player input creates emotional tension, intimacy, teasing or vulnerability, relationship_updates should reflect it.
+- If Dean reacts positively to Elina, update dean -> elina accordingly.
 
 CANON RULES
 - Elina is arriving on campus with luggage.
@@ -103,6 +110,11 @@ JSON RULES
 - Never include "elina" as a speaker in dialogues.
 - Never generate dialogue for elina.
 - If the player writes dialogue, treat it as already spoken by elina and only generate reactions from other characters.
+- memory_updates must use character IDs.
+- memory owner must be one of the active participants.
+- importance must be an integer between 1 and 10.
+- Only create memories for narratively meaningful moments.
+- Do not create memories for every line of dialogue.
 
 EXPECTED JSON FORMAT
 {expected_json_format}
@@ -179,6 +191,16 @@ def build_expected_json_format() -> str:
         "respect": 0
       }
     }
+  ],
+  "memory_updates": [
+    {
+      "owner": "",
+      "type": "",
+      "content": "",
+      "importance": 0,
+      "age": 0,
+      "tags": []
+    }
   ]
 }
 """.strip()
@@ -194,3 +216,61 @@ Previous scene :
 """.strip()
 
     return "No previous scene yet."
+
+def build_memory_context(
+    scene_context: Dict[str, Any],
+) -> str:
+    """
+    Construit le contexte mémoire envoyé au LLM.
+    """
+
+    memory_lines = []
+
+    for character in scene_context["participants"]:
+        first_name = character["identity"]["first_name"]
+
+        memories = character.get(
+            "memories",
+            [],
+        )
+
+        if not memories:
+            continue
+
+        memory_lines.append(
+            f"{first_name} memories:"
+        )
+
+        sorted_memories = sorted(
+            memories,
+            key=lambda memory: memory.get(
+                "importance",
+                0,
+            ),
+            reverse=True,
+        )
+
+        top_memories = sorted_memories[:5]
+
+        for memory in top_memories:
+            content = memory.get(
+                "content",
+                "",
+            )
+
+            importance = memory.get(
+                "importance",
+                0,
+            )
+
+            memory_lines.append(
+                f'- {content} '
+                f'(importance: {importance})'
+            )
+
+        memory_lines.append("")
+
+    if not memory_lines:
+        return "No important memories yet."
+
+    return "\n".join(memory_lines)

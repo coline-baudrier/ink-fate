@@ -206,3 +206,69 @@ def clamp_relationship_updates(
     scene_result["relationship_updates"] = relationship_updates
 
     return scene_result
+
+def remove_invalid_memory_updates(
+    scene_result: Dict[str, Any],
+    valid_character_ids: list[str],
+) -> Dict[str, Any]:
+    """Supprime les souvenirs invalides."""
+
+    valid_memories = []
+
+    memory_updates = ensure_list(
+        scene_result.get("memory_updates", [])
+    )
+
+    for memory in memory_updates:
+        if not isinstance(memory, dict):
+            continue
+
+        owner = memory.get("owner")
+        content = memory.get("content")
+
+        if owner not in valid_character_ids:
+            continue
+
+        if not isinstance(content, str):
+            continue
+
+        if not content.strip():
+            continue
+
+        valid_memories.append(memory)
+
+    scene_result["memory_updates"] = valid_memories
+
+    return scene_result
+
+def clamp_memory_importance(
+    scene_result: Dict[str, Any],
+    min_value: int = 1,
+    max_value: int = 10,
+) -> Dict[str, Any]:
+    """Valide et limite l'importance des souvenirs."""
+
+    memory_updates = ensure_list(
+        scene_result.get("memory_updates", [])
+    )
+
+    for memory in memory_updates:
+        if not isinstance(memory, dict):
+            continue
+
+        importance = memory.get("importance", min_value)
+
+        if not isinstance(importance, int):
+            importance = min_value
+
+        if importance < min_value:
+            importance = min_value
+
+        if importance > max_value:
+            importance = max_value
+
+        memory["importance"] = importance
+
+    scene_result["memory_updates"] = memory_updates
+
+    return scene_result

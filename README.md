@@ -13,23 +13,26 @@ Ce qui existe deja :
 - chargement d'un univers depuis des fichiers JSON ;
 - chargement et sauvegarde des personnages ;
 - construction du contexte de scene active ;
+- pipeline de generation et validation de scene ;
 - generation d'un prompt structure pour le LLM ;
 - appel a l'API OpenAI ;
 - parsing d'une reponse JSON `SceneResult` ;
 - boucle CLI avec entree joueur ;
 - historique de scene envoye au prompt ;
+- souvenirs pertinents reinjectes au prompt ;
 - rendu texte simple ;
 - validation minimale du `SceneResult` ;
 - filtrage des dialogues/actions/evenements invalides ;
 - suppression des dialogues du personnage joueur ;
 - limitation des deltas relationnels ;
-- application et sauvegarde des mises a jour relationnelles.
+- application et sauvegarde des mises a jour relationnelles ;
+- creation et sauvegarde de souvenirs ;
+- avancee et sauvegarde du temps dans `world.json`.
 
 Ce qui n'existe pas encore :
 
 - validation complete de tous les champs du `SceneResult` ;
-- application des updates de temps et de scene ;
-- creation et sauvegarde de souvenirs ;
+- changement de lieu et de scene active ;
 - simulation hors champ ;
 - sauvegarde de partie separee ;
 - interface frontend ;
@@ -48,7 +51,9 @@ Le MVP 1 vise une boucle jouable simple :
 - validation minimale ;
 - rendu texte ;
 - evolution simple des relations ;
-- sauvegarde des personnages modifies.
+- souvenirs simples ;
+- avancee du temps ;
+- sauvegarde des personnages et du monde.
 
 Voir [docs/mvp.md](docs/mvp.md) pour le perimetre exact.
 
@@ -70,6 +75,7 @@ Chaque partie doit pouvoir produire une histoire unique.
 
 ## Documentation
 
+- [Comment ca fonctionne](docs/how-it-works.md) : guide simple du projet et des interactions entre fichiers.
 - [Vision](docs/vision.md) : experience cible et philosophie du moteur.
 - [MVP](docs/mvp.md) : perimetre de la premiere version jouable.
 - [Architecture](docs/architecture.md) : modules, flux actuel et flux cible.
@@ -107,4 +113,4 @@ Depuis la racine du projet :
 py .\backend\main.py
 ```
 
-Le prototype charge l'univers `off-campus`, genere une scene d'ouverture, attend une action du joueur, genere la suite, valide partiellement la reponse, applique les mises a jour relationnelles, puis sauvegarde les personnages.
+Le prototype charge l'univers `off-campus`, genere une scene d'ouverture, attend une action du joueur, genere la suite, valide partiellement la reponse, applique les relations, les souvenirs, avance le temps, puis sauvegarde les personnages et le monde.

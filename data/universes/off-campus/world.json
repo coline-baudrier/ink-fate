@@ -5,7 +5,7 @@
   },
   "timeline": {
     "current_date": "2026-09-01",
-    "current_time": "10:00",
+    "current_time": "10:10",
     "current_day": 1
   },
   "player_character": "elina",
@@ -31,7 +31,11 @@
       "description": "La bibliothèque universitaire de Briar, calme et studieuse."
     }
   ],
-  "characters": ["dean", "beau", "elina"],
+  "characters": [
+    "dean",
+    "beau",
+    "elina"
+  ],
   "active_events": [
     {
       "id": "arrival_day",
@@ -41,6 +45,10 @@
   ],
   "active_scene": {
     "location": "campus",
-    "participants": ["beau", "elina", "dean"]
+    "participants": [
+      "beau",
+      "elina",
+      "dean"
+    ]
   }
 }
