@@ -12,12 +12,20 @@ def build_scene_context(
 
     participants: List[Dict[str, Any]] = []
 
+    location_id = active_scene["location"]
+
+    location = next(
+        location
+        for location in world["locations"]
+        if location["id"] == location_id
+    )
+
     for character_id in participant_ids:
         character = characters[character_id]
         participants.append(character)
 
     scene_context = {
-    "location": active_scene["location"],
+    "location": location,
     "date": world["timeline"]["current_date"],
     "time": world["timeline"]["current_time"],
     "participants": participants

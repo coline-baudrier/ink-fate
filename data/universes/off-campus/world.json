@@ -12,7 +12,8 @@
   "locations": [
     {
       "id": "campus",
-      "name": "Briar University Campus"
+      "name": "Briar University Campus",
+      "description": "Le campus de Briar University, une université américaine contemporaine connue notamment pour son équipe de hockey."
     },
     {
       "id": "dormitory",
@@ -37,6 +38,6 @@
   ],
   "active_scene": {
     "location": "campus",
-    "participants": ["beau", "elina"]
+    "participants": ["beau", "elina", "dean"]
   }
 }
