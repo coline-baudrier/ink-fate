@@ -1,10 +1,10 @@
-# Relationship System
+# 💞 Relationship System
 
 Le relationship system suit ce qu'un personnage ressent envers un autre.
 
 Les relations sont asymetriques, multidimensionnelles et stockees directement dans les fichiers personnages.
 
-## Dimensions
+## 📐 Dimensions
 
 Structure actuelle :
 
@@ -19,7 +19,7 @@ Structure actuelle :
 }
 ```
 
-## Definitions
+## 📖 Definitions
 
 - `attraction` : est-ce que cette personne me plait ?
 - `trust` : est-ce que je lui fais confiance ?
@@ -28,7 +28,7 @@ Structure actuelle :
 - `friendship` : est-ce que j'aime passer du temps avec elle ?
 - `jealousy` : est-ce que ses interactions avec les autres m'affectent ?
 
-## Asymetrie
+## ↔️ Asymetrie
 
 Une relation est stockee du point de vue d'un personnage.
 
@@ -57,7 +57,7 @@ Exemple :
 
 Dean peut etre attire par Elina sans que l'inverse soit vrai.
 
-## Valeurs
+## 🔢 Valeurs
 
 Chaque dimension doit rester entre `0` et `100`.
 
@@ -69,7 +69,7 @@ Interpretation indicative :
 - `75` : fort ;
 - `100` : maximum.
 
-## Updates Actuels
+## 🔁 Updates Actuels
 
 Le LLM propose des deltas dans `relationship_updates`.
 
@@ -104,7 +104,7 @@ Regles actuelles :
 - la valeur finale est limitee entre `0` et `100` ;
 - les personnages modifies sont sauvegardes en JSON.
 
-## Exemple
+## 🧪 Exemple
 
 Etat initial :
 
@@ -135,14 +135,14 @@ Etat apres application :
 }
 ```
 
-## Limites Actuelles
+## 🚧 Limites Actuelles
 
 - Le moteur ne cree pas encore une relation manquante.
 - Le moteur n'affiche pas encore un resume joli des changements.
 - Les changements sont sauvegardes directement dans les fichiers personnages.
 - Il n'y a pas encore de sauvegarde de partie separee.
 
-## Regles Narratives
+## ✨ Regles Narratives
 
 - Une romance ne doit pas etre forcee.
 - La confiance monte lentement.

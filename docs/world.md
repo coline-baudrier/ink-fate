@@ -1,4 +1,4 @@
-# World
+# 🌍 World
 
 Le world state represente l'etat courant du monde.
 
@@ -10,7 +10,7 @@ Il ne doit pas decrire tout l'univers en detail. Il doit contenir seulement les 
 - quels evenements sont actifs ;
 - quelle scene est actuellement jouee.
 
-## Structure Actuelle
+## 🗂️ Structure Actuelle
 
 ```json
 {
@@ -34,7 +34,7 @@ Il ne doit pas decrire tout l'univers en detail. Il doit contenir seulement les 
 }
 ```
 
-## timeline
+## 🕰️ timeline
 
 Contient la date et l'heure courantes.
 
@@ -42,7 +42,7 @@ Le moteur met actuellement a jour l'heure apres chaque tour via `world_engine.py
 
 La mise a jour reste simple : elle avance l'heure, mais ne gere pas encore les changements de jour complexes ou les ellipses longues.
 
-## player_character
+## 👤 player_character
 
 Identifiant du personnage controle par le joueur.
 
@@ -56,7 +56,7 @@ Regle importante :
 
 Le validator supprime aussi les dialogues generes pour ce personnage.
 
-## locations
+## 📍 locations
 
 Liste des lieux connus de l'univers.
 
@@ -70,7 +70,7 @@ Liste des lieux connus de l'univers.
 
 Pour le MVP, tout lieu utilise comme scene active doit avoir une `description`, car le prompt builder la lit directement.
 
-## characters
+## 👥 characters
 
 Liste des identifiants de personnages a charger.
 
@@ -80,7 +80,7 @@ Liste des identifiants de personnages a charger.
 
 Les donnees completes sont stockees dans `characters/*.json`.
 
-## active_events
+## 📌 active_events
 
 Evenements importants en cours.
 
@@ -96,7 +96,7 @@ Evenements importants en cours.
 
 Ces evenements ne sont pas encore injectes explicitement dans le prompt, mais ils font partie du world state cible.
 
-## active_scene
+## 🎬 active_scene
 
 Scene actuellement jouee.
 
@@ -111,7 +111,7 @@ Le moteur utilise cette section pour construire le `SceneContext`.
 
 La scene active n'est pas encore modifiee apres une generation.
 
-## Ce Que Le World State Ne Contient Pas Encore
+## 🚧 Ce Que Le World State Ne Contient Pas Encore
 
 Pour le MVP actuel, le world state ne gere pas :
 
@@ -125,7 +125,7 @@ Pour le MVP actuel, le world state ne gere pas :
 - souvenirs persistants ;
 - updates de temps appliquees.
 
-## Scenario
+## 📖 Scenario
 
 Le scenario ne contient pas l'histoire complete.
 

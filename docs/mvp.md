@@ -1,8 +1,8 @@
-# MVP 1
+# 🎮 MVP 1
 
 Le MVP 1 vise une boucle jouable simple dans la CLI.
 
-## Inclus Aujourd'hui
+## ✅ Inclus Aujourd'hui
 
 - un seul univers : `off-campus` ;
 - trois personnages : Elina, Beau et Dean ;
@@ -18,7 +18,7 @@ Le MVP 1 vise une boucle jouable simple dans la CLI.
 - temps qui avance ;
 - sauvegarde de `world.json` et des personnages.
 
-## Encore Partiel
+## 🚧 Encore Partiel
 
 - validation complete de `scene` ;
 - changement de lieu ;
@@ -28,7 +28,7 @@ Le MVP 1 vise une boucle jouable simple dans la CLI.
 - detection d'ellipses ;
 - sauvegarde de partie separee.
 
-## Exclu Du MVP
+## ⛔ Exclu Du MVP
 
 - frontend ;
 - API FastAPI ;
@@ -37,7 +37,7 @@ Le MVP 1 vise une boucle jouable simple dans la CLI.
 - simulation permanente ;
 - systeme d'arcs narratifs complet.
 
-## Boucle MVP Actuelle
+## 🔁 Boucle MVP Actuelle
 
 ```md
 Joueur
@@ -55,7 +55,7 @@ Joueur
 -> Joueur
 ```
 
-## Priorite De Conception
+## 🧠 Priorite De Conception
 
 Le LLM propose.
 

@@ -1,10 +1,10 @@
-# Schema De Donnees
+# 🗂️ Schema De Donnees
 
 Les donnees d'Ink & Fate sont stockees en JSON pendant le MVP.
 
 Le moteur doit rester independant des univers. Les fichiers JSON decrivent l'univers, les personnages, les lieux et l'etat courant.
 
-## Arborescence Actuelle
+## 🌳 Arborescence Actuelle
 
 ```md
 data/
@@ -18,7 +18,7 @@ data/
         dean.json
 ```
 
-## world.json
+## 🌍 world.json
 
 `world.json` represente l'etat global actuel de l'univers.
 
@@ -53,7 +53,7 @@ Champs :
 - `active_events` : evenements importants en cours.
 - `active_scene` : scene actuellement jouee.
 
-## Location
+## 📍 Location
 
 Un lieu doit avoir :
 
@@ -73,7 +73,7 @@ Champs :
 
 Important : le prompt builder lit actuellement `location["description"]`. Tout lieu pouvant devenir actif doit donc avoir une description.
 
-## active_scene
+## 🎬 active_scene
 
 La scene active indique ou se passe la scene et quels personnages sont presents.
 
@@ -89,7 +89,7 @@ Champs :
 - `location` : identifiant d'un lieu existant.
 - `participants` : identifiants de personnages charges.
 
-## scenario.json
+## 📖 scenario.json
 
 `scenario.json` decrit le point de depart narratif.
 
@@ -111,7 +111,7 @@ Champs :
 
 Le prompt n'utilise pas encore directement `scenario.json`. Les regles canon sont encore ecrites dans `prompt_builder.py`.
 
-## character.json
+## 👤 character.json
 
 Un personnage represente une entite narrative autonome.
 
@@ -149,7 +149,7 @@ Champ futur :
 
 - `memories` : souvenirs persistants.
 
-## relationship
+## 💞 relationship
 
 Une relation est stockee du point de vue d'un personnage vers un autre.
 
@@ -171,7 +171,7 @@ Regles actuelles :
 - les updates du LLM sont des deltas ;
 - les personnages sont sauvegardes apres application des updates.
 
-## memory
+## 🧠 memory
 
 Les souvenirs ne sont pas encore implementes dans les fichiers personnages.
 
@@ -188,7 +188,7 @@ Structure cible :
 }
 ```
 
-## Regle Generale
+## 🧠 Regle Generale
 
 Les JSON representent la verite du moteur.
 

@@ -1,4 +1,4 @@
-# Prompt Builder
+# 🧵 Prompt Builder
 
 Le prompt builder construit le contexte envoye au LLM.
 
@@ -10,7 +10,7 @@ Continue l'histoire.
 
 Il doit envoyer un contexte structure qui permet au LLM de generer une scene coherente et exploitable.
 
-## Objectif
+## 🎯 Objectif
 
 Transformer :
 
@@ -25,7 +25,7 @@ Transformer :
 
 en prompt narratif clair, stable et complet.
 
-## Pipeline Actuel
+## 🔁 Pipeline Actuel
 
 ```md
 World
@@ -40,7 +40,7 @@ World
 -> LLM
 ```
 
-## Contenu Du Prompt Actuel
+## 📦 Contenu Du Prompt Actuel
 
 Le prompt contient :
 
@@ -58,7 +58,7 @@ Le prompt contient :
 - regles JSON ;
 - format JSON attendu.
 
-## Historique
+## 🕰️ Historique
 
 Le prompt recoit l'historique de scene.
 
@@ -70,7 +70,7 @@ Previous scene:
 ...
 ```
 
-## Action Joueur
+## ✍️ Action Joueur
 
 Si le joueur ecrit une action, elle est injectee dans le prompt :
 
@@ -83,7 +83,7 @@ Continue the scene from this input.
 
 Si aucune action n'est fournie, le prompt genere la scene d'ouverture.
 
-## Regles Joueur
+## 🛡️ Regles Joueur
 
 Le prompt rappelle que :
 
@@ -92,7 +92,7 @@ Le prompt rappelle que :
 - le LLM ne doit pas decider les pensees, emotions ou choix de `elina` ;
 - si le joueur ecrit du dialogue, il est considere comme deja prononce par `elina`.
 
-## Regles Narratives Actuelles
+## ✨ Regles Narratives Actuelles
 
 Le prompt donne aussi des consignes specifiques pour eviter que toutes les reponses passent par Beau :
 
@@ -103,7 +103,7 @@ Le prompt donne aussi des consignes specifiques pour eviter que toutes les repon
 
 Ces regles sont utiles pour le MVP, mais elles sont encore tres liees a l'univers `off-campus`.
 
-## Format Attendu
+## 🗂️ Format Attendu
 
 Le prompt demande actuellement :
 
@@ -147,14 +147,14 @@ Le prompt demande actuellement :
 }
 ```
 
-## Limites Actuelles
+## 🚧 Limites Actuelles
 
 - Les regles canon sont encore ecrites en dur dans `prompt_builder.py`.
 - Les relations existantes ne sont pas encore injectees dans le prompt.
 - Les souvenirs ne sont pas encore injectes.
 - Les descriptions de lieux doivent exister dans `world.json`.
 
-## Direction Future
+## 🔮 Direction Future
 
 Plus tard, le prompt builder devrait lire davantage de donnees depuis :
 

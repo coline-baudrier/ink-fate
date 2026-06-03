@@ -4,11 +4,11 @@ Ink & Fate est un prototype Python de moteur narratif IA pour roman interactif.
 
 Le but n'est pas de creer un simple chatbot de roleplay, mais un moteur capable de faire vivre une histoire dans un univers peuple de personnages autonomes. Le joueur incarne son propre personnage, agit librement, et le moteur genere la suite en tenant compte du contexte, de l'historique de scene et des relations entre personnages.
 
-## Statut Actuel
+## 📍 Statut Actuel
 
 Le projet est actuellement un prototype CLI jouable.
 
-Ce qui existe deja :
+✅ Ce qui existe deja :
 
 - chargement d'un univers depuis des fichiers JSON ;
 - chargement et sauvegarde des personnages ;
@@ -30,7 +30,7 @@ Ce qui existe deja :
 - creation et sauvegarde de souvenirs ;
 - avancee et sauvegarde du temps dans `world.json`.
 
-Ce qui n'existe pas encore :
+🚧 Ce qui n'existe pas encore :
 
 - validation complete de tous les champs du `SceneResult` ;
 - changement de lieu et de scene active ;
@@ -39,7 +39,7 @@ Ce qui n'existe pas encore :
 - interface frontend ;
 - API FastAPI.
 
-## MVP 1
+## 🎮 MVP 1
 
 Le MVP 1 vise une boucle jouable simple :
 
@@ -58,7 +58,7 @@ Le MVP 1 vise une boucle jouable simple :
 
 Voir [docs/mvp.md](docs/mvp.md) pour le perimetre exact.
 
-## Vision
+## ✨ Vision
 
 Ink & Fate doit permettre de generer des histoires longues, coherentes et evolutives.
 
@@ -74,23 +74,23 @@ L'histoire n'est pas ecrite a l'avance. Elle emerge des interactions entre :
 
 Chaque partie doit pouvoir produire une histoire unique.
 
-## Documentation
+## 📚 Documentation
 
-- [Comment ca fonctionne](docs/how-it-works.md) : guide simple du projet et des interactions entre fichiers.
-- [Vision](docs/vision.md) : experience cible et philosophie du moteur.
-- [MVP](docs/mvp.md) : perimetre de la premiere version jouable.
-- [Architecture](docs/architecture.md) : modules, flux actuel et flux cible.
-- [Schema de donnees](docs/data-schema.md) : structure des fichiers JSON.
-- [Game loop](docs/game-loop.md) : boucle de jeu actuelle et cible.
-- [SceneResult](docs/scene-result.md) : contrat de sortie du LLM.
-- [Prompt builder](docs/prompt-builder.md) : construction du prompt narratif.
-- [Character system](docs/character-system.md) : structure des personnages.
-- [Relationship system](docs/relationship-system.md) : relations dynamiques.
-- [Memory system](docs/memory-system.md) : souvenirs et recuperation contextuelle.
-- [World simulation](docs/world-simulation.md) : simulation hors champ.
-- [Roadmap](docs/roadmap.md) : prochaines phases.
+- 🧭 [Comment ca fonctionne](docs/how-it-works.md) : guide simple du projet et des interactions entre fichiers.
+- ✨ [Vision](docs/vision.md) : experience cible et philosophie du moteur.
+- 🎮 [MVP](docs/mvp.md) : perimetre de la premiere version jouable.
+- 🧱 [Architecture](docs/architecture.md) : modules, flux actuel et flux cible.
+- 🗂️ [Schema de donnees](docs/data-schema.md) : structure des fichiers JSON.
+- 🔁 [Game loop](docs/game-loop.md) : boucle de jeu actuelle et cible.
+- 📦 [SceneResult](docs/scene-result.md) : contrat de sortie du LLM.
+- 🧵 [Prompt builder](docs/prompt-builder.md) : construction du prompt narratif.
+- 👤 [Character system](docs/character-system.md) : structure des personnages.
+- 💞 [Relationship system](docs/relationship-system.md) : relations dynamiques.
+- 🧠 [Memory system](docs/memory-system.md) : souvenirs et recuperation contextuelle.
+- 🌍 [World simulation](docs/world-simulation.md) : simulation hors champ.
+- 🛣️ [Roadmap](docs/roadmap.md) : prochaines phases.
 
-## Technologies
+## 🛠️ Technologies
 
 Actuel :
 
@@ -106,7 +106,7 @@ Prevues plus tard :
 - React ou Vue ;
 - eventuellement d'autres fournisseurs IA ou des modeles locaux.
 
-## Lancement Du Prototype
+## 🚀 Lancement Du Prototype
 
 Depuis la racine du projet :
 

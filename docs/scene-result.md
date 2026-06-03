@@ -1,10 +1,10 @@
-# SceneResult
+# 📦 SceneResult
 
 Le `SceneResult` est le JSON produit par le LLM.
 
 Le LLM propose. Le moteur decide.
 
-## Structure Actuelle
+## 🗂️ Structure Actuelle
 
 ```json
 {
@@ -22,13 +22,13 @@ Le LLM propose. Le moteur decide.
 }
 ```
 
-## narration
+## 📝 narration
 
 Texte narratif lu par le joueur.
 
 Le moteur l'affiche avec `renderer.py`.
 
-## dialogues
+## 💬 dialogues
 
 Dialogues des PNJ.
 
@@ -45,7 +45,7 @@ Regles actuelles :
 - le speaker ne doit pas etre le personnage joueur ;
 - les dialogues invalides sont supprimes.
 
-## actions
+## 🎭 actions
 
 Actions objectives proposees par le LLM.
 
@@ -61,7 +61,7 @@ Regle actuelle :
 
 - `character` doit etre un personnage existant.
 
-## events
+## 📌 events
 
 Evenements importants proposes.
 
@@ -78,7 +78,7 @@ Regles actuelles :
 - un evenement sans participant valide est supprime ;
 - les evenements ne sont pas encore sauvegardes dans un journal.
 
-## relationship_updates
+## 💞 relationship_updates
 
 Deltas relationnels proposes.
 
@@ -100,7 +100,7 @@ Regles actuelles :
 - les deltas sont limites entre `-5` et `5` ;
 - les valeurs finales sont limitees entre `0` et `100`.
 
-## memory_updates
+## 🧠 memory_updates
 
 Souvenirs proposes.
 
@@ -121,7 +121,7 @@ Regles actuelles :
 - `content` doit etre une chaine non vide ;
 - `importance` est limitee entre `1` et `10`.
 
-## Champs Pas Encore Appliques
+## 🚧 Champs Pas Encore Appliques
 
 Le moteur ne se sert pas encore de :
 

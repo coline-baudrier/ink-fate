@@ -1,10 +1,10 @@
-# Character System
+# 👤 Character System
 
 Le character system decrit comment un personnage est represente dans Ink & Fate.
 
 Un personnage n'est pas seulement un nom. C'est une entite narrative avec une personnalite, des objectifs, des relations et une memoire.
 
-## Structure
+## 🗂️ Structure
 
 Structure cible :
 
@@ -24,7 +24,7 @@ Structure cible :
 }
 ```
 
-## identity
+## 🪪 identity
 
 Informations publiques du personnage.
 
@@ -42,7 +42,7 @@ Regles :
 - le nom peut etre affiche au joueur ;
 - l'identite ne doit pas contenir les secrets internes du personnage.
 
-## personality
+## ✨ personality
 
 Traits qui guident le comportement.
 
@@ -57,7 +57,7 @@ Traits qui guident le comportement.
 
 Les valeurs numeriques donnent une direction au LLM et au moteur, mais elles ne doivent pas produire des comportements mecaniques.
 
-## archetype
+## 🎭 archetype
 
 Role narratif general.
 
@@ -69,7 +69,7 @@ Exemples :
 
 L'archetype aide a comprendre rapidement la fonction dramatique du personnage, mais il ne doit pas remplacer la personnalite.
 
-## goals
+## 🎯 goals
 
 Objectifs longs du personnage.
 
@@ -79,7 +79,7 @@ Objectifs longs du personnage.
 
 Ces objectifs influencent les decisions sur plusieurs scenes.
 
-## current_goals
+## 📍 current_goals
 
 Objectifs actifs maintenant.
 
@@ -89,7 +89,7 @@ Objectifs actifs maintenant.
 
 Ils sont plus utiles au prompt que les objectifs longs pour generer une scene precise.
 
-## fears
+## 😟 fears
 
 Peurs profondes.
 
@@ -99,7 +99,7 @@ Peurs profondes.
 
 Elles doivent influencer les reactions, surtout dans les scenes emotionnelles.
 
-## desires
+## 💭 desires
 
 Envies ou besoins profonds.
 
@@ -109,13 +109,13 @@ Envies ou besoins profonds.
 
 Les desirs peuvent entrer en conflit avec les peurs.
 
-## relationships
+## 💞 relationships
 
 Relations asymetriques vers d'autres personnages.
 
 Voir [relationship-system.md](relationship-system.md).
 
-## private_thoughts
+## 🔒 private_thoughts
 
 Informations internes au personnage.
 
@@ -125,13 +125,13 @@ Regles :
 - elles ne doivent pas etre revelees directement au joueur sans scene appropriee ;
 - elles ne sont pas forcement des faits objectifs.
 
-## memories
+## 🧠 memories
 
 Souvenirs persistants du personnage.
 
 Voir [memory-system.md](memory-system.md).
 
-## MVP
+## 🎮 MVP
 
 Pour le MVP, un personnage doit au minimum avoir :
 
@@ -144,7 +144,7 @@ Pour le MVP, un personnage doit au minimum avoir :
 
 La memoire peut etre ajoutee progressivement.
 
-## Regles
+## 🛡️ Regles
 
 - Un personnage doit agir selon ses donnees.
 - Un personnage peut mentir, eviter, hesiter ou mal comprendre.

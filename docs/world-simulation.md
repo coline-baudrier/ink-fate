@@ -1,10 +1,10 @@
-# World Simulation Engine
+# 🌙 World Simulation Engine
 
 Le world simulation engine gere ce qui se passe lorsque le joueur n'est pas directement implique dans une scene.
 
 Cette fonctionnalite est importante pour la vision finale, mais elle doit rester limitee dans le MVP.
 
-## Role
+## 🎭 Role
 
 Le monde ne doit pas attendre le joueur.
 
@@ -19,7 +19,7 @@ Quand le joueur laisse passer du temps, les personnages peuvent :
 - eviter quelqu'un ;
 - prendre une decision importante.
 
-## Declencheurs
+## ⚡ Declencheurs
 
 La simulation hors champ se declenche quand le joueur indique une ellipse.
 
@@ -34,7 +34,7 @@ Je laisse passer deux jours.
 
 Pour le MVP, il ne doit pas y avoir de simulation permanente. La simulation se produit seulement sur ellipse explicite.
 
-## Boucle Cible
+## 🔁 Boucle Cible
 
 ```md
 1. Lire l'etat actuel du monde.
@@ -49,7 +49,7 @@ Pour le MVP, il ne doit pas y avoir de simulation permanente. La simulation se p
 10. Sauvegarder le nouvel etat.
 ```
 
-## Exemple
+## 🧪 Exemple
 
 Elina va dormir a 23h.
 
@@ -76,7 +76,7 @@ Le moteur simule la nuit :
 }
 ```
 
-## Types D'Evenements Hors Champ
+## 📌 Types D'Evenements Hors Champ
 
 ### conversation
 
@@ -139,7 +139,7 @@ Une tension apparait ou augmente.
 }
 ```
 
-## Visibilite
+## 👁️ Visibilite
 
 Tous les evenements hors champ ne doivent pas etre reveles immediatement au joueur.
 
@@ -155,7 +155,7 @@ Valeurs :
 - `discoverable` : le joueur peut l'apprendre plus tard ;
 - `hidden` : seulement connu des personnages concernes.
 
-## Exemple Complet
+## 🧩 Exemple Complet
 
 ```json
 {
@@ -193,7 +193,7 @@ Valeurs :
 }
 ```
 
-## MVP
+## 🎮 MVP
 
 Pour le MVP 1, cette fonctionnalite peut rester minimale :
 

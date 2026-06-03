@@ -1,8 +1,8 @@
-# Architecture
+# 🧱 Architecture
 
 Cette documentation decrit l'architecture actuelle du prototype Ink & Fate.
 
-## Principe Central
+## 🧠 Principe Central
 
 Le moteur garde la verite.
 
@@ -24,7 +24,7 @@ World + Characters
 -> JSON Save
 ```
 
-## Architecture Actuelle
+## 🗂️ Architecture Actuelle
 
 ```md
 backend/
@@ -57,7 +57,7 @@ data/
         dean.json
 ```
 
-## Modules
+## 🧩 Modules
 
 ### backend/main.py
 
@@ -176,7 +176,7 @@ Lecture et ecriture JSON.
 
 Chargement et sauvegarde des personnages.
 
-## Flux Actuel
+## 🔁 Flux Actuel
 
 ```md
 1. main.py charge world.json.
@@ -196,7 +196,7 @@ Chargement et sauvegarde des personnages.
 15. renderer affiche la scene suivante.
 ```
 
-## Regles Techniques
+## 🛡️ Regles Techniques
 
 - Le LLM ne modifie jamais directement les JSON.
 - Toute sortie LLM passe par le parser puis le validator.

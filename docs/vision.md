@@ -1,10 +1,10 @@
-# Vision
+# ✨ Vision
 
 Ink & Fate est une application personnelle de roman interactif IA.
 
 Le joueur ne discute pas avec un chatbot. Il vit une histoire dans un monde narratif ou les personnages existent avec leur propre personnalite, leurs objectifs, leurs peurs, leurs relations et leurs souvenirs.
 
-## Experience Cible
+## 🎮 Experience Cible
 
 L'utilisateur ouvre l'application et choisit :
 
@@ -30,7 +30,7 @@ Le moteur genere ensuite une premiere scene, puis le joueur peut :
 - dormir ;
 - laisser passer plusieurs heures ou plusieurs jours.
 
-## Philosophie
+## 🧠 Philosophie
 
 Le moteur ne suit pas un scenario impose.
 
@@ -53,7 +53,7 @@ Par exemple :
 - une amitie peut devenir plus importante que la romance ;
 - un evenement hors champ peut changer la dynamique.
 
-## Monde Vivant
+## 🌍 Monde Vivant
 
 Le monde ne doit pas attendre le joueur.
 
@@ -68,7 +68,7 @@ Quand le joueur dort, part en cours ou laisse passer du temps, les autres person
 
 Ces evenements peuvent etre visibles, decouvrables plus tard, ou rester caches.
 
-## Personnages Autonomes
+## 👥 Personnages Autonomes
 
 Chaque personnage doit posseder :
 
@@ -83,7 +83,7 @@ Chaque personnage doit posseder :
 
 Le moteur doit s'appuyer sur ces donnees pour garder des comportements coherents sur le long terme.
 
-## Relations Dynamiques
+## 💞 Relations Dynamiques
 
 Les relations ne sont pas binaires.
 
@@ -104,7 +104,7 @@ Il suit plusieurs dimensions :
 
 Ces dimensions evoluent progressivement selon les scenes, les evenements et les souvenirs.
 
-## Univers Independants
+## 🗂️ Univers Independants
 
 Le moteur doit etre separe de l'univers.
 
@@ -118,7 +118,7 @@ Un univers est defini par des donnees :
 
 Ainsi, le meme moteur pourra fonctionner avec un univers original, une romance universitaire, de la fantasy ou de la science-fiction.
 
-## MVP Et Vision Future
+## 🚀 MVP Et Vision Future
 
 Le MVP 1 reste volontairement simple :
 

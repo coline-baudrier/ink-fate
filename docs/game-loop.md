@@ -1,8 +1,8 @@
-# Game Loop
+# 🔁 Game Loop
 
 La game loop definit ce qui se passe a chaque interaction entre le joueur et Ink & Fate.
 
-## Boucle Actuelle
+## 🎮 Boucle Actuelle
 
 ```md
 1. Charger world.json.
@@ -27,7 +27,7 @@ La game loop definit ce qui se passe a chaque interaction entre le joueur et Ink
 20. Recommencer.
 ```
 
-## Entree Joueur
+## ✍️ Entree Joueur
 
 Le joueur ecrit librement dans la CLI.
 
@@ -47,7 +47,7 @@ Dean, tu es ou ?
 
 Pour l'instant, l'entree est envoyee au prompt comme une action libre.
 
-## ScenePipeline
+## 🧪 ScenePipeline
 
 Le pipeline de scene fait :
 
@@ -61,7 +61,7 @@ PromptBuilder
 
 Cela permet a `main.py` de rester plus simple.
 
-## Effets Persistants
+## 💾 Effets Persistants
 
 Apres validation, le moteur applique :
 
@@ -72,7 +72,7 @@ Apres validation, le moteur applique :
 
 Les personnages et le monde sont ensuite sauvegardes en JSON.
 
-## Non Encore Gere
+## 🚧 Non Encore Gere
 
 La boucle ne gere pas encore :
 
@@ -82,7 +82,7 @@ La boucle ne gere pas encore :
 - ellipses longues ;
 - simulation hors champ.
 
-## Objectif Du Prochain Palier
+## 🎯 Objectif Du Prochain Palier
 
 Le prochain palier logique :
 

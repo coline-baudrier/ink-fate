@@ -1,10 +1,10 @@
-# Roadmap
+# 🛣️ Roadmap
 
 La roadmap separe ce qui existe deja, ce qui est partiel et les extensions futures.
 
-## Phase 0 - Prototype De Base
+## ✅ Phase 0 - Prototype De Base
 
-Statut : fait.
+**Statut : fait.**
 
 - charger un univers ;
 - charger des personnages ;
@@ -13,9 +13,9 @@ Statut : fait.
 - appeler le LLM ;
 - parser un `SceneResult`.
 
-## Phase 1 - Boucle Joueur CLI
+## ✅ Phase 1 - Boucle Joueur CLI
 
-Statut : fait.
+**Statut : fait.**
 
 - scene d'ouverture ;
 - entree joueur ;
@@ -23,11 +23,11 @@ Statut : fait.
 - historique de scene ;
 - commande `quit` ou `exit`.
 
-## Phase 2 - Validation SceneResult
+## 🧪 Phase 2 - Validation SceneResult
 
-Statut : partiellement fait.
+**Statut : partiellement fait.**
 
-Deja fait :
+✅ Deja fait :
 
 - verification des listes/dictionnaires de base ;
 - suppression des dialogues invalides ;
@@ -39,32 +39,34 @@ Deja fait :
 - limitation des deltas relationnels ;
 - limitation de l'importance des souvenirs.
 
-Reste a faire :
+🚧 Reste a faire :
 
 - verifier les champs obligatoires de `scene` ;
 - verifier les lieux ;
 - verifier les types de chaque champ ;
 - produire un rapport de validation lisible.
 
-## Phase 3 - Relations Persistantes
+## 💞 Phase 3 - Relations Persistantes
 
-Statut : fait pour le MVP.
+**Statut : fait pour le MVP.**
+
+✅ Deja fait :
 
 - appliquer les `relationship_updates` ;
 - limiter les valeurs finales entre `0` et `100` ;
 - sauvegarder les personnages modifies en JSON.
 
-Ameliorations futures :
+🔮 Ameliorations futures :
 
 - creer une relation manquante si elle n'existe pas ;
 - afficher les changements relationnels de facon plus lisible ;
 - tester les cas limites.
 
-## Phase 4 - Memoire Simple
+## 🧠 Phase 4 - Memoire Simple
 
-Statut : partiellement fait.
+**Statut : partiellement fait.**
 
-Deja fait :
+✅ Deja fait :
 
 - demander des `memory_updates` au LLM ;
 - valider proprietaire et contenu ;
@@ -73,24 +75,24 @@ Deja fait :
 - reinjecter quelques souvenirs dans le prompt ;
 - vieillir les souvenirs.
 
-Reste a faire :
+🚧 Reste a faire :
 
 - eviter de vieillir les souvenirs tout juste crees ;
 - mieux choisir les souvenirs pertinents ;
 - eviter les doublons ;
 - ajouter des types de souvenirs plus stricts.
 
-## Phase 5 - Updates Du Monde
+## 🌍 Phase 5 - Updates Du Monde
 
-Statut : partiellement fait.
+**Statut : partiellement fait.**
 
-Deja fait :
+✅ Deja fait :
 
 - avancer l'heure ;
 - sauvegarder `world.json` ;
 - reconstruire le contexte de scene.
 
-Reste a faire :
+🚧 Reste a faire :
 
 - changer `active_scene` ;
 - changer de lieu ;
@@ -98,18 +100,18 @@ Reste a faire :
 - gerer les jours quand minuit est depasse ;
 - enregistrer les evenements.
 
-## Phase 6 - Ellipses Et Simulation Hors Champ
+## 🌙 Phase 6 - Ellipses Et Simulation Hors Champ
 
-Statut : a faire.
+**Statut : a faire.**
 
 - detection d'ellipses simples ;
 - evenements hors champ ;
 - souvenirs hors champ ;
 - visibilite `visible`, `discoverable`, `hidden`.
 
-## Phase 7 - Nettoyage Et Tests
+## 🧼 Phase 7 - Nettoyage Et Tests
 
-Statut : a faire.
+**Statut : a faire.**
 
 - tests unitaires du validator ;
 - tests du relationship engine ;
@@ -118,9 +120,9 @@ Statut : a faire.
 - nettoyage des accents dans les JSON ;
 - documentation a jour.
 
-## Phase 8 - API Et Interface
+## 🖥️ Phase 8 - API Et Interface
 
-Statut : futur.
+**Statut : futur.**
 
 - API FastAPI ;
 - base SQLite ;

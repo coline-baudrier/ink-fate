@@ -1,8 +1,8 @@
-# Comment Fonctionne Ink & Fate
+# 🧭 Comment Fonctionne Ink & Fate
 
 Ce document explique simplement comment le projet fonctionne et comment les fichiers se parlent.
 
-## Idee Generale
+## ✨ Idee Generale
 
 Ink & Fate est un moteur narratif IA.
 
@@ -19,7 +19,7 @@ Action joueur
 -> Sauvegarde JSON
 ```
 
-## Les Deux Grandes Parties
+## 🧱 Les Deux Grandes Parties
 
 Le projet est separe en deux grandes zones.
 
@@ -35,9 +35,9 @@ Le code Python est le moteur.
 
 Les fichiers JSON sont la verite du monde.
 
-## Point D'Entree
+## 🚪 Point D'Entree
 
-### backend/main.py
+### `backend/main.py`
 
 C'est le fichier lance par :
 
@@ -45,7 +45,7 @@ C'est le fichier lance par :
 py .\backend\main.py
 ```
 
-Il ne devrait pas contenir toute la logique. Son role est surtout d'orchestrer :
+Son role est surtout d'orchestrer :
 
 1. charger le monde ;
 2. charger les personnages ;
@@ -55,9 +55,9 @@ Il ne devrait pas contenir toute la logique. Son role est surtout d'orchestrer :
 6. sauvegarder ;
 7. afficher la suite.
 
-## Les Donnees
+## 🗂️ Les Donnees
 
-### data/universes/off-campus/world.json
+### `data/universes/off-campus/world.json`
 
 Contient l'etat global :
 
@@ -69,7 +69,7 @@ Contient l'etat global :
 - personnages a charger ;
 - scene active.
 
-### data/universes/off-campus/characters/*.json
+### `data/universes/off-campus/characters/*.json`
 
 Chaque personnage a son fichier.
 
@@ -83,15 +83,13 @@ Un personnage contient :
 
 Quand les relations ou souvenirs changent, ces fichiers sont sauvegardes.
 
-## Chargement Et Sauvegarde
+## 💾 Chargement Et Sauvegarde
 
-### json_loader.py
+### `json_loader.py`
 
 Lit et ecrit les fichiers JSON.
 
-Il est utilise par presque tous les modules qui ont besoin de charger ou sauvegarder des donnees.
-
-### character_loader.py
+### `character_loader.py`
 
 Charge et sauvegarde les personnages.
 
@@ -103,28 +101,24 @@ Il transforme une liste comme :
 
 en dictionnaire Python contenant les donnees completes de chaque personnage.
 
-## Construire Le Contexte De Scene
+## 🎬 Construire Le Contexte De Scene
 
-### scene_context.py
+### `scene_context.py`
 
 Le monde complet est trop grand pour etre envoye tel quel au LLM.
 
-`scene_context.py` extrait seulement ce qui est utile pour la scene :
+`scene_context.py` extrait seulement :
 
 - lieu actuel ;
 - date ;
 - heure ;
 - personnages presents.
 
-Ce contexte est ensuite donne au prompt builder.
+## 🧪 Generer Une Scene
 
-## Generer Une Scene
-
-### scene_pipeline.py
+### `scene_pipeline.py`
 
 C'est le pipeline de generation.
-
-Il fait :
 
 ```md
 build prompt
@@ -135,34 +129,32 @@ build prompt
 
 Il retourne une scene deja filtree.
 
-### prompt_builder.py
+### `prompt_builder.py`
 
 Construit le texte envoye au LLM.
 
 Il inclut :
 
-- le contexte du monde ;
-- le personnage joueur ;
-- les participants ;
-- l'historique ;
-- les souvenirs importants ;
-- l'action du joueur ;
-- les regles narratives ;
-- le format JSON attendu.
+- contexte du monde ;
+- personnage joueur ;
+- participants ;
+- historique ;
+- souvenirs importants ;
+- action du joueur ;
+- regles narratives ;
+- format JSON attendu.
 
-### openai_client.py
+### `openai_client.py`
 
 Envoie le prompt a OpenAI et recupere la reponse texte.
 
-### scene_result_parser.py
+### `scene_result_parser.py`
 
 Transforme la reponse texte du LLM en dictionnaire Python.
 
-Si le LLM ne renvoie pas un JSON valide, c'est ici que ca casse.
+## 🛡️ Valider La Sortie Du LLM
 
-## Valider La Sortie Du LLM
-
-### scene_validator.py
+### `scene_validator.py`
 
 Le LLM peut se tromper.
 
@@ -179,11 +171,9 @@ Il supprime ou corrige :
 - valeurs relationnelles trop grandes ;
 - importance de souvenir hors limites.
 
-Cette etape est importante parce que le moteur ne doit pas faire confiance aveuglement au LLM.
+## 🖨️ Afficher La Scene
 
-## Afficher La Scene
-
-### renderer.py
+### `renderer.py`
 
 Transforme le `SceneResult` en texte lisible dans le terminal.
 
@@ -192,9 +182,9 @@ Il affiche :
 - narration ;
 - dialogues.
 
-## Appliquer Les Consequences
+## 🔁 Appliquer Les Consequences
 
-### character_state_engine.py
+### `character_state_engine.py`
 
 Applique tous les effets qui concernent les personnages.
 
@@ -210,7 +200,7 @@ Dans `main.py`, cela permet d'appeler une seule fonction :
 update_characters_after_scene(...)
 ```
 
-### relationship_engine.py
+### `relationship_engine.py`
 
 Applique les `relationship_updates`.
 
@@ -232,35 +222,17 @@ Cela modifie la relation :
 dean -> elina
 ```
 
-Les valeurs finales restent entre `0` et `100`.
-
-### memory_engine.py
+### `memory_engine.py`
 
 Applique les `memory_updates`.
 
 Il ajoute des souvenirs aux personnages.
 
-Le vieillissement des souvenirs est appele par `character_state_engine.py`.
-
-Exemple :
-
-```json
-{
-  "owner": "dean",
-  "content": "Elina challenged him directly.",
-  "importance": 5
-}
-```
-
-Ce souvenir est ajoute dans `dean.json`.
-
-### time_engine.py
+### `time_engine.py`
 
 Avance l'heure du monde.
 
-Actuellement, le temps avance de quelques minutes apres chaque tour.
-
-### world_engine.py
+### `world_engine.py`
 
 Regroupe les operations simples sur le monde :
 
@@ -268,7 +240,7 @@ Regroupe les operations simples sur le monde :
 - sauvegarder `world.json` ;
 - reconstruire le contexte de scene.
 
-## Cycle Complet D'Un Tour
+## 🧵 Cycle Complet D'Un Tour
 
 Voici ce qui se passe quand le joueur ecrit une action :
 
@@ -288,7 +260,7 @@ Voici ce qui se passe quand le joueur ecrit une action :
 13. main.py ajoute la scene a l'historique.
 ```
 
-## Ce Qui Est Persistant
+## 💾 Ce Qui Est Persistant
 
 Persistant veut dire : sauvegarde dans un fichier.
 
@@ -305,7 +277,7 @@ Ne sont pas encore persistants :
 - changements de scene active ;
 - arcs narratifs.
 
-## Comment Lire Le Projet
+## 🗺️ Comment Lire Le Projet
 
 Si tu es perdue, lis dans cet ordre :
 
@@ -325,7 +297,7 @@ Puis regarde les JSON :
 3. `data/universes/off-campus/characters/elina.json`
 4. `data/universes/off-campus/characters/beau.json`
 
-## Regle A Garder En Tete
+## 🧠 Regle A Garder En Tete
 
 Le LLM propose.
 

@@ -1,10 +1,10 @@
-# Memory System
+# 🧠 Memory System
 
 La memoire permet aux personnages de garder une trace subjective de ce qui arrive.
 
 Un souvenir n'est pas seulement un evenement objectif. C'est ce qu'un personnage retient ou ressent a propos d'un moment.
 
-## Etat Actuel
+## 📍 Etat Actuel
 
 La memoire existe en version MVP.
 
@@ -19,7 +19,7 @@ Le moteur peut :
 - reinjecter quelques souvenirs importants dans le prompt ;
 - augmenter l'age des souvenirs.
 
-## Structure Actuelle
+## 🗂️ Structure Actuelle
 
 ```json
 {
@@ -41,7 +41,7 @@ Champs :
 - `age` : age du souvenir.
 - `tags` : mots cles optionnels.
 
-## Flux Actuel
+## 🔁 Flux Actuel
 
 ```md
 SceneResult
@@ -52,7 +52,7 @@ SceneResult
 -> save_characters
 ```
 
-## Recuperation Dans Le Prompt
+## 🧵 Recuperation Dans Le Prompt
 
 `prompt_builder.py` lit les souvenirs des participants de la scene.
 
@@ -64,7 +64,7 @@ RELEVANT MEMORIES
 
 Cela aide le LLM a rester coherent sur plusieurs tours.
 
-## Limites Actuelles
+## 🚧 Limites Actuelles
 
 - Les souvenirs tout juste ajoutes vieillissent actuellement pendant le meme tour.
 - Les doublons ne sont pas encore detectes.
@@ -72,7 +72,7 @@ Cela aide le LLM a rester coherent sur plusieurs tours.
 - Les types de souvenirs ne sont pas encore stricts.
 - Il n'y a pas encore d'id unique de souvenir.
 
-## Direction Future
+## 🔮 Direction Future
 
 Plus tard, le moteur pourra :
 
