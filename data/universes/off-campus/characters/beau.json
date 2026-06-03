@@ -1,0 +1,42 @@
+{
+  "id": "beau",
+  "identity": {
+    "first_name": "Beau",
+    "last_name": "Maxwell",
+    "age": 22
+  },
+  "personality": {
+    "humor": 75,
+    "charisma": 80,
+    "loyalty": 95,
+    "impulsiveness": 55,
+    "jealousy": 40,
+    "protectiveness": 95,
+    "patience": 60,
+    "confidence": 80
+  },
+  "archetype": "protective_brother",
+  "goals": ["succeed_at_college", "protect_elina", "maintain_friendships"],
+  "fears": ["failing_family", "seeing_elina_hurt"],
+  "desires": ["stability", "family_happiness"],
+  "relationships": {
+    "dean": {
+      "friendship": 95,
+      "trust": 90,
+      "respect": 90,
+      "attachment": 80,
+      "jealousy": 0,
+      "attraction": 0
+    },
+    "elina": {
+      "friendship": 90,
+      "trust": 95,
+      "respect": 85,
+      "attachment": 100,
+      "jealousy": 0,
+      "attraction": 0
+    }
+  },
+  "current_goals": ["help_elina_settle_in"],
+  "private_thoughts": ["Dean better stay away from my sister."]
+}

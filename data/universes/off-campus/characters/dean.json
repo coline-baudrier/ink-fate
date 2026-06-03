@@ -1,0 +1,23 @@
+{
+  "id": "dean",
+  "identity": {
+    "first_name": "Dean",
+    "middle_name": "Heayward",
+    "last_name": "Di Laurentis",
+    "age": "22"
+  },
+  "personality": {
+    "humor": 95,
+    "charisma": 95,
+    "loyalty": 90,
+    "impulsiveness": 70,
+    "jealousy": 40,
+    "commitment_fear": 85
+  },
+  "archetype": "charmer",
+  "goals": ["enjoy_college_life"],
+  "fears": ["emotional_commitment"],
+  "desires": ["freedom"],
+  "current_goals": ["tease_beau"],
+  "private_thoughts": ["Elina seems more interesting than expected."]
+}

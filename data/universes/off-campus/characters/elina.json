@@ -1,0 +1,44 @@
+{
+  "id": "elina",
+  "identity": {
+    "first_name": "Elina",
+    "last_name": "Maxwell",
+    "age": 20
+  },
+  "personality": {
+    "humor": 70,
+    "charisma": 75,
+    "loyalty": 90,
+    "impulsiveness": 45,
+    "jealousy": 30,
+    "independence": 90,
+    "curiosity": 85,
+    "confidence": 70
+  },
+  "archetype": "newcomer",
+  "goals": ["build_new_life", "find_true_friends", "gain_independence"],
+  "fears": ["being_controlled", "being_disappointed"],
+  "desires": ["freedom", "belonging", "love"],
+  "relationships": {
+    "beau": {
+      "friendship": 85,
+      "trust": 95,
+      "respect": 90,
+      "attachment": 95,
+      "jealousy": 0,
+      "attraction": 0
+    },
+    "dean": {
+      "friendship": 0,
+      "trust": 0,
+      "respect": 0,
+      "attachment": 0,
+      "jealousy": 0,
+      "attraction": 0
+    }
+  },
+  "current_goals": ["survive_first_day"],
+  "private_thoughts": [
+    "I want people to see me as more than Beau's little sister."
+  ]
+}

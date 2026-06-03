@@ -1,0 +1,42 @@
+{
+  "universe": {
+    "id": "off-campus",
+    "name": "Off Campus"
+  },
+  "timeline": {
+    "current_date": "2026-09-01",
+    "current_time": "10:00",
+    "current_day": 1
+  },
+  "player_character": "elina",
+  "locations": [
+    {
+      "id": "campus",
+      "name": "Briar University Campus"
+    },
+    {
+      "id": "dormitory",
+      "name": "Student Dormitory"
+    },
+    {
+      "id": "hockey_house",
+      "name": "Hockey House"
+    },
+    {
+      "id": "library",
+      "name": "University Library"
+    }
+  ],
+  "characters": ["dean", "beau", "elina"],
+  "active_events": [
+    {
+      "id": "arrival_day",
+      "title": "Elina arrives at Briar",
+      "status": "active"
+    }
+  ],
+  "active_scene": {
+    "location": "campus",
+    "participants": ["beau", "elina"]
+  }
+}
