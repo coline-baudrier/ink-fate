@@ -113,8 +113,20 @@ Regles actuelles :
 
 - `source` et `target` doivent exister ;
 - les valeurs doivent etre des entiers ;
-- les deltas sont limites entre `-5` et `5` ;
+- les deltas sont limites selon la dimension relationnelle ;
 - les valeurs finales sont limitees entre `0` et `100`.
+
+Limites actuelles :
+
+```md
+attraction: -2 a +2
+respect: -3 a +3
+friendship: -2 a +2
+trust: -1 a +2
+attachment: -1 a +1
+jealousy: -2 a +2
+autre dimension: -2 a +2
+```
 
 ## memory_updates
 

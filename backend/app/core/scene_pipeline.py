@@ -19,6 +19,7 @@ from app.core.scene_validator import (
 
 def generate_scene(
     world: Dict[str, Any],
+    scenario: Dict[str, Any],
     scene_context: Dict[str, Any],
     player_input: str | None = None,
     scene_history: str | None = None,
@@ -27,6 +28,7 @@ def generate_scene(
 
     prompt = build_structured_scene_prompt(
         world,
+        scenario,
         scene_context,
         player_input,
         scene_history,

@@ -2,6 +2,7 @@ from backend.app.core.scene_validator import (
     validate_scene,
     validate_world_updates,
 )
+from backend.app.core.scene_validator import clamp_relationship_updates
 
 
 def build_world():
@@ -221,3 +222,65 @@ def test_validate_world_updates_cleans_character_movements():
     assert validated["world_updates"]["character_movements"] == {
         "beau": "dormitory",
     }
+
+def test_clamp_relationship_updates_limits_attraction():
+    scene_result = {
+        "relationship_updates": [
+            {
+                "source": "dean",
+                "target": "elina",
+                "changes": {
+                    "attraction": 5,
+                },
+            }
+        ]
+    }
+
+    validated = clamp_relationship_updates(scene_result)
+
+    assert (
+        validated["relationship_updates"][0]["changes"]["attraction"]
+        == 2
+    )
+
+
+def test_clamp_relationship_updates_limits_attachment():
+    scene_result = {
+        "relationship_updates": [
+            {
+                "source": "dean",
+                "target": "elina",
+                "changes": {
+                    "attachment": 5,
+                },
+            }
+        ]
+    }
+
+    validated = clamp_relationship_updates(scene_result)
+
+    assert (
+        validated["relationship_updates"][0]["changes"]["attachment"]
+        == 1
+    )
+
+
+def test_clamp_relationship_updates_limits_trust_negative():
+    scene_result = {
+        "relationship_updates": [
+            {
+                "source": "dean",
+                "target": "elina",
+                "changes": {
+                    "trust": -5,
+                },
+            }
+        ]
+    }
+
+    validated = clamp_relationship_updates(scene_result)
+
+    assert (
+        validated["relationship_updates"][0]["changes"]["trust"]
+        == -1
+    )

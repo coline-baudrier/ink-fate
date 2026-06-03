@@ -37,6 +37,7 @@ La roadmap separe ce qui existe deja, ce qui est partiel et les extensions futur
 - suppression des updates relationnels invalides ;
 - suppression des updates memoire invalides ;
 - limitation des deltas relationnels ;
+- limitation des deltas relationnels par dimension ;
 - limitation de l'importance des souvenirs ;
 - validation des champs principaux de `scene` ;
 - validation de `scene.location` ;
@@ -59,13 +60,14 @@ La roadmap separe ce qui existe deja, ce qui est partiel et les extensions futur
 
 - appliquer les `relationship_updates` ;
 - limiter les valeurs finales entre `0` et `100` ;
+- produire des paliers narratifs de relation ;
+- reinjecter le statut relationnel dans le prompt ;
 - sauvegarder les personnages modifies en JSON.
 
 🔮 Ameliorations futures :
 
 - creer une relation manquante si elle n'existe pas ;
-- afficher les changements relationnels de facon plus lisible ;
-- tester les cas limites.
+- afficher les changements relationnels de facon plus lisible.
 
 ## 🧠 Phase 4 - Memoire Simple
 
@@ -77,14 +79,15 @@ La roadmap separe ce qui existe deja, ce qui est partiel et les extensions futur
 - valider proprietaire et contenu ;
 - limiter l'importance ;
 - sauvegarder les souvenirs dans les personnages ;
-- reinjecter quelques souvenirs dans le prompt ;
+- selectionner les souvenirs pertinents par score ;
+- reinjecter les souvenirs pertinents dans le prompt ;
 - vieillir les souvenirs ;
 - eviter de vieillir les souvenirs crees pendant le tour courant.
 
 🚧 Reste a faire :
 
-- mieux choisir les souvenirs pertinents ;
 - eviter les doublons ;
+- enrichir le scoring avec les relations, lieux et evenements ;
 - ajouter des types de souvenirs plus stricts.
 
 ## 🌍 Phase 5 - Updates Du Monde

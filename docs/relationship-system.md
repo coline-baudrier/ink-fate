@@ -69,6 +69,10 @@ Interpretation indicative :
 - `75` : fort ;
 - `100` : maximum.
 
+Le module `relationship_stages.py` transforme ces valeurs en paliers narratifs comme `low attraction`, `emerging trust`, `strong respect` ou `trusted`.
+
+Ces paliers sont reinjectes dans le prompt pour aider le LLM a garder une progression romance graduelle.
+
 ## 🔁 Updates Actuels
 
 Le LLM propose des deltas dans `relationship_updates`.
@@ -98,11 +102,23 @@ Regles actuelles :
 
 - les updates sont des deltas ;
 - les deltas non entiers sont ignores ;
-- les deltas sont limites entre `-5` et `5` ;
+- les deltas sont limites selon la dimension ;
 - `source` et `target` doivent etre des personnages existants ;
 - la relation `source -> target` doit deja exister ;
 - la valeur finale est limitee entre `0` et `100` ;
 - les personnages modifies sont sauvegardes en JSON.
+
+Limites de deltas actuelles :
+
+```md
+attraction: -2 a +2
+respect: -3 a +3
+friendship: -2 a +2
+trust: -1 a +2
+attachment: -1 a +1
+jealousy: -2 a +2
+autre dimension: -2 a +2
+```
 
 ## 🧪 Exemple
 

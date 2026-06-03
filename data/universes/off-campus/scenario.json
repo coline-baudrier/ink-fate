@@ -1,23 +1,75 @@
 {
+  "id": "arrival-at-briar",
   "title": "Arrival at Briar",
-  "premise": "Elina Maxwell arrives at Briar University to begin a new chapter of her life.",
-  "initial_state": {
-    "beau_knows": [
-      "Elina is arriving today"
-    ],
-    "dean_knows": [
-      "Beau has a younger sister"
-    ],
-    "elina_knows": [
-      "Beau studies at Briar"
-    ]
-  },
-  "initial_tensions": [
-    {
-      "description": "Dean enjoys teasing Beau."
-    },
-    {
-      "description": "Beau is protective of Elina."
-    }
+  "premise": "Elina arrives at Briar University with luggage, reconnects with her older brother Beau, and meets Dean, Beau's best friend.",
+  "tone": [
+    "Write all narration and dialogue in French.",
+    "Never write English narration or dialogue.",
+    "Contemporary college romance.",
+    "Natural modern French dialogue.",
+    "Emotional realism.",
+    "Playful romantic tension.",
+    "Light teasing without melodrama."
+  ],
+  "canon_rules": [
+    "Elina is arriving on campus with luggage.",
+    "Beau is Elina's older brother.",
+    "Dean is Beau's best friend.",
+    "Dean initially wants to tease Beau, but once Elina challenges him, he becomes directly interested in her reactions.",
+    "The story takes place at Briar University.",
+    "Do not invent another university name.",
+    "Do not invent important past events unless they are provided."
+  ],
+  "character_dynamics": [
+    "Dean should feel charismatic, teasing, socially confident, and quick-witted.",
+    "Dean may tease Beau, but he should also engage directly with Elina when she challenges him.",
+    "When Elina directly challenges Dean, Dean must answer Elina directly.",
+    "Do not redirect Dean's answer toward Beau unless Elina explicitly mentions Beau.",
+    "Dean can tease Beau briefly, but the main reaction must target Elina.",
+    "Dean should become intrigued when Elina pushes back.",
+    "Beau should feel protective and used to Dean's behavior.",
+    "Beau can intervene, but he should not speak for Elina.",
+    "Do not route every interaction through Beau.",
+    "Characters should remember emotionally or socially significant moments.",
+    "When an interaction creates emotional tension, intimacy, teasing or vulnerability, relationship_updates should reflect it.",
+    "If Dean reacts positively to Elina, update dean -> elina accordingly."
+  ],
+  "narrative_limits": [
+    "The response language must always be French.",
+    "All narration must be written in French.",
+    "All dialogue must be written in natural French.",
+    "Never generate English narration or dialogue.",
+    "Avoid cliches and overly dramatic narration.",
+    "Keep characters emotionally believable.",
+    "Keep dialogue natural and modern.",
+    "Carefully track who the player is addressing.",
+    "If the player mentions \"tu\", infer the addressed character from the previous sentence and scene context.",
+    "Do not reinterpret the player's insult or challenge as targeting another character.",
+    "If the player character directly addresses a character, that character should usually respond directly to the player character.",
+    "Never decide the player character's thoughts, feelings or choices.",
+    "Never generate dialogue for Elina.",
+    "Characters should behave consistently with their current relationship stage.",
+    "Romantic behavior should escalate gradually.",
+    "Do not make characters act romantically intimate before the relationship stage supports it.",
+    "Playful teasing can happen early, but emotional intimacy should take time.",
+    "Physical intimacy should not appear before a close relationship stage unless strongly justified by the scene context.",
+    "Relationship updates must be gradual.",
+    "Attraction should usually increase by 0 to 2 points per scene.",
+    "Respect may change faster than attraction when the player shows courage, wit or vulnerability.",
+    "Do not increase attraction in every scene unless there is real tension, chemistry or emotional impact.",
+    "Relationship dimensions have different meanings: attraction is chemistry, respect is admiration, trust is emotional safety, friendship is social closeness, attachment is emotional dependence, jealousy is possessiveness or fear of losing someone.",
+    "Attraction can rise faster than trust or attachment.",
+    "Trust and attachment should grow slowly through repeated meaningful interactions.",
+    "Jealousy should only rise when there is a clear rival, insecurity or fear of losing attention.",
+    "Do not treat attraction as love.",
+    "Do not treat attachment as attraction."
+  ],
+  "pacing_rules": [
+    "Keep each scene focused on the immediate consequence of the player's action.",
+    "Do not skip ahead to a new major moment unless the player clearly moves time forward.",
+    "Do not resolve emotional tension too quickly.",
+    "Prefer short interactive beats over long summaries.",
+    "Do not make every player action a major dramatic event.",
+    "Leave space for the player to respond."
   ]
 }

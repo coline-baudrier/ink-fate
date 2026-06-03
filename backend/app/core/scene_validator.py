@@ -6,6 +6,32 @@ moteur sait verifier avant d'appliquer des effets au monde.
 
 from typing import Any, Dict
 
+RELATIONSHIP_DELTA_LIMITS = {
+    "attraction": {
+        "min": -2,
+        "max": 2,
+    },
+    "respect": {
+        "min": -3,
+        "max": 3,
+    },
+    "friendship": {
+        "min": -2,
+        "max": 2,
+    },
+    "trust": {
+        "min": -1,
+        "max": 2,
+    },
+    "attachment": {
+        "min": -1,
+        "max": 1,
+    },
+    "jealousy": {
+        "min": -2,
+        "max": 2,
+    },
+}
 
 def ensure_list(value: Any) -> list:
     """Retourne la valeur si c'est une liste, sinon une liste vide."""
@@ -272,8 +298,6 @@ def remove_invalid_relationship_updates(
 
 def clamp_relationship_updates(
     scene_result: Dict[str, Any],
-    min_value: int = -5,
-    max_value: int = 5,
 ) -> Dict[str, Any]:
     """Valide et limite les changements relationnels."""
 
@@ -289,9 +313,19 @@ def clamp_relationship_updates(
         valid_changes = {}
 
         for key, value in changes.items():
-            # Les valeurs relationnelles doivent etre des nombres entiers.
             if not isinstance(value, int):
                 continue
+
+            limits = RELATIONSHIP_DELTA_LIMITS.get(
+                key,
+                {
+                    "min": -2,
+                    "max": 2,
+                },
+            )
+
+            min_value = limits["min"]
+            max_value = limits["max"]
 
             if value < min_value:
                 value = min_value

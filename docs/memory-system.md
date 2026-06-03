@@ -16,7 +16,8 @@ Le moteur peut :
 - limiter l'importance entre `1` et `10` ;
 - ajouter les souvenirs au personnage concerne ;
 - sauvegarder les souvenirs dans les fichiers personnages ;
-- reinjecter quelques souvenirs importants dans le prompt ;
+- selectionner les souvenirs pertinents selon importance, age, tags et contexte ;
+- reinjecter les souvenirs selectionnes dans le prompt ;
 - augmenter l'age des souvenirs.
 
 ## 🗂️ Structure Actuelle
@@ -54,9 +55,17 @@ SceneResult
 
 ## 🧵 Recuperation Dans Le Prompt
 
-`prompt_builder.py` lit les souvenirs des participants de la scene.
+`prompt_builder.py` passe par `memory_retriever.py` pour choisir les souvenirs utiles.
 
-Il garde les souvenirs les plus importants et les ajoute dans :
+Le score d'un souvenir prend en compte :
+
+- son importance ;
+- son age ;
+- ses tags ;
+- les mots presents dans l'action du joueur ;
+- les mots presents dans l'historique de scene.
+
+Les souvenirs retenus sont ajoutes dans :
 
 ```md
 RELEVANT MEMORIES
@@ -66,9 +75,8 @@ Cela aide le LLM a rester coherent sur plusieurs tours.
 
 ## 🚧 Limites Actuelles
 
-- Les souvenirs tout juste ajoutes vieillissent actuellement pendant le meme tour.
 - Les doublons ne sont pas encore detectes.
-- La recuperation est simple : elle trie surtout par importance.
+- La recuperation reste simple et locale aux participants actifs.
 - Les types de souvenirs ne sont pas encore stricts.
 - Il n'y a pas encore d'id unique de souvenir.
 
@@ -79,6 +87,6 @@ Plus tard, le moteur pourra :
 - creer des souvenirs avec un id stable ;
 - distinguer `core`, `episodic`, `emotional`, `secret` ;
 - eviter les doublons ;
-- recuperer selon les tags, la recence et les personnages presents ;
+- ameliorer le scoring selon les relations, les lieux et les evenements ;
 - reduire l'importance des vieux souvenirs ;
 - proteger les secrets.

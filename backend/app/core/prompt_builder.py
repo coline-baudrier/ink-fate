@@ -5,10 +5,13 @@ les regles narratives et le format JSON attendu.
 """
 
 from typing import Any, Dict, List
+from app.core.memory_retriever import select_relevant_memories
+from app.core.relationship_stages import build_relationship_context
 
 
 def build_structured_scene_prompt(
     world: Dict[str, Any],
+    scenario: Dict[str, Any],
     scene_context: Dict[str, Any],
     player_input: str | None = None,
     scene_history: str | None = None,
@@ -33,9 +36,15 @@ def build_structured_scene_prompt(
     player_context = build_player_context(player_input)
     expected_json_format = build_expected_json_format()
     scene_history_context = build_scene_history_context(scene_history)
-    memory_context = build_memory_context(scene_context)
+    memory_context = build_memory_context(
+        scene_context,
+        player_input,
+        scene_history,
+    )
     available_locations = build_available_locations(world)
     event_log_context = build_event_log_context(world)
+    scenario_context = build_scenario_context(scenario)
+    relationship_context = build_relationship_context(scene_context)
 
     # Le prompt est volontairement separe en sections lisibles.
     prompt = f"""
@@ -72,39 +81,14 @@ RECENT EVENTS
 RELEVANT MEMORIES
 {memory_context}
 
+RELATIONSHIP STATUS
+{relationship_context}
+
 PLAYER INPUT
 {player_context}
 
-NARRATIVE RULES
-- Write in French.
-- Use a contemporary college romance tone.
-- Keep characters emotionally believable.
-- Keep dialogue natural and modern.
-- Avoid cliches and overly dramatic narration.
-- Do not invent important past events unless they are provided.
-- Do not invent another university name.
-- The story takes place at Briar University.
-- If the player character directly addresses a character, that character should usually respond directly to the player character.
-- Do not route every interaction through Beau.
-- Dean may tease Beau, but he should also engage directly with Elina when she challenges him.
-- Carefully track who the player is addressing.
-- If the player mentions "tu", infer the addressed character from the previous sentence and scene context.
-- Do not reinterpret the player's insult or challenge as targeting another character.
-- When the player directly challenges Dean, Dean should respond directly.
-- If the player directly addresses Dean, Dean must answer Elina directly.
-- Do not redirect Dean's answer toward Beau unless the player explicitly mentions Beau.
-- Dean can tease Beau briefly, but the main reaction must target Elina.
-- Characters should remember emotionally or socially significant moments.
-- When a player input creates emotional tension, intimacy, teasing or vulnerability, relationship_updates should reflect it.
-- If Dean reacts positively to Elina, update dean -> elina accordingly.
-
-CANON RULES
-- Elina is arriving on campus with luggage.
-- Beau is Elina's older brother.
-- Dean is Beau's best friend.
-- Dean initially wants to tease Beau, but once Elina challenges him, he becomes directly interested in her reactions.
-- Dean should feel charismatic, teasing and socially confident.
-- Beau should feel protective and used to Dean's behavior.
+SCENARIO CONTEXT
+{scenario_context}
 
 JSON RULES
 - Return valid JSON only.
@@ -130,6 +114,9 @@ JSON RULES
 - Do not move uninvolved characters.
 - If no non-player character moves, use an empty object.
 - If no location change happens, use an empty string.
+- Keep narration concise: 1 to 3 narration paragraphs.
+- Generate 1 to 3 dialogue lines maximum.
+- Do not end the scene with a full resolution if the player can still respond.
 
 EXPECTED JSON FORMAT
 {expected_json_format}
@@ -242,59 +229,38 @@ Previous scene :
 
 def build_memory_context(
     scene_context: Dict[str, Any],
+    player_input: str | None = None,
+    scene_history: str | None = None,
 ) -> str:
-    """
-    Construit le contexte memoire envoye au LLM.
-    """
+    """Construit le contexte memoire envoye au LLM."""
+
+    relevant_memories = select_relevant_memories(
+        scene_context,
+        player_input,
+        scene_history,
+    )
+
+    if not relevant_memories:
+        return "No important memories yet."
 
     memory_lines = []
 
-    for character in scene_context["participants"]:
-        first_name = character["identity"]["first_name"]
-
-        memories = character.get(
-            "memories",
-            [],
-        )
-
-        if not memories:
-            continue
-
+    for character_id, memories in relevant_memories.items():
         memory_lines.append(
-            f"{first_name} memories:"
+            f"{character_id} memories:"
         )
 
-        sorted_memories = sorted(
-            memories,
-            key=lambda memory: memory.get(
-                "importance",
-                0,
-            ),
-            reverse=True,
-        )
-
-        top_memories = sorted_memories[:5]
-
-        for memory in top_memories:
-            content = memory.get(
-                "content",
-                "",
-            )
-
-            importance = memory.get(
-                "importance",
-                0,
-            )
+        for memory in memories:
+            content = memory.get("content", "")
+            importance = memory.get("importance", 0)
+            age = memory.get("age", 0)
 
             memory_lines.append(
-                f'- {content} '
-                f'(importance: {importance})'
+                f"- {content} "
+                f"(importance: {importance}, age: {age})"
             )
 
         memory_lines.append("")
-
-    if not memory_lines:
-        return "No important memories yet."
 
     return "\n".join(memory_lines)
 
@@ -376,5 +342,84 @@ def build_available_locations(world: Dict[str, Any]) -> str:
         location_name = location["name"]
 
         lines.append(f"- {location_id} = {location_name}")
+
+    return "\n".join(lines)
+
+
+def build_list_lines(
+    title: str,
+    items: Any,
+) -> List[str]:
+    """Transforme une liste de textes en section lisible."""
+
+    lines = [
+        f"{title}:",
+    ]
+
+    if not isinstance(items, list):
+        return lines
+
+    for item in items:
+        if isinstance(item, str) and item.strip():
+            lines.append(f"- {item}")
+
+    return lines
+
+
+def build_scenario_context(
+    scenario: Dict[str, Any],
+) -> str:
+    """Construit le contexte narratif du scenario."""
+
+    title = scenario.get(
+        "title",
+        "Unknown Scenario",
+    )
+
+    premise = scenario.get(
+        "premise",
+        "",
+    )
+
+    tone = scenario.get(
+        "tone",
+        [],
+    )
+
+    canon_rules = scenario.get(
+        "canon_rules",
+        [],
+    )
+
+    character_dynamics = scenario.get(
+        "character_dynamics",
+        [],
+    )
+
+    pacing_rules = scenario.get(
+        "pacing_rules",
+        [],
+    )
+
+    narrative_limits = scenario.get(
+        "narrative_limits",
+        [],
+    )
+
+    lines: List[str] = [
+        f"Title: {title}",
+        f"Premise: {premise}",
+        "",
+    ]
+
+    lines.extend(build_list_lines("Tone", tone))
+    lines.append("")
+    lines.extend(build_list_lines("Canon rules", canon_rules))
+    lines.append("")
+    lines.extend(build_list_lines("Character dynamics", character_dynamics))
+    lines.append("")
+    lines.extend(build_list_lines("Pacing rules", pacing_rules))
+    lines.append("")
+    lines.extend(build_list_lines("Narrative limits", narrative_limits))
 
     return "\n".join(lines)

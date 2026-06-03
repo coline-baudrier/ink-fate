@@ -35,7 +35,9 @@ World
 -> Scene History
 -> Recent Events
 -> Relevant Memories
+-> Relationship Status
 -> Player Input
+-> Scenario Context
 -> Narrative Rules
 -> Canon Rules
 -> JSON Rules
@@ -58,9 +60,10 @@ Le prompt contient :
 - historique de scene ;
 - evenements recents ;
 - souvenirs pertinents ;
+- statuts relationnels ;
 - action du joueur ;
-- regles narratives ;
-- regles canon du scenario actuel ;
+- contexte de scenario ;
+- regles de pacing ;
 - regles JSON ;
 - format JSON attendu.
 
@@ -86,6 +89,27 @@ Cela aide le LLM a tenir compte de ce qui a deja ete marque comme important par 
 RECENT EVENTS
 - Day 1, 10:05, arrival (elina): Elina arrives on campus.
 ```
+
+## Souvenirs Pertinents
+
+Le prompt recoit des souvenirs choisis par `memory_retriever.py`.
+
+La selection tient compte de l'importance, de l'age, des tags, de l'action du joueur et de l'historique recent.
+
+## Statuts Relationnels
+
+Le prompt recoit aussi un resume des relations entre participants actifs.
+
+Exemple :
+
+```md
+RELATIONSHIP STATUS
+- dean -> elina:
+  - attraction: 20/100 (emerging attraction)
+  - trust: 5/100 (guarded)
+```
+
+Cela aide le LLM a ne pas faire monter la romance trop vite.
 
 ## ✍️ Action Joueur
 
@@ -185,9 +209,9 @@ Le prompt demande actuellement :
 
 ## 🚧 Limites Actuelles
 
-- Les regles canon sont encore ecrites en dur dans `prompt_builder.py`.
-- Les relations existantes ne sont pas encore injectees dans le prompt.
-- Les souvenirs sont injectes, mais la selection reste simple.
+- Les regles canon sont lues depuis `scenario.json`.
+- Les relations existantes sont injectees sous forme de paliers narratifs.
+- Les souvenirs sont injectes avec une selection par score.
 - Les evenements recents sont injectes, mais la selection reste simple.
 - Les descriptions de lieux doivent exister dans `world.json`.
 - Les regles canon sont encore tres liees a l'univers `off-campus`.
@@ -196,8 +220,7 @@ Le prompt demande actuellement :
 
 Plus tard, le prompt builder devrait lire davantage de donnees depuis :
 
-- `scenario.json` ;
 - les personnages ;
-- les relations ;
-- les souvenirs pertinents ;
+- les relations avec une selection plus fine ;
+- les souvenirs avec un scoring plus riche ;
 - les evenements actifs et le journal d'evenements.

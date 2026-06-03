@@ -19,15 +19,17 @@ Le projet est actuellement un prototype CLI jouable.
 - parsing d'une reponse JSON `SceneResult` ;
 - boucle CLI avec entree joueur ;
 - historique de scene envoye au prompt ;
-- souvenirs pertinents reinjectes au prompt ;
+- souvenirs pertinents selectionnes puis reinjectes au prompt ;
+- statut relationnel des participants reinjecte au prompt ;
 - evenements recents reinjectes au prompt ;
+- regles de scenario, de romance progressive et de pacing dans `scenario.json` ;
 - module central pour appliquer les effets personnages ;
 - rendu texte simple ;
 - validation du `SceneResult` ;
 - validation des champs principaux de `scene` ;
 - filtrage des dialogues/actions/evenements invalides ;
 - suppression des dialogues du personnage joueur ;
-- limitation des deltas relationnels ;
+- limitation des deltas relationnels par dimension ;
 - application et sauvegarde des mises a jour relationnelles ;
 - creation et sauvegarde de souvenirs ;
 - avancee et sauvegarde du temps dans `world.json` ;
@@ -40,6 +42,7 @@ Le projet est actuellement un prototype CLI jouable.
 🚧 Ce qui n'existe pas encore :
 
 - validation complete de tous les champs du `SceneResult` ;
+- selection encore plus fine des souvenirs/evenements ;
 - simulation hors champ ;
 - sauvegarde de partie separee ;
 - interface frontend ;

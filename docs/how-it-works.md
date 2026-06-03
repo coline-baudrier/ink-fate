@@ -143,9 +143,11 @@ Il inclut :
 - personnage joueur ;
 - participants ;
 - historique ;
-- souvenirs importants ;
+- evenements recents ;
+- souvenirs pertinents ;
+- statuts relationnels ;
+- contexte du scenario ;
 - action du joueur ;
-- regles narratives ;
 - format JSON attendu.
 
 ### `openai_client.py`
@@ -227,11 +229,23 @@ Cela modifie la relation :
 dean -> elina
 ```
 
+### `relationship_stages.py`
+
+Transforme les valeurs numeriques des relations en paliers narratifs.
+
+Ces paliers sont envoyes au prompt pour eviter que les relations changent trop vite.
+
 ### `memory_engine.py`
 
 Applique les `memory_updates`.
 
 Il ajoute des souvenirs aux personnages.
+
+### `memory_retriever.py`
+
+Selectionne les souvenirs les plus pertinents pour la scene.
+
+Il tient compte de l'importance, de l'age, des tags, de l'action du joueur et de l'historique.
 
 ### `time_engine.py`
 

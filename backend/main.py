@@ -144,6 +144,7 @@ def main() -> None:
 
     # Chargement initial : monde, personnages, puis contexte de scene.
     world = load_json(UNIVERSE_PATH / "world.json")
+    scenario = load_json(UNIVERSE_PATH / "scenario.json")
     backup_paths = create_session_backup(UNIVERSE_PATH)
 
     character_ids = world["characters"]
@@ -164,6 +165,7 @@ def main() -> None:
 
     opening_scene = generate_scene(
         world,
+        scenario,
         scene_context,
     )
 
@@ -193,6 +195,7 @@ def main() -> None:
 
         next_scene = generate_scene(
             world,
+            scenario,
             scene_context,
             player_input,
             scene_history,

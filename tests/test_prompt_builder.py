@@ -1,5 +1,6 @@
 from backend.app.core.prompt_builder import (
     build_event_log_context,
+    build_scenario_context,
     build_structured_scene_prompt,
 )
 
@@ -71,6 +72,26 @@ def build_scene_context():
     }
 
 
+def build_scenario():
+    return {
+        "title": "Arrival at Briar",
+        "premise": "Elina arrives at Briar University.",
+        "tone": [
+            "contemporary college romance",
+            "natural modern dialogue",
+        ],
+        "canon_rules": [
+            "Beau is Elina's older brother.",
+        ],
+        "character_dynamics": [
+            "Dean should answer Elina directly.",
+        ],
+        "narrative_limits": [
+            "Do not invent another university name.",
+        ],
+    }
+
+
 def test_build_event_log_context_returns_empty_message():
     context = build_event_log_context(
         {
@@ -118,8 +139,49 @@ def test_build_event_log_context_keeps_only_recent_events():
 def test_structured_prompt_includes_recent_events_section():
     prompt = build_structured_scene_prompt(
         build_world(),
+        build_scenario(),
         build_scene_context(),
     )
 
     assert "RECENT EVENTS" in prompt
     assert "Elina arrives on campus." in prompt
+
+
+def test_build_scenario_context_formats_scenario_rules():
+    context = build_scenario_context(build_scenario())
+
+    assert "Title: Arrival at Briar" in context
+    assert "Premise: Elina arrives at Briar University." in context
+    assert "- contemporary college romance" in context
+    assert "- Beau is Elina's older brother." in context
+    assert "- Dean should answer Elina directly." in context
+    assert "- Do not invent another university name." in context
+
+
+def test_build_scenario_context_ignores_invalid_sections():
+    scenario = {
+        "title": "Arrival at Briar",
+        "premise": "Elina arrives at Briar University.",
+        "tone": "not-a-list",
+        "canon_rules": [
+            "Valid rule.",
+        ],
+    }
+
+    context = build_scenario_context(scenario)
+
+    assert "Tone:" in context
+    assert "- not-a-list" not in context
+    assert "- Valid rule." in context
+
+
+def test_structured_prompt_includes_scenario_context():
+    prompt = build_structured_scene_prompt(
+        build_world(),
+        build_scenario(),
+        build_scene_context(),
+    )
+
+    assert "SCENARIO CONTEXT" in prompt
+    assert "Elina arrives at Briar University." in prompt
+    assert "Beau is Elina's older brother." in prompt

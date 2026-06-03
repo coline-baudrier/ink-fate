@@ -42,7 +42,9 @@ backend/
       renderer.py
       character_state_engine.py
       relationship_engine.py
+      relationship_stages.py
       memory_engine.py
+      memory_retriever.py
       event_log_engine.py
       time_engine.py
       world_engine.py
@@ -127,6 +129,16 @@ Responsabilites actuelles :
 - appliquer les nouveaux souvenirs aux personnages ;
 - vieillir les souvenirs existants.
 
+### app/core/memory_retriever.py
+
+Selection des souvenirs pertinents pour le prompt.
+
+Responsabilites actuelles :
+
+- calculer un score selon importance, age, tags et contexte joueur ;
+- choisir les souvenirs les plus utiles par participant actif ;
+- eviter d'envoyer toute la memoire au LLM.
+
 ### app/core/relationship_engine.py
 
 Gestion des relations.
@@ -135,6 +147,16 @@ Responsabilites actuelles :
 
 - appliquer les deltas relationnels ;
 - limiter les valeurs finales entre `0` et `100`.
+
+### app/core/relationship_stages.py
+
+Lecture narrative des relations.
+
+Responsabilites actuelles :
+
+- transformer des valeurs numeriques en paliers narratifs ;
+- construire un contexte relationnel lisible pour les participants ;
+- aider le LLM a respecter une progression romance graduelle.
 
 ### app/core/event_log_engine.py
 
@@ -174,6 +196,9 @@ Responsabilites :
 - injecter les participants ;
 - injecter l'historique de scene ;
 - injecter les souvenirs pertinents ;
+- injecter les statuts relationnels ;
+- injecter les evenements recents ;
+- injecter le contexte de scenario ;
 - injecter l'action joueur ;
 - demander un JSON `SceneResult`.
 
