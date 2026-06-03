@@ -34,6 +34,8 @@ def build_structured_scene_prompt(
     expected_json_format = build_expected_json_format()
     scene_history_context = build_scene_history_context(scene_history)
     memory_context = build_memory_context(scene_context)
+    available_locations = build_available_locations(world)
+    event_log_context = build_event_log_context(world)
 
     # Le prompt est volontairement separe en sections lisibles.
     prompt = f"""
@@ -49,6 +51,9 @@ WORLD CONTEXT
 - Location: {location_name}
 - Location description: {location_description}
 
+AVAILABLE LOCATIONS
+{available_locations}
+
 PLAYER CHARACTER
 - The player controls: {player_character_id}
 - Never write dialogue for the player character.
@@ -60,6 +65,9 @@ ACTIVE PARTICIPANTS
 
 SCENE HISTORY
 {scene_history_context}
+
+RECENT EVENTS
+{event_log_context}
 
 RELEVANT MEMORIES
 {memory_context}
@@ -115,6 +123,13 @@ JSON RULES
 - importance must be an integer between 1 and 10.
 - Only create memories for narratively meaningful moments.
 - Do not create memories for every line of dialogue.
+- world_updates.new_location must be empty unless the player clearly moves to another location.
+- world_updates.new_location must use a valid location ID.
+- world_updates.character_movements must map character IDs to valid location IDs.
+- Only include character_movements when a non-player character clearly moves, follows, leaves, or stays behind.
+- Do not move uninvolved characters.
+- If no non-player character moves, use an empty object.
+- If no location change happens, use an empty string.
 
 EXPECTED JSON FORMAT
 {expected_json_format}
@@ -201,7 +216,14 @@ def build_expected_json_format() -> str:
       "age": 0,
       "tags": []
     }
-  ]
+  ],
+  "world_updates": {
+    "new_location": "",
+    "time_advance_minutes": 0,
+    "character_movements": {
+        "character_id": "location_id"
+    }
+  }
 }
 """.strip()
 
@@ -217,11 +239,12 @@ Previous scene :
 
     return "No previous scene yet."
 
+
 def build_memory_context(
     scene_context: Dict[str, Any],
 ) -> str:
     """
-    Construit le contexte mémoire envoyé au LLM.
+    Construit le contexte memoire envoye au LLM.
     """
 
     memory_lines = []
@@ -274,3 +297,84 @@ def build_memory_context(
         return "No important memories yet."
 
     return "\n".join(memory_lines)
+
+
+def build_event_log_context(
+    world: Dict[str, Any],
+    max_events: int = 5,
+) -> str:
+    """Construit le resume des derniers evenements importants."""
+
+    event_log = world.get(
+        "event_log",
+        [],
+    )
+
+    if not isinstance(event_log, list) or not event_log:
+        return "No important events recorded yet."
+
+    event_lines = []
+    recent_events = event_log[-max_events:]
+
+    for event in recent_events:
+        if not isinstance(event, dict):
+            continue
+
+        day = event.get(
+            "day",
+            "?",
+        )
+
+        time = event.get(
+            "time",
+            "??:??",
+        )
+
+        event_type = event.get(
+            "type",
+            "event",
+        )
+
+        summary = event.get(
+            "summary",
+            "",
+        )
+
+        participants = event.get(
+            "participants",
+            [],
+        )
+
+        if not isinstance(participants, list):
+            participants = []
+
+        participant_text = ", ".join(participants)
+
+        if participant_text:
+            event_lines.append(
+                f"- Day {day}, {time}, {event_type} "
+                f"({participant_text}): {summary}"
+            )
+        else:
+            event_lines.append(
+                f"- Day {day}, {time}, {event_type}: {summary}"
+            )
+
+    if not event_lines:
+        return "No important events recorded yet."
+
+    return "\n".join(event_lines)
+
+
+def build_available_locations(world: Dict[str, Any]) -> str:
+    """Construit la liste des lieux disponibles."""
+
+    lines = []
+
+    for location in world["locations"]:
+        location_id = location["id"]
+        location_name = location["name"]
+
+        lines.append(f"- {location_id} = {location_name}")
+
+    return "\n".join(lines)

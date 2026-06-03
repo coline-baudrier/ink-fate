@@ -30,7 +30,13 @@ Il ne doit pas decrire tout l'univers en detail. Il doit contenir seulement les 
   "active_scene": {
     "location": "campus",
     "participants": ["beau", "elina", "dean"]
-  }
+  },
+  "character_locations": {
+    "elina": "campus",
+    "beau": "campus",
+    "dean": "campus"
+  },
+  "event_log": []
 }
 ```
 
@@ -40,7 +46,9 @@ Contient la date et l'heure courantes.
 
 Le moteur met actuellement a jour l'heure apres chaque tour via `world_engine.py` et `time_engine.py`.
 
-La mise a jour reste simple : elle avance l'heure, mais ne gere pas encore les changements de jour complexes ou les ellipses longues.
+La mise a jour reste simple : elle avance l'heure, applique `world_updates.time_advance_minutes` quand il existe, et augmente `current_day` quand minuit est depasse.
+
+Elle ne gere pas encore les dates calendaires complexes ou les ellipses longues.
 
 ## 👤 player_character
 
@@ -109,7 +117,41 @@ Scene actuellement jouee.
 
 Le moteur utilise cette section pour construire le `SceneContext`.
 
-La scene active n'est pas encore modifiee apres une generation.
+La scene active peut maintenant changer apres une generation si le `SceneResult` contient un `world_updates.new_location` valide.
+
+## Positions Des Personnages
+
+`character_locations` indique ou se trouve chaque personnage.
+
+```json
+{
+  "elina": "dormitory",
+  "beau": "campus",
+  "dean": "campus"
+}
+```
+
+Le moteur s'en sert pour recalculer les participants de la scene active.
+
+Regle simple actuelle :
+
+- si le joueur change de lieu, `active_scene.location` change aussi ;
+- le joueur est deplace vers ce nouveau lieu ;
+- les PNJ peuvent etre deplaces via `world_updates.character_movements` ;
+- les participants sont recalcules selon les personnages qui se trouvent dans le lieu actif.
+
+## Journal D'Evenements
+
+`event_log` garde une trace des evenements importants.
+
+Chaque entree contient :
+
+- le jour ;
+- la date ;
+- l'heure ;
+- le type d'evenement ;
+- les participants ;
+- un resume court.
 
 ## 🚧 Ce Que Le World State Ne Contient Pas Encore
 
@@ -122,8 +164,7 @@ Pour le MVP actuel, le world state ne gere pas :
 - carte complete ;
 - simulation permanente ;
 - historique de partie sauvegarde ;
-- souvenirs persistants ;
-- updates de temps appliquees.
+- dates calendaires avancees.
 
 ## 📖 Scenario
 

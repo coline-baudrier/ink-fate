@@ -14,9 +14,9 @@ Action joueur
 -> LLM
 -> SceneResult JSON
 -> Validation
--> Affichage
--> Relations / Memoires / Temps
+-> Relations / Memoires / Monde / Event Log / Temps
 -> Sauvegarde JSON
+-> Affichage
 ```
 
 ## 🧱 Les Deux Grandes Parties
@@ -67,7 +67,8 @@ Contient l'etat global :
 - personnage joueur ;
 - lieux ;
 - personnages a charger ;
-- scene active.
+- scene active ;
+- position actuelle des personnages.
 
 ### `data/universes/off-campus/characters/*.json`
 
@@ -114,6 +115,8 @@ Le monde complet est trop grand pour etre envoye tel quel au LLM.
 - heure ;
 - personnages presents.
 
+Les personnages presents viennent de `active_scene["participants"]`, qui peut etre recalculee par `world_engine.py` quand les positions changent.
+
 ## 🧪 Generer Une Scene
 
 ### `scene_pipeline.py`
@@ -136,6 +139,7 @@ Construit le texte envoye au LLM.
 Il inclut :
 
 - contexte du monde ;
+- lieux disponibles ;
 - personnage joueur ;
 - participants ;
 - historique ;
@@ -168,6 +172,7 @@ Il supprime ou corrige :
 - evenements invalides ;
 - updates relationnels invalides ;
 - souvenirs invalides ;
+- changements de lieu invalides ;
 - valeurs relationnelles trop grandes ;
 - importance de souvenir hors limites.
 
@@ -234,11 +239,27 @@ Avance l'heure du monde.
 
 ### `world_engine.py`
 
-Regroupe les operations simples sur le monde :
+Regroupe les operations persistantes sur le monde :
 
-- avancer le monde apres une scene ;
+- appliquer un changement de lieu propose par `world_updates` ;
+- mettre a jour les positions des personnages ;
+- recalculer les participants presents dans la scene active ;
+- avancer l'heure apres une scene ;
 - sauvegarder `world.json` ;
 - reconstruire le contexte de scene.
+
+### `event_log_engine.py`
+
+Ajoute les evenements importants dans `world.event_log`.
+
+Le journal garde :
+
+- le jour ;
+- la date ;
+- l'heure ;
+- le type d'evenement ;
+- les participants ;
+- un resume court.
 
 ## 🧵 Cycle Complet D'Un Tour
 
@@ -254,10 +275,12 @@ Voici ce qui se passe quand le joueur ecrit une action :
 7. character_state_engine.py applique les effets personnages.
 8. relationship_engine.py applique les relations.
 9. memory_engine.py applique et vieillit les souvenirs.
-10. world_engine.py avance et sauvegarde le monde.
-11. character_loader.py sauvegarde les personnages.
-12. renderer.py affiche la scene.
-13. main.py ajoute la scene a l'historique.
+10. world_engine.py applique les changements de lieu.
+11. event_log_engine.py enregistre les evenements importants.
+12. world_engine.py avance et sauvegarde le monde.
+13. character_loader.py sauvegarde les personnages.
+14. renderer.py affiche la scene.
+15. main.py ajoute la scene a l'historique.
 ```
 
 ## 💾 Ce Qui Est Persistant
@@ -268,13 +291,14 @@ Actuellement, sont persistants :
 
 - relations ;
 - souvenirs ;
-- heure du monde.
+- heure du monde ;
+- lieu actif ;
+- position des personnages ;
+- journal d'evenements.
 
 Ne sont pas encore persistants :
 
 - historique complet de partie ;
-- journal d'evenements ;
-- changements de scene active ;
 - arcs narratifs.
 
 ## 🗺️ Comment Lire Le Projet

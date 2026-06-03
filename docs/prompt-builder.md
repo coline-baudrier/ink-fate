@@ -30,8 +30,11 @@ en prompt narratif clair, stable et complet.
 ```md
 World
 -> SceneContext
+-> Available Locations
 -> Active Participants
 -> Scene History
+-> Recent Events
+-> Relevant Memories
 -> Player Input
 -> Narrative Rules
 -> Canon Rules
@@ -49,9 +52,12 @@ Le prompt contient :
 - date et heure ;
 - lieu actuel ;
 - description du lieu ;
+- liste des lieux disponibles ;
 - personnage joueur ;
 - personnages presents ;
 - historique de scene ;
+- evenements recents ;
+- souvenirs pertinents ;
 - action du joueur ;
 - regles narratives ;
 - regles canon du scenario actuel ;
@@ -68,6 +74,17 @@ Cela permet au LLM de repondre a la suite de ce qui vient de se passer, au lieu 
 SCENE HISTORY
 Previous scene:
 ...
+```
+
+## Evenements Recents
+
+Le prompt recoit aussi les derniers evenements importants de `world.event_log`.
+
+Cela aide le LLM a tenir compte de ce qui a deja ete marque comme important par le moteur, meme si l'historique de scene devient long.
+
+```md
+RECENT EVENTS
+- Day 1, 10:05, arrival (elina): Elina arrives on campus.
 ```
 
 ## ✍️ Action Joueur
@@ -102,6 +119,19 @@ Le prompt donne aussi des consignes specifiques pour eviter que toutes les repon
 - Dean peut taquiner Beau, mais la reaction principale doit viser Elina.
 
 Ces regles sont utiles pour le MVP, mais elles sont encore tres liees a l'univers `off-campus`.
+
+## Changements De Monde
+
+Le prompt demande aussi au LLM de remplir `world_updates`.
+
+Objectif :
+
+- proposer un nouveau lieu seulement si le joueur bouge clairement ;
+- utiliser des IDs de lieux valides ;
+- deplacer un PNJ seulement si la scene le justifie ;
+- laisser les champs vides quand rien ne change.
+
+Le validator et le world engine gardent le dernier mot : le LLM propose, le moteur applique seulement ce qui est valide.
 
 ## 🗂️ Format Attendu
 
@@ -143,7 +173,13 @@ Le prompt demande actuellement :
         "respect": 0
       }
     }
-  ]
+  ],
+  "memory_updates": [],
+  "world_updates": {
+    "new_location": "",
+    "time_advance_minutes": 0,
+    "character_movements": {}
+  }
 }
 ```
 
@@ -151,8 +187,10 @@ Le prompt demande actuellement :
 
 - Les regles canon sont encore ecrites en dur dans `prompt_builder.py`.
 - Les relations existantes ne sont pas encore injectees dans le prompt.
-- Les souvenirs ne sont pas encore injectes.
+- Les souvenirs sont injectes, mais la selection reste simple.
+- Les evenements recents sont injectes, mais la selection reste simple.
 - Les descriptions de lieux doivent exister dans `world.json`.
+- Les regles canon sont encore tres liees a l'univers `off-campus`.
 
 ## 🔮 Direction Future
 
@@ -162,4 +200,4 @@ Plus tard, le prompt builder devrait lire davantage de donnees depuis :
 - les personnages ;
 - les relations ;
 - les souvenirs pertinents ;
-- les evenements actifs.
+- les evenements actifs et le journal d'evenements.

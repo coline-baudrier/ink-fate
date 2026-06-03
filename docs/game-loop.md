@@ -18,13 +18,15 @@ La game loop definit ce qui se passe a chaque interaction entre le joueur et Ink
 11. Appliquer les updates relationnels.
 12. Appliquer les memory_updates.
 13. Vieillir les souvenirs.
-14. Avancer l'heure du monde.
-15. Sauvegarder world.json.
-16. Sauvegarder les personnages.
-17. Reconstruire le contexte de scene.
-18. Afficher la nouvelle scene.
-19. Ajouter l'action et la scene a l'historique.
-20. Recommencer.
+14. Appliquer les `world_updates`.
+15. Ajouter les evenements valides dans `event_log`.
+16. Avancer l'heure du monde.
+17. Sauvegarder world.json.
+18. Reconstruire le contexte de scene.
+19. Sauvegarder les personnages.
+20. Afficher la nouvelle scene.
+21. Ajouter l'action et la scene a l'historique.
+22. Recommencer.
 ```
 
 ## ✍️ Entree Joueur
@@ -68,6 +70,8 @@ Apres validation, le moteur applique :
 - les effets personnages avec `character_state_engine.py` ;
 - `relationship_updates` avec `relationship_engine.py` ;
 - `memory_updates` et vieillissement des souvenirs avec `memory_engine.py` ;
+- changements de lieu et positions avec `world_engine.py` ;
+- journal d'evenements avec `event_log_engine.py` ;
 - avancee de temps avec `world_engine.py` et `time_engine.py`.
 
 Les personnages et le monde sont ensuite sauvegardes en JSON.
@@ -76,8 +80,6 @@ Les personnages et le monde sont ensuite sauvegardes en JSON.
 
 La boucle ne gere pas encore :
 
-- changement de lieu via `SceneResult` ;
-- mise a jour de `active_scene` ;
 - sauvegarde de partie separee ;
 - ellipses longues ;
 - simulation hors champ.
@@ -89,7 +91,7 @@ Le prochain palier logique :
 ```md
 SceneResult
 -> world_updates
--> active_scene update
+-> active_scene update plus fiable
 -> event log
 -> saved game state
 ```

@@ -39,7 +39,9 @@ Structure actuelle :
   "locations": [],
   "characters": [],
   "active_events": [],
-  "active_scene": {}
+  "active_scene": {},
+  "character_locations": {},
+  "event_log": []
 }
 ```
 
@@ -52,6 +54,8 @@ Champs :
 - `characters` : identifiants des personnages a charger.
 - `active_events` : evenements importants en cours.
 - `active_scene` : scene actuellement jouee.
+- `character_locations` : position actuelle de chaque personnage.
+- `event_log` : journal des evenements importants deja arrives.
 
 ## 📍 Location
 
@@ -88,6 +92,44 @@ Champs :
 
 - `location` : identifiant d'un lieu existant.
 - `participants` : identifiants de personnages charges.
+
+## Positions Des Personnages
+
+`character_locations` stocke le lieu actuel de chaque personnage.
+
+```json
+{
+  "elina": "dormitory",
+  "beau": "campus",
+  "dean": "campus"
+}
+```
+
+Le moteur utilise ces positions pour recalculer `active_scene.participants` apres un changement de lieu.
+
+Regles actuelles :
+
+- les cles sont des IDs de personnages ;
+- les valeurs sont des IDs de lieux ;
+- le joueur est deplace automatiquement quand `world_updates.new_location` est applique ;
+- les PNJ peuvent etre deplaces via `world_updates.character_movements`.
+
+## event_log
+
+`event_log` conserve les evenements importants valides.
+
+```json
+{
+  "day": 1,
+  "date": "2026-09-01",
+  "time": "10:15",
+  "type": "arrival",
+  "participants": ["elina"],
+  "summary": "Elina arrive sur le campus."
+}
+```
+
+Le journal est sauvegarde dans `world.json` et les derniers evenements sont reinjectes dans le prompt.
 
 ## 📖 scenario.json
 
@@ -145,7 +187,7 @@ Champs :
 - `current_goals` : objectifs actifs dans la scene ou la journee.
 - `private_thoughts` : informations internes a utiliser avec prudence.
 
-Champ futur :
+Champ courant :
 
 - `memories` : souvenirs persistants.
 
@@ -173,17 +215,17 @@ Regles actuelles :
 
 ## 🧠 memory
 
-Les souvenirs ne sont pas encore implementes dans les fichiers personnages.
+Les souvenirs sont sauvegardes dans les fichiers personnages.
 
-Structure cible :
+Structure actuelle simplifiee :
 
 ```json
 {
-  "id": "memory_001",
   "owner": "dean",
-  "type": "episodic",
-  "importance": 40,
   "content": "Elina seemed confident.",
+  "type": "memory",
+  "importance": 5,
+  "age": 0,
   "tags": ["elina", "first_meeting"]
 }
 ```

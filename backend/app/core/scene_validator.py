@@ -25,6 +25,106 @@ def ensure_dict(value: Any) -> dict:
     return {}
 
 
+def is_valid_time(value: Any) -> bool:
+    """Verifie qu'une heure ressemble a HH:MM."""
+
+    if not isinstance(value, str):
+        return False
+
+    parts = value.split(":")
+
+    if len(parts) != 2:
+        return False
+
+    hours, minutes = parts
+
+    if not hours.isdigit():
+        return False
+
+    if not minutes.isdigit():
+        return False
+
+    hour_value = int(hours)
+    minute_value = int(minutes)
+
+    return 0 <= hour_value <= 23 and 0 <= minute_value <= 59
+
+
+def validate_scene(
+    scene_result: Dict[str, Any],
+    world: Dict[str, Any],
+) -> Dict[str, Any]:
+    """Nettoie les informations principales de la scene."""
+
+    valid_location_ids = {
+        location["id"]
+        for location in world["locations"]
+    }
+
+    valid_character_ids = set(
+        world["characters"]
+    )
+
+    active_scene = world["active_scene"]
+    timeline = world["timeline"]
+    scene = ensure_dict(
+        scene_result.get(
+            "scene",
+            {},
+        )
+    )
+
+    location = scene.get(
+        "location",
+        active_scene["location"],
+    )
+
+    if location not in valid_location_ids:
+        location = active_scene["location"]
+
+    time = scene.get(
+        "time",
+        timeline["current_time"],
+    )
+
+    if not is_valid_time(time):
+        time = timeline["current_time"]
+
+    participant_ids = ensure_list(
+        scene.get(
+            "participants",
+            active_scene.get(
+                "participants",
+                [],
+            ),
+        )
+    )
+
+    valid_participants = []
+
+    for character_id in participant_ids:
+        if character_id in valid_character_ids:
+            valid_participants.append(character_id)
+
+    if not valid_participants:
+        valid_participants = [
+            character_id
+            for character_id in active_scene.get(
+                "participants",
+                [],
+            )
+            if character_id in valid_character_ids
+        ]
+
+    scene_result["scene"] = {
+        "location": location,
+        "time": time,
+        "participants": valid_participants,
+    }
+
+    return scene_result
+
+
 def remove_player_dialogues(
     scene_result: Dict[str, Any],
     player_character_id: str,
@@ -270,5 +370,89 @@ def clamp_memory_importance(
         memory["importance"] = importance
 
     scene_result["memory_updates"] = memory_updates
+
+    return scene_result
+
+def validate_world_updates(
+    scene_result: Dict[str, Any],
+    world: Dict[str, Any],
+) -> Dict[str, Any]:
+    """Nettoie les world_updates invalides."""
+
+    valid_location_ids = {
+        location["id"]
+        for location in world["locations"]
+    }
+
+    valid_character_ids = set(
+        world["characters"]
+    )
+
+    world_updates = ensure_dict(
+        scene_result.get(
+            "world_updates",
+            {},
+        )
+    )
+
+    new_location = world_updates.get(
+        "new_location",
+        "",
+    )
+
+    if new_location:
+        if new_location not in valid_location_ids:
+            world_updates["new_location"] = ""
+
+    time_advance_minutes = world_updates.get(
+        "time_advance_minutes",
+        0,
+    )
+
+    if not isinstance(
+        time_advance_minutes,
+        int,
+    ):
+        time_advance_minutes = 0
+
+    if time_advance_minutes < 0:
+        time_advance_minutes = 0
+
+    if time_advance_minutes > 180:
+        time_advance_minutes = 180
+
+    world_updates["time_advance_minutes"] = (
+        time_advance_minutes
+    )
+
+    character_movements = ensure_dict(
+        world_updates.get(
+            "character_movements",
+            {},
+        )
+    )
+
+    cleaned_movements = {}
+
+    for character_id, location_id in (
+        character_movements.items()
+    ):
+        if character_id not in valid_character_ids:
+            continue
+
+        if location_id not in valid_location_ids:
+            continue
+
+        cleaned_movements[
+            character_id
+        ] = location_id
+
+    world_updates[
+        "character_movements"
+    ] = cleaned_movements
+
+    scene_result[
+        "world_updates"
+    ] = world_updates
 
     return scene_result

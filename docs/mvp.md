@@ -11,19 +11,22 @@ Le MVP 1 vise une boucle jouable simple dans la CLI.
 - generation de scene par LLM ;
 - boucle CLI avec entree joueur ;
 - historique de scene ;
-- validation minimale du `SceneResult` ;
+- validation du `SceneResult` ;
 - rendu texte ;
 - relations persistantes ;
 - souvenirs persistants ;
+- journal d'evenements ;
+- evenements recents reinjectes au prompt ;
 - temps qui avance ;
+- passage au jour suivant apres minuit ;
+- changements simples de lieu ;
+- positions des personnages dans `world.json` ;
+- validation des mouvements de PNJ ;
 - sauvegarde de `world.json` et des personnages.
 
 ## 🚧 Encore Partiel
 
-- validation complete de `scene` ;
-- changement de lieu ;
-- changement de `active_scene` ;
-- journal d'evenements ;
+- validation de tous les champs secondaires du `SceneResult` ;
 - selection intelligente des souvenirs ;
 - detection d'ellipses ;
 - sauvegarde de partie separee.

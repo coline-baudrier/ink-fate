@@ -37,13 +37,18 @@ La roadmap separe ce qui existe deja, ce qui est partiel et les extensions futur
 - suppression des updates relationnels invalides ;
 - suppression des updates memoire invalides ;
 - limitation des deltas relationnels ;
-- limitation de l'importance des souvenirs.
+- limitation de l'importance des souvenirs ;
+- validation des champs principaux de `scene` ;
+- validation de `scene.location` ;
+- validation de `scene.time` ;
+- validation de `scene.participants` ;
+- validation du lieu demande dans `world_updates.new_location` ;
+- limitation de `world_updates.time_advance_minutes` ;
+- validation des lieux dans `world_updates.character_movements`.
 
 🚧 Reste a faire :
 
-- verifier les champs obligatoires de `scene` ;
-- verifier les lieux ;
-- verifier les types de chaque champ ;
+- verifier les types de tous les champs secondaires ;
 - produire un rapport de validation lisible.
 
 ## 💞 Phase 3 - Relations Persistantes
@@ -73,11 +78,11 @@ La roadmap separe ce qui existe deja, ce qui est partiel et les extensions futur
 - limiter l'importance ;
 - sauvegarder les souvenirs dans les personnages ;
 - reinjecter quelques souvenirs dans le prompt ;
-- vieillir les souvenirs.
+- vieillir les souvenirs ;
+- eviter de vieillir les souvenirs crees pendant le tour courant.
 
 🚧 Reste a faire :
 
-- eviter de vieillir les souvenirs tout juste crees ;
 - mieux choisir les souvenirs pertinents ;
 - eviter les doublons ;
 - ajouter des types de souvenirs plus stricts.
@@ -90,15 +95,19 @@ La roadmap separe ce qui existe deja, ce qui est partiel et les extensions futur
 
 - avancer l'heure ;
 - sauvegarder `world.json` ;
-- reconstruire le contexte de scene.
+- reconstruire le contexte de scene ;
+- appliquer `world_updates.new_location` ;
+- changer le lieu actif ;
+- suivre la position des personnages avec `character_locations` ;
+- recalculer les participants selon le lieu actif ;
+- appliquer `world_updates.time_advance_minutes` ;
+- gerer le passage au jour suivant quand minuit est depasse ;
+- enregistrer les evenements dans `event_log`.
 
 🚧 Reste a faire :
 
-- changer `active_scene` ;
-- changer de lieu ;
-- appliquer des `world_updates` depuis le `SceneResult` ;
-- gerer les jours quand minuit est depasse ;
-- enregistrer les evenements.
+- mieux choisir les evenements de `event_log` a reinjecter dans le prompt ;
+- gerer des evenements hors champ.
 
 ## 🌙 Phase 6 - Ellipses Et Simulation Hors Champ
 
@@ -111,12 +120,14 @@ La roadmap separe ce qui existe deja, ce qui est partiel et les extensions futur
 
 ## 🧼 Phase 7 - Nettoyage Et Tests
 
-**Statut : a faire.**
+**Statut : partiellement fait.**
 
 - tests unitaires du validator ;
-- tests du relationship engine ;
+- tests du world engine ;
 - tests du memory engine ;
+- tests du relationship engine ;
 - tests du time engine ;
+- tests de l'event log ;
 - nettoyage des accents dans les JSON ;
 - documentation a jour.
 

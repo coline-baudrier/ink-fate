@@ -5,7 +5,7 @@
   },
   "timeline": {
     "current_date": "2026-09-01",
-    "current_time": "10:10",
+    "current_time": "10:15",
     "current_day": 1
   },
   "player_character": "elina",
@@ -13,29 +13,25 @@
     {
       "id": "campus",
       "name": "Briar University Campus",
-      "description": "Le campus de Briar University, une université américaine contemporaine connue notamment pour son équipe de hockey."
+      "description": "Le campus de Briar University."
     },
     {
       "id": "dormitory",
       "name": "Briar Dormitory",
-      "description": "La résidence universitaire principale de Briar University, animée par les allées et venues constantes des étudiants, les soirées improvisées et les discussions tard dans la nuit."
+      "description": "La residence universitaire principale de Briar University."
     },
     {
       "id": "hockey_house",
       "name": "Hockey House",
-      "description": "La maison partagée par plusieurs joueurs de l'équipe de hockey de Briar University, connue pour son ambiance chaotique, ses fêtes fréquentes et la musique qui résonne presque en permanence."
+      "description": "La maison partagée par plusieurs joueurs de hockey."
     },
     {
       "id": "library",
       "name": "University Library",
-      "description": "La bibliothèque universitaire de Briar, calme et studieuse."
+      "description": "La bibliotheque universitaire de Briar."
     }
   ],
-  "characters": [
-    "dean",
-    "beau",
-    "elina"
-  ],
+  "characters": ["dean", "beau", "elina"],
   "active_events": [
     {
       "id": "arrival_day",
@@ -45,10 +41,12 @@
   ],
   "active_scene": {
     "location": "campus",
-    "participants": [
-      "beau",
-      "elina",
-      "dean"
-    ]
-  }
+    "participants": ["elina", "beau", "dean"]
+  },
+  "character_locations": {
+    "elina": "campus",
+    "beau": "campus",
+    "dean": "campus"
+  },
+  "event_log": []
 }

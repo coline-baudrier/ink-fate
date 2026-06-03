@@ -7,6 +7,8 @@ appliquer les relations et afficher le resultat.
 
 from pathlib import Path
 from typing import Any, Dict
+import shutil
+import tempfile
 
 from app.core.character_loader import (
     load_characters,
@@ -20,11 +22,63 @@ from app.core.world_engine import (
     rebuild_scene_context,
     save_world,
     update_world_after_scene,
+    apply_world_updates,
 )
 from app.core.character_state_engine import update_characters_after_scene
+from app.core.event_log_engine import update_event_log_after_scene
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 UNIVERSE_PATH = PROJECT_ROOT / "data" / "universes" / "off-campus"
+
+
+def create_session_backup(
+    universe_path: Path,
+) -> Dict[str, Path]:
+    """Cree une sauvegarde temporaire des JSON au debut de session."""
+
+    temp_dir = Path(
+        tempfile.mkdtemp()
+    )
+
+    backup_world_path = temp_dir / "world.json"
+
+    shutil.copy(
+        universe_path / "world.json",
+        backup_world_path,
+    )
+
+    backup_characters_path = temp_dir / "characters"
+
+    shutil.copytree(
+        universe_path / "characters",
+        backup_characters_path,
+    )
+
+    return {
+        "world": backup_world_path,
+        "characters": backup_characters_path,
+    }
+
+
+def restore_session_backup(
+    universe_path: Path,
+    backup_paths: Dict[str, Path],
+) -> None:
+    """Restaure les JSON dans leur etat du debut de session."""
+
+    shutil.copy(
+        backup_paths["world"],
+        universe_path / "world.json",
+    )
+
+    shutil.rmtree(
+        universe_path / "characters",
+    )
+
+    shutil.copytree(
+        backup_paths["characters"],
+        universe_path / "characters",
+    )
 
 
 def print_project_header(world: Dict[str, Any]) -> None:
@@ -90,6 +144,8 @@ def main() -> None:
 
     # Chargement initial : monde, personnages, puis contexte de scene.
     world = load_json(UNIVERSE_PATH / "world.json")
+    backup_paths = create_session_backup(UNIVERSE_PATH)
+
     character_ids = world["characters"]
 
     characters = load_characters(
@@ -126,6 +182,15 @@ def main() -> None:
             print("Fin de la session.")
             break
 
+        if player_input.lower() in ["reset"]:
+            restore_session_backup(
+                UNIVERSE_PATH,
+                backup_paths,
+            )
+
+            print("Session annulee. JSON restaures.")
+            break
+
         next_scene = generate_scene(
             world,
             scene_context,
@@ -138,8 +203,19 @@ def main() -> None:
             characters,
         )
 
+        world = apply_world_updates(
+            world,
+            next_scene,
+        )
+
+        world = update_event_log_after_scene(
+            world,
+            next_scene,
+        )
+
         world = update_world_after_scene(
             world,
+            next_scene,
         )
 
         save_world(

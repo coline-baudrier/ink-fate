@@ -39,21 +39,21 @@
     "elina": {
       "friendship": 0,
       "trust": 0,
-      "respect": 3,
+      "respect": 5,
       "attachment": 0,
       "jealousy": 0,
-      "attraction": 2
+      "attraction": 4
     }
   },
   "memories": [
     {
       "owner": "dean",
       "type": "memory",
-      "content": "Elina a exprimé qu'elle lui avait manqué, renforçant leur complicité.",
+      "content": "Elina a exprime qu'elle lui avait manque, renforcant leur complicite.",
       "importance": 5,
-      "age": 2,
+      "age": 4,
       "tags": [
-        "complicité",
+        "complicite",
         "retour"
       ]
     }

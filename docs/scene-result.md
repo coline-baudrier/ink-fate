@@ -1,10 +1,10 @@
-# 📦 SceneResult
+# SceneResult
 
 Le `SceneResult` est le JSON produit par le LLM.
 
 Le LLM propose. Le moteur decide.
 
-## 🗂️ Structure Actuelle
+## Structure Actuelle
 
 ```json
 {
@@ -18,17 +18,33 @@ Le LLM propose. Le moteur decide.
   "actions": [],
   "events": [],
   "relationship_updates": [],
-  "memory_updates": []
+  "memory_updates": [],
+  "world_updates": {
+    "new_location": "",
+    "time_advance_minutes": 0,
+    "character_movements": {}
+  }
 }
 ```
 
-## 📝 narration
+## scene
+
+Informations principales de la scene.
+
+Regles actuelles :
+
+- `scene.location` doit etre un lieu existant, sinon le moteur garde le lieu actif ;
+- `scene.time` doit etre une heure valide au format `HH:MM`, sinon le moteur garde l'heure courante ;
+- `scene.participants` ne garde que les personnages existants ;
+- si les participants sont invalides ou absents, le moteur garde les participants de la scene active.
+
+## narration
 
 Texte narratif lu par le joueur.
 
 Le moteur l'affiche avec `renderer.py`.
 
-## 💬 dialogues
+## dialogues
 
 Dialogues des PNJ.
 
@@ -45,7 +61,7 @@ Regles actuelles :
 - le speaker ne doit pas etre le personnage joueur ;
 - les dialogues invalides sont supprimes.
 
-## 🎭 actions
+## actions
 
 Actions objectives proposees par le LLM.
 
@@ -61,7 +77,7 @@ Regle actuelle :
 
 - `character` doit etre un personnage existant.
 
-## 📌 events
+## events
 
 Evenements importants proposes.
 
@@ -76,9 +92,9 @@ Regles actuelles :
 
 - les participants invalides sont retires ;
 - un evenement sans participant valide est supprime ;
-- les evenements ne sont pas encore sauvegardes dans un journal.
+- les evenements valides sont sauvegardes dans `world.event_log`.
 
-## 💞 relationship_updates
+## relationship_updates
 
 Deltas relationnels proposes.
 
@@ -100,7 +116,7 @@ Regles actuelles :
 - les deltas sont limites entre `-5` et `5` ;
 - les valeurs finales sont limitees entre `0` et `100`.
 
-## 🧠 memory_updates
+## memory_updates
 
 Souvenirs proposes.
 
@@ -119,15 +135,40 @@ Regles actuelles :
 
 - `owner` doit etre un personnage existant ;
 - `content` doit etre une chaine non vide ;
-- `importance` est limitee entre `1` et `10`.
+- `importance` est limitee entre `1` et `10` ;
+- un souvenir cree pendant le tour courant ne vieillit pas immediatement.
 
-## 🚧 Champs Pas Encore Appliques
+## world_updates
+
+`world_updates` permet au LLM de proposer des changements persistants dans `world.json`.
+
+```json
+{
+  "new_location": "library",
+  "time_advance_minutes": 10,
+  "character_movements": {
+    "dean": "library"
+  }
+}
+```
+
+Regles actuelles :
+
+- `new_location` doit etre vide si le joueur ne change pas clairement de lieu ;
+- `new_location` doit etre un ID de lieu existant ;
+- si `new_location` est valide, le moteur change `active_scene.location` ;
+- le personnage joueur est deplace vers le nouveau lieu ;
+- `character_movements` sert a deplacer des PNJ ;
+- les mouvements de PNJ vers des lieux invalides sont supprimes ;
+- `time_advance_minutes` peut remplacer l'avance de temps par defaut ;
+- les participants de la scene sont recalcules selon les positions actuelles.
+
+## Champs Encore Partiels
 
 Le moteur ne se sert pas encore de :
 
-- `scene.location` pour changer de lieu ;
-- `scene.time` pour regler l'heure ;
-- `world_updates` ;
+- `scene.location` pour appliquer directement un changement de lieu ;
+- `scene.time` pour regler directement l'heure ;
 - `next_hooks`.
 
-Ces champs pourront etre ajoutes quand le world engine sera plus avance.
+Pour changer le monde, le moteur utilise actuellement `world_updates`.

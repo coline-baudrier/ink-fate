@@ -43,6 +43,7 @@ backend/
       character_state_engine.py
       relationship_engine.py
       memory_engine.py
+      event_log_engine.py
       time_engine.py
       world_engine.py
 
@@ -91,7 +92,10 @@ Gestion simple du monde.
 
 Responsabilites :
 
-- appliquer les changements simples du monde apres une scene ;
+- appliquer les changements de lieu proposes par `world_updates` ;
+- maintenir `character_locations` ;
+- recalculer les participants de la scene active ;
+- avancer le temps apres une scene ;
 - sauvegarder `world.json` ;
 - reconstruire le contexte de scene.
 
@@ -111,7 +115,8 @@ Gestion du temps.
 
 Responsabilite actuelle :
 
-- avancer l'heure du monde de quelques minutes.
+- avancer l'heure du monde ;
+- passer au jour suivant quand minuit est depasse.
 
 ### app/core/memory_engine.py
 
@@ -131,6 +136,16 @@ Responsabilites actuelles :
 - appliquer les deltas relationnels ;
 - limiter les valeurs finales entre `0` et `100`.
 
+### app/core/event_log_engine.py
+
+Gestion du journal d'evenements.
+
+Responsabilites actuelles :
+
+- lire les `events` valides du `SceneResult` ;
+- creer un resume court ;
+- ajouter les evenements dans `world.event_log`.
+
 ### app/core/scene_validator.py
 
 Validation minimale de la sortie LLM.
@@ -138,10 +153,12 @@ Validation minimale de la sortie LLM.
 Responsabilites actuelles :
 
 - proteger contre les listes/dictionnaires invalides ;
+- valider les champs principaux de `scene` ;
 - supprimer dialogues, actions, evenements invalides ;
 - supprimer les dialogues du joueur ;
 - valider les updates relationnels ;
 - valider les updates memoire ;
+- valider les changements de lieu proposes ;
 - limiter les deltas relationnels ;
 - limiter l'importance des souvenirs.
 
@@ -153,6 +170,7 @@ Responsabilites :
 
 - injecter le monde ;
 - injecter la scene active ;
+- injecter les lieux disponibles ;
 - injecter les participants ;
 - injecter l'historique de scene ;
 - injecter les souvenirs pertinents ;
@@ -189,11 +207,13 @@ Chargement et sauvegarde des personnages.
 8. character_state_engine applique les effets personnages.
 9. relationship_engine applique les relations.
 10. memory_engine applique et vieillit les souvenirs.
-11. world_engine avance le temps.
-12. world_engine sauvegarde le monde.
-13. character_loader sauvegarde les personnages.
-14. world_engine reconstruit le contexte.
-15. renderer affiche la scene suivante.
+11. world_engine applique les changements de lieu.
+12. event_log_engine enregistre les evenements.
+13. world_engine avance le temps.
+14. world_engine sauvegarde le monde.
+15. character_loader sauvegarde les personnages.
+16. world_engine reconstruit le contexte.
+17. renderer affiche la scene suivante.
 ```
 
 ## 🛡️ Regles Techniques
@@ -204,4 +224,5 @@ Chargement et sauvegarde des personnages.
 - Les relations finales restent entre `0` et `100`.
 - Le joueur ne doit jamais recevoir de dialogue genere par le LLM.
 - Les souvenirs doivent avoir un proprietaire valide et un contenu non vide.
+- Les lieux proposes par le LLM doivent exister dans `world.json`.
 - Le monde et les personnages sont sauvegardes separement.

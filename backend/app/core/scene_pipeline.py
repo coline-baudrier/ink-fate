@@ -12,6 +12,8 @@ from app.core.scene_validator import (
     remove_invalid_memory_updates,
     remove_invalid_relationship_updates,
     remove_player_dialogues,
+    validate_scene,
+    validate_world_updates,
 )
 
 
@@ -46,6 +48,10 @@ def validate_scene_result(
     """Applique tous les filtres de validation au SceneResult."""
 
     valid_character_ids = world["characters"]
+    scene_result = validate_scene(
+        scene_result,
+        world,
+    )
 
     scene_result = remove_invalid_dialogues(
         scene_result,
@@ -79,5 +85,10 @@ def validate_scene_result(
 
     scene_result = clamp_relationship_updates(scene_result)
     scene_result = clamp_memory_importance(scene_result)
+
+    scene_result = validate_world_updates(
+        scene_result,
+        world,
+    )
 
     return scene_result

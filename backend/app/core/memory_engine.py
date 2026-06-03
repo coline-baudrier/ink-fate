@@ -28,6 +28,8 @@ def apply_memory_updates(
             [],
         )
 
+        # Ce marqueur evite de vieillir un souvenir cree pendant ce tour.
+        memory["_created_this_turn"] = True
         character_memories.append(memory)
 
         character["memories"] = character_memories
@@ -48,6 +50,9 @@ def increase_memory_age(
         )
 
         for memory in memories:
+            if memory.pop("_created_this_turn", False):
+                continue
+
             age = memory.get("age", 0)
 
             if not isinstance(age, int):

@@ -20,20 +20,26 @@ Le projet est actuellement un prototype CLI jouable.
 - boucle CLI avec entree joueur ;
 - historique de scene envoye au prompt ;
 - souvenirs pertinents reinjectes au prompt ;
+- evenements recents reinjectes au prompt ;
 - module central pour appliquer les effets personnages ;
 - rendu texte simple ;
-- validation minimale du `SceneResult` ;
+- validation du `SceneResult` ;
+- validation des champs principaux de `scene` ;
 - filtrage des dialogues/actions/evenements invalides ;
 - suppression des dialogues du personnage joueur ;
 - limitation des deltas relationnels ;
 - application et sauvegarde des mises a jour relationnelles ;
 - creation et sauvegarde de souvenirs ;
-- avancee et sauvegarde du temps dans `world.json`.
+- avancee et sauvegarde du temps dans `world.json` ;
+- passage au jour suivant apres minuit ;
+- changements simples de lieu via `world_updates` ;
+- positions des personnages sauvegardees dans `world.json` ;
+- validation des mouvements de personnages proposes par le LLM ;
+- journal d'evenements persistant.
 
 🚧 Ce qui n'existe pas encore :
 
 - validation complete de tous les champs du `SceneResult` ;
-- changement de lieu et de scene active ;
 - simulation hors champ ;
 - sauvegarde de partie separee ;
 - interface frontend ;
@@ -114,4 +120,4 @@ Depuis la racine du projet :
 py .\backend\main.py
 ```
 
-Le prototype charge l'univers `off-campus`, genere une scene d'ouverture, attend une action du joueur, genere la suite, valide partiellement la reponse, applique les relations, les souvenirs, avance le temps, puis sauvegarde les personnages et le monde.
+Le prototype charge l'univers `off-campus`, genere une scene d'ouverture, attend une action du joueur, genere la suite, valide la reponse, applique les relations, les souvenirs, certains changements de monde et le journal d'evenements, avance le temps, puis sauvegarde les personnages et le monde.
