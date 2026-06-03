@@ -5,6 +5,7 @@
     "last_name": "Maxwell",
     "age": 20
   },
+  "archetype": "newcomer",
   "personality": {
     "humor": 70,
     "charisma": 75,
@@ -15,11 +16,13 @@
     "curiosity": 85,
     "confidence": 70
   },
-  "archetype": "newcomer",
   "goals": [
     "build_new_life",
     "find_true_friends",
     "gain_independence"
+  ],
+  "current_goals": [
+    "survive_first_day"
   ],
   "fears": [
     "being_controlled",
@@ -48,11 +51,8 @@
       "attraction": 1
     }
   },
-  "current_goals": [
-    "survive_first_day"
-  ],
+  "memories": [],
   "private_thoughts": [
     "I want people to see me as more than Beau's little sister."
-  ],
-  "memories": []
+  ]
 }

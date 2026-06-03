@@ -5,6 +5,7 @@
     "last_name": "Maxwell",
     "age": 22
   },
+  "archetype": "protective_brother",
   "personality": {
     "humor": 75,
     "charisma": 80,
@@ -15,11 +16,13 @@
     "patience": 60,
     "confidence": 80
   },
-  "archetype": "protective_brother",
   "goals": [
     "succeed_at_college",
     "protect_elina",
     "maintain_friendships"
+  ],
+  "current_goals": [
+    "help_elina_settle_in"
   ],
   "fears": [
     "failing_family",
@@ -47,11 +50,8 @@
       "attraction": 0
     }
   },
-  "current_goals": [
-    "help_elina_settle_in"
-  ],
+  "memories": [],
   "private_thoughts": [
     "Dean better stay away from my sister."
-  ],
-  "memories": []
+  ]
 }

@@ -2,11 +2,15 @@
   "title": "Arrival at Briar",
   "premise": "Elina Maxwell arrives at Briar University to begin a new chapter of her life.",
   "initial_state": {
-    "beau_knows": ["Elina is arriving today"],
-
-    "dean_knows": ["Beau has a younger sister"],
-
-    "elina_knows": ["Beau studies at Briar"]
+    "beau_knows": [
+      "Elina is arriving today"
+    ],
+    "dean_knows": [
+      "Beau has a younger sister"
+    ],
+    "elina_knows": [
+      "Beau studies at Briar"
+    ]
   },
   "initial_tensions": [
     {

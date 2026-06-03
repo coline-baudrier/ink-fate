@@ -4,8 +4,9 @@
     "first_name": "Dean",
     "middle_name": "Heayward",
     "last_name": "Di Laurentis",
-    "age": "22"
+    "age": 22
   },
+  "archetype": "charmer",
   "personality": {
     "humor": 95,
     "charisma": 95,
@@ -14,21 +15,17 @@
     "jealousy": 40,
     "commitment_fear": 85
   },
-  "archetype": "charmer",
   "goals": [
     "enjoy_college_life"
+  ],
+  "current_goals": [
+    "tease_beau"
   ],
   "fears": [
     "emotional_commitment"
   ],
   "desires": [
     "freedom"
-  ],
-  "current_goals": [
-    "tease_beau"
-  ],
-  "private_thoughts": [
-    "Elina seems more interesting than expected."
   ],
   "relationships": {
     "beau": {
@@ -54,11 +51,14 @@
       "type": "memory",
       "content": "Elina a exprimé qu'elle lui avait manqué, renforçant leur complicité.",
       "importance": 5,
+      "age": 2,
       "tags": [
         "complicité",
         "retour"
-      ],
-      "age": 2
+      ]
     }
+  ],
+  "private_thoughts": [
+    "Elina seems more interesting than expected."
   ]
 }
