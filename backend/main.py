@@ -15,15 +15,13 @@ from app.core.character_loader import (
 from app.core.json_loader import load_json
 from app.core.renderer import render_scene_result
 from app.core.scene_context import build_scene_context
-from app.core.relationship_engine import apply_relationship_updates
-from app.core.memory_engine import apply_memory_updates, increase_memory_age
 from app.core.scene_pipeline import generate_scene
 from app.core.world_engine import (
     rebuild_scene_context,
     save_world,
     update_world_after_scene,
 )
-
+from app.core.character_state_engine import update_characters_after_scene
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 UNIVERSE_PATH = PROJECT_ROOT / "data" / "universes" / "off-campus"
@@ -87,25 +85,6 @@ def print_rendered_scene(
     print(rendered_scene)
 
 
-def update_characters_from_scene(
-    scene_result: Dict[str, Any],
-    characters: Dict[str, Dict[str, Any]],
-) -> Dict[str, Dict[str, Any]]:
-    """Applique les effets persistants d'une scene aux personnages."""
-
-    characters = apply_relationship_updates(
-        scene_result,
-        characters,
-    )
-
-    characters = apply_memory_updates(
-        scene_result,
-        characters,
-    )
-
-    return characters
-
-
 def main() -> None:
     """Lance le prototype CLI."""
 
@@ -154,12 +133,8 @@ def main() -> None:
             scene_history,
         )
 
-        characters = update_characters_from_scene(
+        characters = update_characters_after_scene(
             next_scene,
-            characters,
-        )
-
-        characters = increase_memory_age(
             characters,
         )
 

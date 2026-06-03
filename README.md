@@ -20,6 +20,7 @@ Ce qui existe deja :
 - boucle CLI avec entree joueur ;
 - historique de scene envoye au prompt ;
 - souvenirs pertinents reinjectes au prompt ;
+- module central pour appliquer les effets personnages ;
 - rendu texte simple ;
 - validation minimale du `SceneResult` ;
 - filtrage des dialogues/actions/evenements invalides ;

@@ -194,6 +194,22 @@ Il affiche :
 
 ## Appliquer Les Consequences
 
+### character_state_engine.py
+
+Applique tous les effets qui concernent les personnages.
+
+Il regroupe :
+
+- les relations ;
+- les souvenirs ;
+- le vieillissement des souvenirs.
+
+Dans `main.py`, cela permet d'appeler une seule fonction :
+
+```python
+update_characters_after_scene(...)
+```
+
 ### relationship_engine.py
 
 Applique les `relationship_updates`.
@@ -222,7 +238,9 @@ Les valeurs finales restent entre `0` et `100`.
 
 Applique les `memory_updates`.
 
-Il ajoute des souvenirs aux personnages, puis vieillit les souvenirs.
+Il ajoute des souvenirs aux personnages.
+
+Le vieillissement des souvenirs est appele par `character_state_engine.py`.
 
 Exemple :
 
@@ -261,12 +279,13 @@ Voici ce qui se passe quand le joueur ecrit une action :
 4. openai_client.py appelle OpenAI.
 5. scene_result_parser.py parse le JSON.
 6. scene_validator.py nettoie le SceneResult.
-7. relationship_engine.py applique les relations.
-8. memory_engine.py applique les souvenirs.
-9. world_engine.py avance et sauvegarde le monde.
-10. character_loader.py sauvegarde les personnages.
-11. renderer.py affiche la scene.
-12. main.py ajoute la scene a l'historique.
+7. character_state_engine.py applique les effets personnages.
+8. relationship_engine.py applique les relations.
+9. memory_engine.py applique et vieillit les souvenirs.
+10. world_engine.py avance et sauvegarde le monde.
+11. character_loader.py sauvegarde les personnages.
+12. renderer.py affiche la scene.
+13. main.py ajoute la scene a l'historique.
 ```
 
 ## Ce Qui Est Persistant
@@ -294,9 +313,10 @@ Si tu es perdue, lis dans cet ordre :
 2. `backend/app/core/scene_pipeline.py`
 3. `backend/app/core/prompt_builder.py`
 4. `backend/app/core/scene_validator.py`
-5. `backend/app/core/relationship_engine.py`
-6. `backend/app/core/memory_engine.py`
-7. `backend/app/core/world_engine.py`
+5. `backend/app/core/character_state_engine.py`
+6. `backend/app/core/relationship_engine.py`
+7. `backend/app/core/memory_engine.py`
+8. `backend/app/core/world_engine.py`
 
 Puis regarde les JSON :
 

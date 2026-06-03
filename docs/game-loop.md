@@ -14,16 +14,17 @@ La game loop definit ce qui se passe a chaque interaction entre le joueur et Ink
 7. Lire l'action du joueur.
 8. Generer une nouvelle scene via scene_pipeline.
 9. Valider le SceneResult.
-10. Appliquer les updates relationnels.
-11. Appliquer les memory_updates.
-12. Vieillir les souvenirs.
-13. Avancer l'heure du monde.
-14. Sauvegarder world.json.
-15. Sauvegarder les personnages.
-16. Reconstruire le contexte de scene.
-17. Afficher la nouvelle scene.
-18. Ajouter l'action et la scene a l'historique.
-19. Recommencer.
+10. Appliquer les effets personnages via `character_state_engine`.
+11. Appliquer les updates relationnels.
+12. Appliquer les memory_updates.
+13. Vieillir les souvenirs.
+14. Avancer l'heure du monde.
+15. Sauvegarder world.json.
+16. Sauvegarder les personnages.
+17. Reconstruire le contexte de scene.
+18. Afficher la nouvelle scene.
+19. Ajouter l'action et la scene a l'historique.
+20. Recommencer.
 ```
 
 ## Entree Joueur
@@ -64,8 +65,9 @@ Cela permet a `main.py` de rester plus simple.
 
 Apres validation, le moteur applique :
 
+- les effets personnages avec `character_state_engine.py` ;
 - `relationship_updates` avec `relationship_engine.py` ;
-- `memory_updates` avec `memory_engine.py` ;
+- `memory_updates` et vieillissement des souvenirs avec `memory_engine.py` ;
 - avancee de temps avec `world_engine.py` et `time_engine.py`.
 
 Les personnages et le monde sont ensuite sauvegardes en JSON.

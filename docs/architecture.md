@@ -17,6 +17,7 @@ World + Characters
 -> SceneResultParser
 -> SceneValidator
 -> Renderer
+-> CharacterStateEngine
 -> RelationshipEngine
 -> MemoryEngine
 -> WorldEngine
@@ -39,6 +40,7 @@ backend/
       scene_result_parser.py
       scene_validator.py
       renderer.py
+      character_state_engine.py
       relationship_engine.py
       memory_engine.py
       time_engine.py
@@ -92,6 +94,16 @@ Responsabilites :
 - appliquer les changements simples du monde apres une scene ;
 - sauvegarder `world.json` ;
 - reconstruire le contexte de scene.
+
+### app/core/character_state_engine.py
+
+Gestion des changements persistants des personnages apres une scene.
+
+Responsabilites :
+
+- appliquer les changements relationnels ;
+- appliquer les nouveaux souvenirs ;
+- vieillir les souvenirs.
 
 ### app/core/time_engine.py
 
@@ -174,13 +186,13 @@ Chargement et sauvegarde des personnages.
 5. renderer affiche la scene.
 6. Le joueur ecrit une action.
 7. scene_pipeline genere et valide la suite.
-8. relationship_engine applique les relations.
-9. memory_engine applique les souvenirs.
-10. memory_engine vieillit les souvenirs.
+8. character_state_engine applique les effets personnages.
+9. relationship_engine applique les relations.
+10. memory_engine applique et vieillit les souvenirs.
 11. world_engine avance le temps.
 12. world_engine sauvegarde le monde.
 13. character_loader sauvegarde les personnages.
-14. scene_context reconstruit le contexte.
+14. world_engine reconstruit le contexte.
 15. renderer affiche la scene suivante.
 ```
 
