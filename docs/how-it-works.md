@@ -259,8 +259,23 @@ Regroupe les operations persistantes sur le monde :
 - mettre a jour les positions des personnages ;
 - recalculer les participants presents dans la scene active ;
 - avancer l'heure apres une scene ;
+- appliquer les plannings PNJ ;
+- proteger les participants actifs pour qu'ils ne soient pas deplaces par leur schedule pendant la scene ;
+- enregistrer les mouvements PNJ hors champ ;
 - sauvegarder `world.json` ;
 - reconstruire le contexte de scene.
+
+### `npc_schedule_engine.py`
+
+Lit les schedules des personnages et deplace les PNJ selon l'heure.
+
+Le personnage joueur n'est pas deplace automatiquement par son schedule.
+
+Si un PNJ a deja ete deplace par la scene, son schedule ne l'ecrase pas pendant le meme tour.
+
+Si un PNJ participe a la scene en cours, son schedule ne le deplace pas non plus pendant ce tour. Cela evite qu'un personnage quitte une conversation sans que la narration l'ait indique.
+
+Les PNJ hors scene peuvent continuer a bouger avec leur schedule, ce qui garde une simulation simple du hors champ.
 
 ### `event_log_engine.py`
 
@@ -289,12 +304,14 @@ Voici ce qui se passe quand le joueur ecrit une action :
 7. character_state_engine.py applique les effets personnages.
 8. relationship_engine.py applique les relations.
 9. memory_engine.py applique et vieillit les souvenirs.
-10. world_engine.py applique les changements de lieu.
+10. world_engine.py applique les consequences monde du tour.
 11. event_log_engine.py enregistre les evenements importants.
-12. world_engine.py avance et sauvegarde le monde.
-13. character_loader.py sauvegarde les personnages.
-14. renderer.py affiche la scene.
-15. main.py ajoute la scene a l'historique.
+12. world_engine.py avance le temps.
+13. npc_schedule_engine.py applique les plannings PNJ hors scene.
+14. world_engine.py sauvegarde le monde.
+15. character_loader.py sauvegarde les personnages.
+16. renderer.py affiche la scene.
+17. main.py ajoute la scene a l'historique.
 ```
 
 ## 💾 Ce Qui Est Persistant

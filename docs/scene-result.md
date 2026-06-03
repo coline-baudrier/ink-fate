@@ -169,9 +169,12 @@ Regles actuelles :
 - `new_location` doit etre vide si le joueur ne change pas clairement de lieu ;
 - `new_location` doit etre un ID de lieu existant ;
 - si `new_location` est valide, le moteur change `active_scene.location` ;
+- si `new_location` est vide mais que `scene.location` indique un lieu valide, le moteur peut aussi s'en servir comme lieu de scene ;
 - le personnage joueur est deplace vers le nouveau lieu ;
 - `character_movements` sert a deplacer des PNJ ;
+- `character_movements` ne doit pas deplacer le personnage joueur ;
 - les mouvements de PNJ vers des lieux invalides sont supprimes ;
+- les mouvements du personnage joueur dans `character_movements` sont ignores ;
 - `time_advance_minutes` peut remplacer l'avance de temps par defaut ;
 - les participants de la scene sont recalcules selon les positions actuelles.
 
@@ -179,8 +182,8 @@ Regles actuelles :
 
 Le moteur ne se sert pas encore de :
 
-- `scene.location` pour appliquer directement un changement de lieu ;
 - `scene.time` pour regler directement l'heure ;
 - `next_hooks`.
 
-Pour changer le monde, le moteur utilise actuellement `world_updates`.
+Pour changer le monde, le moteur utilise d'abord `world_updates`.
+`scene.location` sert seulement de securite si le LLM a place le bon lieu dans la scene mais a oublie `world_updates.new_location`.

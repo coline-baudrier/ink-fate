@@ -53,5 +53,22 @@
   "memories": [],
   "private_thoughts": [
     "Dean better stay away from my sister."
+  ],
+  "schedule": [
+    {
+      "time": "10:00",
+      "location": "campus",
+      "activity": "waiting for Elina"
+    },
+    {
+      "time": "11:00",
+      "location": "dormitory",
+      "activity": "helping Elina settle in"
+    },
+    {
+      "time": "14:00",
+      "location": "campus",
+      "activity": "checking campus errands"
+    }
   ]
 }

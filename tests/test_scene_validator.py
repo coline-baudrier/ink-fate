@@ -3,6 +3,7 @@ from backend.app.core.scene_validator import (
     validate_world_updates,
 )
 from backend.app.core.scene_validator import clamp_relationship_updates
+from backend.app.core.scene_validator import validate_scene_pacing
 
 
 def build_world():
@@ -12,6 +13,7 @@ def build_world():
             "current_time": "10:15",
             "current_day": 1,
         },
+        "player_character": "elina",
         "locations": [
             {"id": "campus", "name": "Campus"},
             {"id": "dormitory", "name": "Dormitory"},
@@ -223,6 +225,31 @@ def test_validate_world_updates_cleans_character_movements():
         "beau": "dormitory",
     }
 
+
+def test_validate_world_updates_removes_player_movement():
+    world = build_world()
+
+    scene_result = {
+        "world_updates": {
+            "new_location": "dormitory",
+            "time_advance_minutes": 5,
+            "character_movements": {
+                "elina": "campus",
+                "beau": "dormitory",
+            },
+        }
+    }
+
+    validated = validate_world_updates(
+        scene_result,
+        world,
+    )
+
+    assert validated["world_updates"]["character_movements"] == {
+        "beau": "dormitory",
+    }
+
+
 def test_clamp_relationship_updates_limits_attraction():
     scene_result = {
         "relationship_updates": [
@@ -284,3 +311,95 @@ def test_clamp_relationship_updates_limits_trust_negative():
         validated["relationship_updates"][0]["changes"]["trust"]
         == -1
     )
+
+def test_validate_scene_pacing_limits_narration():
+    scene_result = {
+        "narration": [
+            "Paragraph 1",
+            "Paragraph 2",
+            "Paragraph 3",
+            "Paragraph 4",
+        ],
+        "dialogues": [],
+    }
+
+    validated = validate_scene_pacing(scene_result)
+
+    assert validated["narration"] == [
+        "Paragraph 1",
+        "Paragraph 2",
+        "Paragraph 3",
+    ]
+
+
+def test_validate_scene_pacing_limits_dialogues():
+    scene_result = {
+        "narration": [],
+        "dialogues": [
+            {"speaker": "dean", "text": "1"},
+            {"speaker": "beau", "text": "2"},
+            {"speaker": "dean", "text": "3"},
+            {"speaker": "beau", "text": "4"},
+        ],
+    }
+
+    validated = validate_scene_pacing(scene_result)
+
+    assert validated["dialogues"] == [
+        {"speaker": "dean", "text": "1"},
+        {"speaker": "beau", "text": "2"},
+        {"speaker": "dean", "text": "3"},
+    ]
+
+
+def test_validate_scene_pacing_removes_invalid_narration():
+    scene_result = {
+        "narration": [
+            "  Paragraph 1  ",
+            "",
+            "   ",
+            123,
+            "Paragraph 2",
+        ],
+        "dialogues": [],
+    }
+
+    validated = validate_scene_pacing(scene_result)
+
+    assert validated["narration"] == [
+        "Paragraph 1",
+        "Paragraph 2",
+    ]
+
+
+def test_validate_scene_pacing_removes_invalid_dialogues():
+    scene_result = {
+        "narration": [],
+        "dialogues": [
+            {"speaker": " dean ", "text": " Hello "},
+            {"speaker": "", "text": "No speaker"},
+            {"speaker": "beau", "text": ""},
+            {"speaker": "dean"},
+            "invalid",
+            {"speaker": "beau", "text": "Valid"},
+        ],
+    }
+
+    validated = validate_scene_pacing(scene_result)
+
+    assert validated["dialogues"] == [
+        {"speaker": "dean", "text": "Hello"},
+        {"speaker": "beau", "text": "Valid"},
+    ]
+
+
+def test_validate_scene_pacing_handles_non_list_values():
+    scene_result = {
+        "narration": "not-a-list",
+        "dialogues": "not-a-list",
+    }
+
+    validated = validate_scene_pacing(scene_result)
+
+    assert validated["narration"] == []
+    assert validated["dialogues"] == []

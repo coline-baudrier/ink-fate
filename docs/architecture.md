@@ -45,6 +45,7 @@ backend/
       relationship_stages.py
       memory_engine.py
       memory_retriever.py
+      npc_schedule_engine.py
       event_log_engine.py
       time_engine.py
       world_engine.py
@@ -95,8 +96,12 @@ Gestion simple du monde.
 Responsabilites :
 
 - appliquer les changements de lieu proposes par `world_updates` ;
+- appliquer les consequences monde d'un tour avec `update_world_after_turn` ;
 - maintenir `character_locations` ;
 - recalculer les participants de la scene active ;
+- appliquer les plannings PNJ ;
+- proteger les participants actifs contre les mouvements automatiques de schedule ;
+- enregistrer les mouvements PNJ hors champ ;
 - avancer le temps apres une scene ;
 - sauvegarder `world.json` ;
 - reconstruire le contexte de scene.
@@ -168,6 +173,19 @@ Responsabilites actuelles :
 - creer un resume court ;
 - ajouter les evenements dans `world.event_log`.
 
+### app/core/npc_schedule_engine.py
+
+Gestion simple des plannings PNJ.
+
+Responsabilites actuelles :
+
+- lire l'heure actuelle ;
+- trouver l'entree de planning applicable ;
+- deplacer les PNJ vers leur lieu prevu ;
+- ignorer les PNJ deplaces narrativement pendant le tour ;
+- ignorer les PNJ presents dans la scene active pendant le tour ;
+- retourner les mouvements effectues pour les enregistrer dans `event_log`.
+
 ### app/core/scene_validator.py
 
 Validation minimale de la sortie LLM.
@@ -232,13 +250,14 @@ Chargement et sauvegarde des personnages.
 8. character_state_engine applique les effets personnages.
 9. relationship_engine applique les relations.
 10. memory_engine applique et vieillit les souvenirs.
-11. world_engine applique les changements de lieu.
-12. event_log_engine enregistre les evenements.
+11. world_engine applique les consequences du tour.
+12. world_engine enregistre les evenements.
 13. world_engine avance le temps.
-14. world_engine sauvegarde le monde.
-15. character_loader sauvegarde les personnages.
-16. world_engine reconstruit le contexte.
-17. renderer affiche la scene suivante.
+14. world_engine applique les plannings PNJ hors scene.
+15. world_engine sauvegarde le monde.
+16. character_loader sauvegarde les personnages.
+17. world_engine reconstruit le contexte.
+18. renderer affiche la scene suivante.
 ```
 
 ## 🛡️ Regles Techniques

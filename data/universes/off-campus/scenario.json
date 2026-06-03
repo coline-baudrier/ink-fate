@@ -62,7 +62,8 @@
     "Trust and attachment should grow slowly through repeated meaningful interactions.",
     "Jealousy should only rise when there is a clear rival, insecurity or fear of losing attention.",
     "Do not treat attraction as love.",
-    "Do not treat attachment as attraction."
+    "Do not treat attachment as attraction.",
+    "If the player explicitly refuses to be followed, do not make NPCs follow unless there is a strong justified reason."
   ],
   "pacing_rules": [
     "Keep each scene focused on the immediate consequence of the player's action.",

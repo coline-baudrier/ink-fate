@@ -54,5 +54,22 @@
   "memories": [],
   "private_thoughts": [
     "I want people to see me as more than Beau's little sister."
+  ],
+  "schedule": [
+    {
+      "time": "10:00",
+      "location": "campus",
+      "activity": "arriving at Briar with luggage"
+    },
+    {
+      "time": "11:00",
+      "location": "dormitory",
+      "activity": "settling into the dormitory"
+    },
+    {
+      "time": "14:00",
+      "location": "campus",
+      "activity": "exploring campus"
+    }
   ]
 }

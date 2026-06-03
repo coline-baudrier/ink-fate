@@ -21,11 +21,9 @@ from app.core.scene_pipeline import generate_scene
 from app.core.world_engine import (
     rebuild_scene_context,
     save_world,
-    update_world_after_scene,
-    apply_world_updates,
+    update_world_after_turn,
 )
 from app.core.character_state_engine import update_characters_after_scene
-from app.core.event_log_engine import update_event_log_after_scene
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 UNIVERSE_PATH = PROJECT_ROOT / "data" / "universes" / "off-campus"
@@ -206,18 +204,9 @@ def main() -> None:
             characters,
         )
 
-        world = apply_world_updates(
+        world = update_world_after_turn(
             world,
-            next_scene,
-        )
-
-        world = update_event_log_after_scene(
-            world,
-            next_scene,
-        )
-
-        world = update_world_after_scene(
-            world,
+            characters,
             next_scene,
         )
 

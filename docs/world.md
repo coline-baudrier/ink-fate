@@ -117,7 +117,9 @@ Scene actuellement jouee.
 
 Le moteur utilise cette section pour construire le `SceneContext`.
 
-La scene active peut maintenant changer apres une generation si le `SceneResult` contient un `world_updates.new_location` valide.
+La scene active peut changer apres une generation si le `SceneResult` contient un `world_updates.new_location` valide.
+
+Si `world_updates.new_location` est vide mais que `scene.location` contient un lieu valide, le moteur utilise aussi ce lieu pour garder la position du joueur et la scene active synchronisees.
 
 ## Positions Des Personnages
 
@@ -137,8 +139,16 @@ Regle simple actuelle :
 
 - si le joueur change de lieu, `active_scene.location` change aussi ;
 - le joueur est deplace vers ce nouveau lieu ;
+- `world_updates.new_location` est prioritaire pour deplacer le joueur ;
+- `scene.location` peut servir de secours si `new_location` est vide ;
 - les PNJ peuvent etre deplaces via `world_updates.character_movements` ;
+- les PNJ peuvent aussi bouger via leur `schedule` ;
+- un mouvement narratif garde la priorite sur le schedule pendant le tour ;
+- les personnages presents dans la scene active sont proteges du schedule pendant le tour ;
+- un PNJ hors scene peut toujours bouger avec son schedule ;
 - les participants sont recalcules selon les personnages qui se trouvent dans le lieu actif.
+
+Cette protection evite qu'un personnage disparaisse au milieu d'une conversation simplement parce que son planning indique un autre lieu.
 
 ## Journal D'Evenements
 
@@ -152,6 +162,8 @@ Chaque entree contient :
 - le type d'evenement ;
 - les participants ;
 - un resume court.
+
+Les mouvements PNJ produits par les schedules sont aussi enregistres avec le type `npc_schedule_move`.
 
 ## 🚧 Ce Que Le World State Ne Contient Pas Encore
 
@@ -195,4 +207,4 @@ Exemple :
 }
 ```
 
-Pour l'instant, ce fichier sert surtout de reference de conception. Le prompt builder ne le consomme pas encore directement.
+Le prompt builder consomme ce fichier pour injecter les regles de ton, de canon, de dynamique personnages et de pacing.

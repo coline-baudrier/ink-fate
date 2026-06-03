@@ -95,6 +95,23 @@ def test_score_memory_adds_content_word_bonus():
     assert score == 5
 
 
+def test_score_memory_handles_invalid_fields():
+    memory = {
+        "content": None,
+        "importance": "high",
+        "age": "old",
+        "tags": "challenge",
+    }
+
+    score = score_memory(
+        memory,
+        player_input="challenge",
+        scene_history=None,
+    )
+
+    assert score == 0
+
+
 def test_select_relevant_memories_returns_sorted_memories():
     scene_context = build_scene_context()
 

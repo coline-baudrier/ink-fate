@@ -112,7 +112,9 @@ Regles actuelles :
 - les cles sont des IDs de personnages ;
 - les valeurs sont des IDs de lieux ;
 - le joueur est deplace automatiquement quand `world_updates.new_location` est applique ;
-- les PNJ peuvent etre deplaces via `world_updates.character_movements`.
+- les PNJ peuvent etre deplaces via `world_updates.character_movements` ;
+- les PNJ hors scene peuvent etre deplaces par leur `schedule` ;
+- les PNJ presents dans la scene active sont proteges du schedule pendant le tour.
 
 ## event_log
 
@@ -151,7 +153,7 @@ Champs :
 - `initial_state` : ce que les personnages savent deja.
 - `initial_tensions` : tensions narratives de depart.
 
-Le prompt n'utilise pas encore directement `scenario.json`. Les regles canon sont encore ecrites dans `prompt_builder.py`.
+Le prompt builder lit `scenario.json` pour injecter les regles de ton, de canon, de dynamique personnages et de pacing.
 
 ## 👤 character.json
 
@@ -170,7 +172,8 @@ Structure actuelle :
   "desires": [],
   "relationships": {},
   "current_goals": [],
-  "private_thoughts": []
+  "private_thoughts": [],
+  "schedule": []
 }
 ```
 
@@ -186,10 +189,33 @@ Champs :
 - `relationships` : relations asymetriques vers les autres personnages.
 - `current_goals` : objectifs actifs dans la scene ou la journee.
 - `private_thoughts` : informations internes a utiliser avec prudence.
+- `schedule` : planning simple du personnage.
 
 Champ courant :
 
 - `memories` : souvenirs persistants.
+
+## schedule
+
+Un planning indique ou un personnage devrait etre a partir d'une heure donnee.
+
+```json
+{
+  "time": "11:00",
+  "location": "hockey_house",
+  "activity": "hanging out at the hockey house"
+}
+```
+
+Regles actuelles :
+
+- `time` est au format `HH:MM` ;
+- `location` doit etre un lieu connu ;
+- `activity` sert a resumer le mouvement dans `event_log` ;
+- le schedule ne deplace pas automatiquement le personnage joueur ;
+- un PNJ deplace narrativement pendant le tour n'est pas aussitot ecrase par son schedule ;
+- un PNJ present dans la scene active n'est pas deplace automatiquement par son schedule pendant ce tour ;
+- un PNJ hors scene peut continuer a bouger selon son schedule.
 
 ## 💞 relationship
 

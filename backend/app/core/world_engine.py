@@ -8,7 +8,9 @@ rafraichissent cet etat.
 from pathlib import Path
 from typing import Any, Dict
 
+from app.core.event_log_engine import update_event_log_after_scene
 from app.core.json_loader import save_json
+from app.core.npc_schedule_engine import apply_npc_schedule_movements
 from app.core.scene_context import build_scene_context
 from app.core.time_engine import advance_time
 
@@ -67,6 +69,7 @@ def rebuild_scene_context(
         characters,
     )
 
+
 def ensure_character_locations(world: Dict[str, Any]) -> None:
     """Initialise les positions des personnages si elles n'existent pas encore."""
 
@@ -99,6 +102,7 @@ def resolve_scene_participants(world: Dict[str, Any]) -> list[str]:
 
     return participants
 
+
 def get_valid_location_ids(world: Dict[str, Any]) -> set[str]:
     """Retourne les IDs de lieux valides du monde."""
 
@@ -106,6 +110,153 @@ def get_valid_location_ids(world: Dict[str, Any]) -> set[str]:
         location["id"]
         for location in world["locations"]
     }
+
+
+def get_narratively_moved_character_ids(
+    scene_result: Dict[str, Any],
+) -> set[str]:
+    """Retourne les PNJ explicitement deplaces par la scene."""
+
+    world_updates = scene_result.get(
+        "world_updates",
+        {},
+    )
+
+    if not isinstance(world_updates, dict):
+        return set()
+
+    character_movements = world_updates.get(
+        "character_movements",
+        {},
+    )
+
+    if not isinstance(character_movements, dict):
+        return set()
+
+    return set(character_movements.keys())
+
+
+def get_scene_participant_ids(scene_result: Dict[str, Any]) -> set[str]:
+    """Retourne les participants indiques dans le SceneResult."""
+
+    scene = scene_result.get(
+        "scene",
+        {},
+    )
+
+    if not isinstance(scene, dict):
+        return set()
+
+    participants = scene.get(
+        "participants",
+        [],
+    )
+
+    if not isinstance(participants, list):
+        return set()
+
+    return {
+        participant
+        for participant in participants
+        if isinstance(participant, str)
+    }
+
+
+def get_scene_locked_character_ids(
+    world: Dict[str, Any],
+    scene_result: Dict[str, Any],
+) -> set[str]:
+    """Retourne les personnages que le schedule ne doit pas deplacer ce tour."""
+
+    active_participants = world["active_scene"].get(
+        "participants",
+        [],
+    )
+
+    if not isinstance(active_participants, list):
+        active_participants = []
+
+    locked_character_ids = {
+        character_id
+        for character_id in active_participants
+        if isinstance(character_id, str)
+    }
+
+    locked_character_ids.update(
+        get_scene_participant_ids(scene_result)
+    )
+
+    locked_character_ids.update(
+        get_narratively_moved_character_ids(scene_result)
+    )
+
+    return locked_character_ids
+
+
+def get_scene_location(scene_result: Dict[str, Any]) -> str:
+    """Retourne le lieu de la scene si le LLM en a fourni un."""
+
+    scene = scene_result.get(
+        "scene",
+        {},
+    )
+
+    if not isinstance(scene, dict):
+        return ""
+
+    location = scene.get(
+        "location",
+        "",
+    )
+
+    if not isinstance(location, str):
+        return ""
+
+    return location
+
+
+def add_npc_schedule_events(
+    world: Dict[str, Any],
+    movements: list[Dict[str, str]],
+) -> Dict[str, Any]:
+    """Ajoute un evenement discret pour les mouvements PNJ hors champ."""
+
+    if not movements:
+        return world
+
+    if "event_log" not in world:
+        world["event_log"] = []
+
+    timeline = world["timeline"]
+
+    for movement in movements:
+        character_id = movement["character"]
+        destination = movement["to"]
+        activity = movement.get(
+            "activity",
+            "",
+        )
+
+        summary = f"{character_id} moves to {destination}."
+
+        if activity:
+            summary = f"{character_id} moves to {destination}: {activity}."
+
+        world["event_log"].append(
+            {
+                "day": timeline["current_day"],
+                "date": timeline["current_date"],
+                "time": timeline["current_time"],
+                "type": "npc_schedule_move",
+                "participants": [
+                    character_id,
+                ],
+                "summary": summary,
+            }
+        )
+
+    return world
+
 
 def apply_world_updates(
     world: Dict[str, Any],
@@ -122,24 +273,36 @@ def apply_world_updates(
         {},
     )
 
+    if not isinstance(world_updates, dict):
+        world_updates = {}
+
     new_location = world_updates.get(
         "new_location",
         "",
     )
+
+    if not isinstance(new_location, str):
+        new_location = ""
+
+    if new_location not in valid_location_ids:
+        new_location = get_scene_location(scene_result)
 
     character_movements = world_updates.get(
         "character_movements",
         {},
     )
 
-    if new_location and new_location in valid_location_ids:
-        player_character = world["player_character"]
+    player_character = world["player_character"]
 
+    if new_location in valid_location_ids:
         world["active_scene"]["location"] = new_location
         world["character_locations"][player_character] = new_location
 
     if isinstance(character_movements, dict):
         for character_id, location_id in character_movements.items():
+            if character_id == player_character:
+                continue
+
             if character_id not in world["character_locations"]:
                 continue
 
@@ -149,5 +312,77 @@ def apply_world_updates(
             world["character_locations"][character_id] = location_id
 
     world["active_scene"]["participants"] = resolve_scene_participants(world)
+
+    return world
+
+
+def update_world_after_turn(
+    world: Dict[str, Any],
+    characters: Dict[str, Dict[str, Any]],
+    scene_result: Dict[str, Any],
+) -> Dict[str, Any]:
+    """Applique toutes les consequences monde d'un tour joueur."""
+
+    locked_character_ids = get_scene_locked_character_ids(
+        world,
+        scene_result,
+    )
+
+    world = apply_world_updates(
+        world,
+        scene_result,
+    )
+
+    world = update_event_log_after_scene(
+        world,
+        scene_result,
+    )
+
+    world = update_world_after_scene(
+        world,
+        scene_result,
+    )
+
+    world, schedule_movements = apply_npc_schedule_movements(
+        world,
+        characters,
+        ignored_character_ids=locked_character_ids,
+    )
+
+    world = add_npc_schedule_events(
+        world,
+        schedule_movements,
+    )
+
+    world["active_scene"]["participants"] = resolve_scene_participants(
+        world,
+    )
+
+    world = sync_active_scene_with_player_location(
+        world,
+    )
+
+    return world
+
+
+def sync_active_scene_with_player_location(
+    world: Dict[str, Any],
+) -> Dict[str, Any]:
+    """Synchronise la scene active avec la position du joueur."""
+
+    ensure_character_locations(world)
+
+    player_character = world["player_character"]
+
+    player_location = world["character_locations"].get(
+        player_character,
+        world["active_scene"]["location"],
+    )
+
+    world["active_scene"]["location"] = player_location
+
+    world["active_scene"]["participants"] = (
+        resolve_scene_participants(world)
+    )
 
     return world

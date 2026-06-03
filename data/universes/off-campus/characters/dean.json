@@ -15,18 +15,10 @@
     "jealousy": 40,
     "commitment_fear": 85
   },
-  "goals": [
-    "enjoy_college_life"
-  ],
-  "current_goals": [
-    "tease_beau"
-  ],
-  "fears": [
-    "emotional_commitment"
-  ],
-  "desires": [
-    "freedom"
-  ],
+  "goals": ["enjoy_college_life"],
+  "current_goals": ["tease_beau"],
+  "fears": ["emotional_commitment"],
+  "desires": ["freedom"],
   "relationships": {
     "beau": {
       "friendship": 95,
@@ -39,26 +31,29 @@
     "elina": {
       "friendship": 0,
       "trust": 0,
-      "respect": 5,
+      "respect": 7,
       "attachment": 0,
       "jealousy": 0,
-      "attraction": 4
+      "attraction": 5
     }
   },
-  "memories": [
+  "memories": [],
+  "private_thoughts": ["Elina seems more interesting than expected."],
+  "schedule": [
     {
-      "owner": "dean",
-      "type": "memory",
-      "content": "Elina a exprime qu'elle lui avait manque, renforcant leur complicite.",
-      "importance": 5,
-      "age": 4,
-      "tags": [
-        "complicite",
-        "retour"
-      ]
+      "time": "10:00",
+      "location": "campus",
+      "activity": "waiting with Beau"
+    },
+    {
+      "time": "11:00",
+      "location": "hockey_house",
+      "activity": "hanging out at the hockey house"
+    },
+    {
+      "time": "14:00",
+      "location": "library",
+      "activity": "pretending to study"
     }
-  ],
-  "private_thoughts": [
-    "Elina seems more interesting than expected."
   ]
 }

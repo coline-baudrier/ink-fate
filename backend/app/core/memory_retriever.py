@@ -8,8 +8,18 @@ def score_memory(
 ) -> int:
     """Calcule un score de pertinence pour un souvenir."""
 
-    score = memory.get("importance", 0) * 3
-    score -= memory.get("age", 0)
+    importance = memory.get("importance", 0)
+
+    if not isinstance(importance, int):
+        importance = 0
+
+    age = memory.get("age", 0)
+
+    if not isinstance(age, int):
+        age = 0
+
+    score = importance * 3
+    score -= age
 
     searchable_text = " ".join(
         [
@@ -18,8 +28,17 @@ def score_memory(
         ]
     ).lower()
 
-    content = memory.get("content", "").lower()
+    content = memory.get("content", "")
+
+    if not isinstance(content, str):
+        content = ""
+
+    content = content.lower()
+
     tags = memory.get("tags", [])
+
+    if not isinstance(tags, list):
+        tags = []
 
     for tag in tags:
         if isinstance(tag, str) and tag.lower() in searchable_text:

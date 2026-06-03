@@ -36,6 +36,9 @@ Le projet est actuellement un prototype CLI jouable.
 - passage au jour suivant apres minuit ;
 - changements simples de lieu via `world_updates` ;
 - positions des personnages sauvegardees dans `world.json` ;
+- plannings simples pour les PNJ ;
+- mouvements PNJ hors champ sauvegardes dans `event_log` ;
+- protection des PNJ presents en scene contre les mouvements automatiques de schedule ;
 - validation des mouvements de personnages proposes par le LLM ;
 - journal d'evenements persistant.
 
@@ -43,7 +46,7 @@ Le projet est actuellement un prototype CLI jouable.
 
 - validation complete de tous les champs du `SceneResult` ;
 - selection encore plus fine des souvenirs/evenements ;
-- simulation hors champ ;
+- simulation hors champ avancee ;
 - sauvegarde de partie separee ;
 - interface frontend ;
 - API FastAPI.

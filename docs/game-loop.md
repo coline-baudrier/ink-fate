@@ -18,15 +18,17 @@ La game loop definit ce qui se passe a chaque interaction entre le joueur et Ink
 11. Appliquer les updates relationnels.
 12. Appliquer les memory_updates.
 13. Vieillir les souvenirs.
-14. Appliquer les `world_updates`.
+14. Appliquer les consequences monde via `update_world_after_turn`.
 15. Ajouter les evenements valides dans `event_log`.
 16. Avancer l'heure du monde.
-17. Sauvegarder world.json.
-18. Reconstruire le contexte de scene.
-19. Sauvegarder les personnages.
-20. Afficher la nouvelle scene.
-21. Ajouter l'action et la scene a l'historique.
-22. Recommencer.
+17. Appliquer les plannings PNJ hors scene.
+18. Recalculer les participants.
+19. Sauvegarder world.json.
+20. Reconstruire le contexte de scene.
+21. Sauvegarder les personnages.
+22. Afficher la nouvelle scene.
+23. Ajouter l'action et la scene a l'historique.
+24. Recommencer.
 ```
 
 ## ✍️ Entree Joueur
@@ -72,9 +74,12 @@ Apres validation, le moteur applique :
 - `memory_updates` et vieillissement des souvenirs avec `memory_engine.py` ;
 - changements de lieu et positions avec `world_engine.py` ;
 - journal d'evenements avec `event_log_engine.py` ;
+- plannings PNJ avec `npc_schedule_engine.py` ;
 - avancee de temps avec `world_engine.py` et `time_engine.py`.
 
 Les personnages et le monde sont ensuite sauvegardes en JSON.
+
+Pendant un tour, les PNJ presents dans la scene active ne sont pas deplaces par leur schedule. Un schedule peut seulement bouger un PNJ hors scene, sauf si la narration a explicitement deplace ce personnage.
 
 ## 🚧 Non Encore Gere
 
@@ -82,7 +87,7 @@ La boucle ne gere pas encore :
 
 - sauvegarde de partie separee ;
 - ellipses longues ;
-- simulation hors champ.
+- simulation hors champ avancee.
 
 ## 🎯 Objectif Du Prochain Palier
 

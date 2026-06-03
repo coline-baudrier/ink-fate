@@ -105,19 +105,22 @@ La roadmap separe ce qui existe deja, ce qui est partiel et les extensions futur
 - recalculer les participants selon le lieu actif ;
 - appliquer `world_updates.time_advance_minutes` ;
 - gerer le passage au jour suivant quand minuit est depasse ;
-- enregistrer les evenements dans `event_log`.
+- enregistrer les evenements dans `event_log` ;
+- appliquer des plannings PNJ simples ;
+- proteger les participants actifs contre les mouvements automatiques de schedule ;
+- enregistrer les mouvements PNJ hors champ dans `event_log`.
 
 🚧 Reste a faire :
 
 - mieux choisir les evenements de `event_log` a reinjecter dans le prompt ;
-- gerer des evenements hors champ.
+- mieux simuler les consequences hors champ.
 
 ## 🌙 Phase 6 - Ellipses Et Simulation Hors Champ
 
-**Statut : a faire.**
+**Statut : partiellement fait.**
 
 - detection d'ellipses simples ;
-- evenements hors champ ;
+- evenements hors champ avances ;
 - souvenirs hors champ ;
 - visibilite `visible`, `discoverable`, `hidden`.
 

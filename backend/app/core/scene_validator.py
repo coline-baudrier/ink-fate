@@ -33,6 +33,10 @@ RELATIONSHIP_DELTA_LIMITS = {
     },
 }
 
+MAX_NARRATION_PARAGRAPHS = 3
+MAX_DIALOGUES = 3
+
+
 def ensure_list(value: Any) -> list:
     """Retourne la valeur si c'est une liste, sinon une liste vide."""
 
@@ -422,6 +426,11 @@ def validate_world_updates(
         world["characters"]
     )
 
+    player_character_id = world.get(
+        "player_character",
+        "",
+    )
+
     world_updates = ensure_dict(
         scene_result.get(
             "world_updates",
@@ -474,6 +483,9 @@ def validate_world_updates(
         if character_id not in valid_character_ids:
             continue
 
+        if character_id == player_character_id:
+            continue
+
         if location_id not in valid_location_ids:
             continue
 
@@ -488,5 +500,69 @@ def validate_world_updates(
     scene_result[
         "world_updates"
     ] = world_updates
+
+    return scene_result
+
+def validate_scene_pacing(
+    scene_result: Dict[str, Any],
+) -> Dict[str, Any]:
+    """Nettoie et limite une scene pour garder un rythme interactif."""
+
+    narration = ensure_list(
+        scene_result.get("narration", [])
+    )
+
+    dialogues = ensure_list(
+        scene_result.get("dialogues", [])
+    )
+
+    valid_narration = []
+
+    for paragraph in narration:
+        if not isinstance(paragraph, str):
+            continue
+
+        paragraph = paragraph.strip()
+
+        if not paragraph:
+            continue
+
+        valid_narration.append(paragraph)
+
+    valid_dialogues = []
+
+    for dialogue in dialogues:
+        if not isinstance(dialogue, dict):
+            continue
+
+        speaker = dialogue.get("speaker")
+        text = dialogue.get("text")
+
+        if not isinstance(speaker, str):
+            continue
+
+        if not isinstance(text, str):
+            continue
+
+        speaker = speaker.strip()
+        text = text.strip()
+
+        if not speaker:
+            continue
+
+        if not text:
+            continue
+
+        dialogue["speaker"] = speaker
+        dialogue["text"] = text
+        valid_dialogues.append(dialogue)
+
+    scene_result["narration"] = valid_narration[
+        :MAX_NARRATION_PARAGRAPHS
+    ]
+
+    scene_result["dialogues"] = valid_dialogues[
+        :MAX_DIALOGUES
+    ]
 
     return scene_result

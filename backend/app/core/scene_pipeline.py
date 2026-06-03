@@ -14,6 +14,7 @@ from app.core.scene_validator import (
     remove_player_dialogues,
     validate_scene,
     validate_world_updates,
+    validate_scene_pacing,
 )
 
 
@@ -83,6 +84,10 @@ def validate_scene_result(
     scene_result = remove_player_dialogues(
         scene_result,
         world["player_character"],
+    )
+
+    scene_result = validate_scene_pacing(
+        scene_result,
     )
 
     scene_result = clamp_relationship_updates(scene_result)
