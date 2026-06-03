@@ -37,6 +37,18 @@
       "attraction": 5
     }
   },
+  "contacts": {
+    "beau": {
+      "phone_number_known": true,
+      "phone_numbers_exchanged": true,
+      "instagram_connected": true
+    },
+    "elina": {
+      "phone_number_known": false,
+      "phone_numbers_exchanged": false,
+      "instagram_connected": false
+    }
+  },
   "memories": [],
   "private_thoughts": ["Elina seems more interesting than expected."],
   "schedule": [

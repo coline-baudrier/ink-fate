@@ -171,6 +171,7 @@ Structure actuelle :
   "fears": [],
   "desires": [],
   "relationships": {},
+  "contacts": {},
   "current_goals": [],
   "private_thoughts": [],
   "schedule": []
@@ -187,6 +188,7 @@ Champs :
 - `fears` : peurs importantes.
 - `desires` : envies profondes.
 - `relationships` : relations asymetriques vers les autres personnages.
+- `contacts` : acces de communication asymetriques vers les autres personnages.
 - `current_goals` : objectifs actifs dans la scene ou la journee.
 - `private_thoughts` : informations internes a utiliser avec prudence.
 - `schedule` : planning simple du personnage.
@@ -238,6 +240,32 @@ Regles actuelles :
 - les valeurs sont entre `0` et `100` ;
 - les updates du LLM sont des deltas ;
 - les personnages sont sauvegardes apres application des updates.
+
+## contacts
+
+Les contacts indiquent si un personnage peut joindre un autre personnage hors scene.
+Ils sont stockes separement des relations emotionnelles.
+
+```json
+{
+  "phone_number_known": false,
+  "phone_numbers_exchanged": false,
+  "instagram_connected": false
+}
+```
+
+Champs :
+
+- `phone_number_known` : le personnage source connait le numero du personnage cible. Ce champ est asymetrique et permet de representer un numero obtenu par un tiers.
+- `phone_numbers_exchanged` : les deux personnages ont explicitement echange leurs numeros. Le moteur le duplique dans les deux sens.
+- `instagram_connected` : les deux personnages sont connectes sur Instagram dans le MVP. Le moteur le duplique dans les deux sens.
+
+Regles actuelles :
+
+- `source.contacts[target].phone_number_known = true` permet a `source` d'envoyer un texto ou d'appeler `target` ;
+- `phone_numbers_exchanged = true` implique aussi `phone_number_known = true` dans les deux sens ;
+- `instagram_connected = true` permet les DM Instagram dans les deux sens ;
+- ces champs ne representent pas l'affection, seulement les moyens de contact disponibles.
 
 ## 🧠 memory
 

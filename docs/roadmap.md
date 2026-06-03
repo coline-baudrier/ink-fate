@@ -43,13 +43,17 @@ La roadmap separe ce qui existe deja, ce qui est partiel et les extensions futur
 - validation de `scene.location` ;
 - validation de `scene.time` ;
 - validation de `scene.participants` ;
+- validation des champs secondaires de `actions` ;
+- validation des champs secondaires de `events` ;
+- validation des champs secondaires de `memory_updates` ;
+- validation des champs secondaires de `relationship_updates` ;
 - validation du lieu demande dans `world_updates.new_location` ;
 - limitation de `world_updates.time_advance_minutes` ;
-- validation des lieux dans `world_updates.character_movements`.
+- validation des lieux dans `world_updates.character_movements` ;
+- protection contre les types invalides dans `world_updates`.
 
 🚧 Reste a faire :
 
-- verifier les types de tous les champs secondaires ;
 - produire un rapport de validation lisible.
 
 ## 💞 Phase 3 - Relations Persistantes

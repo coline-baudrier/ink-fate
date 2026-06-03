@@ -36,6 +36,7 @@ World
 -> Recent Events
 -> Relevant Memories
 -> Relationship Status
+-> Contact Access
 -> Player Input
 -> Scenario Context
 -> Narrative Rules
@@ -61,6 +62,7 @@ Le prompt contient :
 - evenements recents ;
 - souvenirs pertinents ;
 - statuts relationnels ;
+- moyens de contact disponibles ;
 - action du joueur ;
 - contexte de scenario ;
 - regles de pacing ;
@@ -110,6 +112,17 @@ RELATIONSHIP STATUS
 ```
 
 Cela aide le LLM a ne pas faire monter la romance trop vite.
+
+## Moyens De Contact
+
+Le prompt recoit aussi un resume des moyens de contact disponibles.
+
+```md
+CONTACT ACCESS
+- elina -> dean: phone known: no, numbers exchanged: no, instagram connected: no, can text/call: no, can DM: no
+```
+
+Ce bloc aide le LLM a savoir si un personnage peut envoyer un texto, appeler ou DM un autre personnage.
 
 ## ✍️ Action Joueur
 
@@ -195,6 +208,17 @@ Le prompt demande actuellement :
       "changes": {
         "attraction": 0,
         "respect": 0
+      }
+    }
+  ],
+  "contact_updates": [
+    {
+      "source": "",
+      "target": "",
+      "changes": {
+        "phone_number_known": false,
+        "phone_numbers_exchanged": false,
+        "instagram_connected": false
       }
     }
   ],

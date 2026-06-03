@@ -7,6 +7,7 @@ from app.core.scene_validator import (
     clamp_memory_importance,
     clamp_relationship_updates,
     remove_invalid_actions,
+    remove_invalid_contact_updates,
     remove_invalid_dialogues,
     remove_invalid_events,
     remove_invalid_memory_updates,
@@ -72,6 +73,11 @@ def validate_scene_result(
     )
 
     scene_result = remove_invalid_relationship_updates(
+        scene_result,
+        valid_character_ids,
+    )
+
+    scene_result = remove_invalid_contact_updates(
         scene_result,
         valid_character_ids,
     )

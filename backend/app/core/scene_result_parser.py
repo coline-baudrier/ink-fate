@@ -46,6 +46,7 @@ def build_fallback_scene_result() -> Dict[str, Any]:
         "actions": [],
         "events": [],
         "relationship_updates": [],
+        "contact_updates": [],
         "memory_updates": [],
         "world_updates": {
             "new_location": "",

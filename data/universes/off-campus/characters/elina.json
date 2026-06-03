@@ -51,6 +51,18 @@
       "attraction": 1
     }
   },
+  "contacts": {
+    "beau": {
+      "phone_number_known": true,
+      "phone_numbers_exchanged": true,
+      "instagram_connected": true
+    },
+    "dean": {
+      "phone_number_known": false,
+      "phone_numbers_exchanged": false,
+      "instagram_connected": false
+    }
+  },
   "memories": [],
   "private_thoughts": [
     "I want people to see me as more than Beau's little sister."

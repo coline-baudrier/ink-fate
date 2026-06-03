@@ -5,6 +5,7 @@ les regles narratives et le format JSON attendu.
 """
 
 from typing import Any, Dict, List
+from app.core.contact_engine import build_contact_context
 from app.core.memory_retriever import select_relevant_memories
 from app.core.relationship_stages import build_relationship_context
 
@@ -45,6 +46,7 @@ def build_structured_scene_prompt(
     event_log_context = build_event_log_context(world)
     scenario_context = build_scenario_context(scenario)
     relationship_context = build_relationship_context(scene_context)
+    contact_context = build_contact_context(scene_context)
 
     # Le prompt est volontairement separe en sections lisibles.
     prompt = f"""
@@ -84,6 +86,9 @@ RELEVANT MEMORIES
 RELATIONSHIP STATUS
 {relationship_context}
 
+CONTACT ACCESS
+{contact_context}
+
 PLAYER INPUT
 {player_context}
 
@@ -97,6 +102,13 @@ JSON RULES
 - Use character IDs for speakers, characters, sources, targets and participants.
 - Never use full names inside JSON structures.
 - Relationship changes must be small integers between -5 and 5.
+- Existing contact access controls whether characters can text, call, or DM each other outside the current in-person scene.
+- Do not make a character text, call, or DM another character unless contact access already allows it, or the current scene clearly creates that access first.
+- Use contact_updates when characters exchange phone numbers, get someone's phone number through a third party, connect on Instagram, accept a follow request, or otherwise gain communication access.
+- Use phone_number_known true when source gets target's phone number without necessarily giving theirs back.
+- Use phone_numbers_exchanged true only when both characters have each other's phone number.
+- Use instagram_connected true only for a mutual Instagram connection in this MVP.
+- Do not add contact_updates just because characters talk in person.
 - Use the location ID for scene.location.
 - The player character ID is elina.
 - Never include "elina" as a speaker in dialogues.
@@ -191,6 +203,17 @@ def build_expected_json_format() -> str:
       "changes": {
         "attraction": 0,
         "respect": 0
+      }
+    }
+  ],
+  "contact_updates": [
+    {
+      "source": "",
+      "target": "",
+      "changes": {
+        "phone_number_known": false,
+        "phone_numbers_exchanged": false,
+        "instagram_connected": false
       }
     }
   ],

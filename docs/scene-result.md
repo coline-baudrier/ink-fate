@@ -18,6 +18,7 @@ Le LLM propose. Le moteur decide.
   "actions": [],
   "events": [],
   "relationship_updates": [],
+  "contact_updates": [],
   "memory_updates": [],
   "world_updates": {
     "new_location": "",
@@ -33,7 +34,7 @@ Informations principales de la scene.
 
 Regles actuelles :
 
-- `scene.location` doit etre un lieu existant, sinon le moteur garde le lieu actif ;
+- `scene.location` doit etre une chaine et un lieu existant, sinon le moteur garde le lieu actif ;
 - `scene.time` doit etre une heure valide au format `HH:MM`, sinon le moteur garde l'heure courante ;
 - `scene.participants` ne garde que les personnages existants ;
 - si les participants sont invalides ou absents, le moteur garde les participants de la scene active.
@@ -75,7 +76,11 @@ Actions objectives proposees par le LLM.
 
 Regle actuelle :
 
-- `character` doit etre un personnage existant.
+- `character` doit etre un personnage existant ;
+- `type` doit etre une chaine non vide ;
+- `target` peut etre vide ;
+- si `target` est rempli, il doit etre un personnage existant ;
+- les champs texte sont nettoyes avant application.
 
 ## events
 
@@ -90,8 +95,10 @@ Evenements importants proposes.
 
 Regles actuelles :
 
+- `type` doit etre une chaine non vide ;
 - les participants invalides sont retires ;
 - un evenement sans participant valide est supprime ;
+- `summary` doit etre une chaine non vide si le LLM en fournit un ;
 - les evenements valides sont sauvegardes dans `world.event_log`.
 
 ## relationship_updates
@@ -113,6 +120,7 @@ Regles actuelles :
 
 - `source` et `target` doivent exister ;
 - les valeurs doivent etre des entiers ;
+- les booleens et textes numeriques invalides sont ignores ;
 - les deltas sont limites selon la dimension relationnelle ;
 - les valeurs finales sont limitees entre `0` et `100`.
 
@@ -127,6 +135,43 @@ attachment: -1 a +1
 jealousy: -2 a +2
 autre dimension: -2 a +2
 ```
+
+## contact_updates
+
+`contact_updates` permet au LLM de signaler qu'un personnage gagne un moyen de joindre un autre personnage.
+
+Exemple : Elina obtient le numero de Dean via Beau, sans donner son numero a Dean.
+
+```json
+{
+  "source": "elina",
+  "target": "dean",
+  "changes": {
+    "phone_number_known": true
+  }
+}
+```
+
+Exemple : Elina et Dean echangent vraiment leurs numeros.
+
+```json
+{
+  "source": "elina",
+  "target": "dean",
+  "changes": {
+    "phone_numbers_exchanged": true
+  }
+}
+```
+
+Regles :
+
+- `source` et `target` doivent etre des IDs de personnages ;
+- `changes` accepte seulement des booleens ;
+- `phone_number_known` est asymetrique ;
+- `phone_numbers_exchanged` est applique dans les deux sens par le moteur ;
+- `instagram_connected` est applique dans les deux sens par le moteur ;
+- une discussion en face a face ne suffit pas a creer un contact.
 
 ## memory_updates
 
@@ -147,6 +192,9 @@ Regles actuelles :
 
 - `owner` doit etre un personnage existant ;
 - `content` doit etre une chaine non vide ;
+- `type` devient `"memory"` s'il est absent ou vide ;
+- `age` doit etre un entier positif ou nul ;
+- `tags` est nettoye pour ne garder que les chaines non vides ;
 - `importance` est limitee entre `1` et `10` ;
 - un souvenir cree pendant le tour courant ne vieillit pas immediatement.
 
@@ -175,6 +223,7 @@ Regles actuelles :
 - `character_movements` ne doit pas deplacer le personnage joueur ;
 - les mouvements de PNJ vers des lieux invalides sont supprimes ;
 - les mouvements du personnage joueur dans `character_movements` sont ignores ;
+- `time_advance_minutes` doit etre un entier entre `0` et `180` ;
 - `time_advance_minutes` peut remplacer l'avance de temps par defaut ;
 - les participants de la scene sont recalcules selon les positions actuelles.
 

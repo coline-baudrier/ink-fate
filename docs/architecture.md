@@ -19,6 +19,7 @@ World + Characters
 -> Renderer
 -> CharacterStateEngine
 -> RelationshipEngine
+-> ContactEngine
 -> MemoryEngine
 -> WorldEngine
 -> JSON Save
@@ -43,6 +44,7 @@ backend/
       character_state_engine.py
       relationship_engine.py
       relationship_stages.py
+      contact_engine.py
       memory_engine.py
       memory_retriever.py
       npc_schedule_engine.py
@@ -113,6 +115,7 @@ Gestion des changements persistants des personnages apres une scene.
 Responsabilites :
 
 - appliquer les changements relationnels ;
+- appliquer les changements de moyens de contact ;
 - appliquer les nouveaux souvenirs ;
 - vieillir les souvenirs.
 
@@ -152,6 +155,18 @@ Responsabilites actuelles :
 
 - appliquer les deltas relationnels ;
 - limiter les valeurs finales entre `0` et `100`.
+
+### app/core/contact_engine.py
+
+Gestion des moyens de contact.
+
+Responsabilites actuelles :
+
+- appliquer les `contact_updates` ;
+- creer les contacts manquants si besoin ;
+- dupliquer les echanges de numeros dans les deux sens ;
+- dupliquer les connexions Instagram dans les deux sens ;
+- construire un contexte de contact lisible pour le prompt.
 
 ### app/core/relationship_stages.py
 
@@ -195,6 +210,7 @@ Responsabilites actuelles :
 - proteger contre les listes/dictionnaires invalides ;
 - valider les champs principaux de `scene` ;
 - supprimer dialogues, actions, evenements invalides ;
+- nettoyer les types invalides dans les champs secondaires ;
 - supprimer les dialogues du joueur ;
 - valider les updates relationnels ;
 - valider les updates memoire ;
@@ -215,6 +231,7 @@ Responsabilites :
 - injecter l'historique de scene ;
 - injecter les souvenirs pertinents ;
 - injecter les statuts relationnels ;
+- injecter les moyens de contact disponibles ;
 - injecter les evenements recents ;
 - injecter le contexte de scenario ;
 - injecter l'action joueur ;
@@ -249,15 +266,16 @@ Chargement et sauvegarde des personnages.
 7. scene_pipeline genere et valide la suite.
 8. character_state_engine applique les effets personnages.
 9. relationship_engine applique les relations.
-10. memory_engine applique et vieillit les souvenirs.
-11. world_engine applique les consequences du tour.
-12. world_engine enregistre les evenements.
-13. world_engine avance le temps.
-14. world_engine applique les plannings PNJ hors scene.
-15. world_engine sauvegarde le monde.
-16. character_loader sauvegarde les personnages.
-17. world_engine reconstruit le contexte.
-18. renderer affiche la scene suivante.
+10. contact_engine applique les moyens de contact.
+11. memory_engine applique et vieillit les souvenirs.
+12. world_engine applique les consequences du tour.
+13. world_engine enregistre les evenements.
+14. world_engine avance le temps.
+15. world_engine applique les plannings PNJ hors scene.
+16. world_engine sauvegarde le monde.
+17. character_loader sauvegarde les personnages.
+18. world_engine reconstruit le contexte.
+19. renderer affiche la scene suivante.
 ```
 
 ## 🛡️ Regles Techniques

@@ -27,6 +27,7 @@ Le projet est actuellement un prototype CLI jouable.
 - rendu texte simple ;
 - validation du `SceneResult` ;
 - validation des champs principaux de `scene` ;
+- validation des champs secondaires de `actions`, `events`, `memory_updates`, `relationship_updates` et `world_updates` ;
 - filtrage des dialogues/actions/evenements invalides ;
 - suppression des dialogues du personnage joueur ;
 - limitation des deltas relationnels par dimension ;
@@ -44,7 +45,7 @@ Le projet est actuellement un prototype CLI jouable.
 
 🚧 Ce qui n'existe pas encore :
 
-- validation complete de tous les champs du `SceneResult` ;
+- rapport de validation lisible pour comprendre ce que le moteur a nettoye ;
 - selection encore plus fine des souvenirs/evenements ;
 - simulation hors champ avancee ;
 - sauvegarde de partie separee ;
@@ -61,7 +62,7 @@ Le MVP 1 vise une boucle jouable simple :
 - stockage local en JSON ;
 - interface CLI ;
 - generation de scene par LLM ;
-- validation minimale ;
+- validation structuree du `SceneResult` ;
 - rendu texte ;
 - evolution simple des relations ;
 - souvenirs simples ;

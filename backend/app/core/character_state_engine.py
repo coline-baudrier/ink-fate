@@ -1,5 +1,6 @@
 from typing import Any, Dict
 
+from app.core.contact_engine import apply_contact_updates
 from app.core.memory_engine import (
     apply_memory_updates,
     increase_memory_age,
@@ -14,6 +15,11 @@ def update_characters_after_scene(
     """Applique aux personnages les effets persistants d'une scène."""
 
     characters = apply_relationship_updates(
+        scene_result,
+        characters,
+    )
+
+    characters = apply_contact_updates(
         scene_result,
         characters,
     )

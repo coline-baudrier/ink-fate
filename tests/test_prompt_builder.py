@@ -58,6 +58,13 @@ def build_scene_context():
                     "first_name": "Elina",
                     "last_name": "Maxwell",
                 },
+                "contacts": {
+                    "dean": {
+                        "phone_number_known": False,
+                        "phone_numbers_exchanged": False,
+                        "instagram_connected": False,
+                    }
+                },
                 "memories": [],
             },
             {
@@ -65,6 +72,13 @@ def build_scene_context():
                 "identity": {
                     "first_name": "Dean",
                     "last_name": "Di Laurentis",
+                },
+                "contacts": {
+                    "elina": {
+                        "phone_number_known": False,
+                        "phone_numbers_exchanged": False,
+                        "instagram_connected": False,
+                    }
                 },
                 "memories": [],
             },
@@ -185,3 +199,17 @@ def test_structured_prompt_includes_scenario_context():
     assert "SCENARIO CONTEXT" in prompt
     assert "Elina arrives at Briar University." in prompt
     assert "Beau is Elina's older brother." in prompt
+
+
+def test_structured_prompt_includes_contact_access_rules():
+    prompt = build_structured_scene_prompt(
+        build_world(),
+        build_scenario(),
+        build_scene_context(),
+    )
+
+    assert "CONTACT ACCESS" in prompt
+    assert "elina -> dean" in prompt
+    assert "contact_updates" in prompt
+    assert "phone_number_known true" in prompt
+    assert "through a third party" in prompt

@@ -21,6 +21,7 @@ Le MVP 1 vise une boucle jouable simple dans la CLI.
 - evenements recents reinjectes au prompt ;
 - statut relationnel reinjecte au prompt ;
 - regles de pacing dans le scenario ;
+- validation des champs secondaires du `SceneResult` ;
 - temps qui avance ;
 - passage au jour suivant apres minuit ;
 - changements simples de lieu ;
@@ -30,7 +31,6 @@ Le MVP 1 vise une boucle jouable simple dans la CLI.
 
 ## 🚧 Encore Partiel
 
-- validation de tous les champs secondaires du `SceneResult` ;
 - selection encore plus fine des souvenirs/evenements ;
 - progression romance plus structuree sur le long terme ;
 - detection d'ellipses ;

@@ -50,6 +50,18 @@
       "attraction": 0
     }
   },
+  "contacts": {
+    "dean": {
+      "phone_number_known": true,
+      "phone_numbers_exchanged": true,
+      "instagram_connected": true
+    },
+    "elina": {
+      "phone_number_known": true,
+      "phone_numbers_exchanged": true,
+      "instagram_connected": true
+    }
+  },
   "memories": [],
   "private_thoughts": [
     "Dean better stay away from my sister."

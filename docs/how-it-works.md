@@ -80,9 +80,10 @@ Un personnage contient :
 - personnalite ;
 - objectifs ;
 - relations ;
+- moyens de contact ;
 - souvenirs.
 
-Quand les relations ou souvenirs changent, ces fichiers sont sauvegardes.
+Quand les relations, contacts ou souvenirs changent, ces fichiers sont sauvegardes.
 
 ## 💾 Chargement Et Sauvegarde
 
@@ -146,6 +147,7 @@ Il inclut :
 - evenements recents ;
 - souvenirs pertinents ;
 - statuts relationnels ;
+- moyens de contact disponibles ;
 - contexte du scenario ;
 - action du joueur ;
 - format JSON attendu.
@@ -173,8 +175,10 @@ Il supprime ou corrige :
 - actions invalides ;
 - evenements invalides ;
 - updates relationnels invalides ;
+- updates de contact invalides ;
 - souvenirs invalides ;
 - changements de lieu invalides ;
+- types invalides dans les champs secondaires ;
 - valeurs relationnelles trop grandes ;
 - importance de souvenir hors limites.
 
@@ -198,6 +202,7 @@ Applique tous les effets qui concernent les personnages.
 Il regroupe :
 
 - les relations ;
+- les contacts ;
 - les souvenirs ;
 - le vieillissement des souvenirs.
 
@@ -228,6 +233,24 @@ Cela modifie la relation :
 ```md
 dean -> elina
 ```
+
+### `contact_engine.py`
+
+Applique les `contact_updates`.
+
+Exemple :
+
+```json
+{
+  "source": "elina",
+  "target": "dean",
+  "changes": {
+    "phone_number_known": true
+  }
+}
+```
+
+Cela signifie qu'Elina connait le numero de Dean, meme si Dean n'a pas forcement le numero d'Elina.
 
 ### `relationship_stages.py`
 
@@ -303,15 +326,16 @@ Voici ce qui se passe quand le joueur ecrit une action :
 6. scene_validator.py nettoie le SceneResult.
 7. character_state_engine.py applique les effets personnages.
 8. relationship_engine.py applique les relations.
-9. memory_engine.py applique et vieillit les souvenirs.
-10. world_engine.py applique les consequences monde du tour.
-11. event_log_engine.py enregistre les evenements importants.
-12. world_engine.py avance le temps.
-13. npc_schedule_engine.py applique les plannings PNJ hors scene.
-14. world_engine.py sauvegarde le monde.
-15. character_loader.py sauvegarde les personnages.
-16. renderer.py affiche la scene.
-17. main.py ajoute la scene a l'historique.
+9. contact_engine.py applique les moyens de contact.
+10. memory_engine.py applique et vieillit les souvenirs.
+11. world_engine.py applique les consequences monde du tour.
+12. event_log_engine.py enregistre les evenements importants.
+13. world_engine.py avance le temps.
+14. npc_schedule_engine.py applique les plannings PNJ hors scene.
+15. world_engine.py sauvegarde le monde.
+16. character_loader.py sauvegarde les personnages.
+17. renderer.py affiche la scene.
+18. main.py ajoute la scene a l'historique.
 ```
 
 ## 💾 Ce Qui Est Persistant
@@ -321,6 +345,7 @@ Persistant veut dire : sauvegarde dans un fichier.
 Actuellement, sont persistants :
 
 - relations ;
+- contacts ;
 - souvenirs ;
 - heure du monde ;
 - lieu actif ;
@@ -342,8 +367,9 @@ Si tu es perdue, lis dans cet ordre :
 4. `backend/app/core/scene_validator.py`
 5. `backend/app/core/character_state_engine.py`
 6. `backend/app/core/relationship_engine.py`
-7. `backend/app/core/memory_engine.py`
-8. `backend/app/core/world_engine.py`
+7. `backend/app/core/contact_engine.py`
+8. `backend/app/core/memory_engine.py`
+9. `backend/app/core/world_engine.py`
 
 Puis regarde les JSON :
 

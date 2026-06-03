@@ -33,6 +33,12 @@ RELATIONSHIP_DELTA_LIMITS = {
     },
 }
 
+CONTACT_UPDATE_FIELDS = {
+    "phone_number_known",
+    "phone_numbers_exchanged",
+    "instagram_connected",
+}
+
 MAX_NARRATION_PARAGRAPHS = 3
 MAX_DIALOGUES = 3
 
@@ -53,6 +59,27 @@ def ensure_dict(value: Any) -> dict:
         return value
 
     return {}
+
+
+def ensure_string(value: Any) -> str:
+    """Retourne une chaine propre, sinon une chaine vide."""
+
+    if not isinstance(value, str):
+        return ""
+
+    return value.strip()
+
+
+def ensure_int(value: Any, default: int = 0) -> int:
+    """Retourne un entier, en evitant les booleens."""
+
+    if isinstance(value, bool):
+        return default
+
+    if not isinstance(value, int):
+        return default
+
+    return value
 
 
 def is_valid_time(value: Any) -> bool:
@@ -104,9 +131,11 @@ def validate_scene(
         )
     )
 
-    location = scene.get(
-        "location",
-        active_scene["location"],
+    location = ensure_string(
+        scene.get(
+            "location",
+            active_scene["location"],
+        )
     )
 
     if location not in valid_location_ids:
@@ -133,6 +162,8 @@ def validate_scene(
     valid_participants = []
 
     for character_id in participant_ids:
+        character_id = ensure_string(character_id)
+
         if character_id in valid_character_ids:
             valid_participants.append(character_id)
 
@@ -170,11 +201,14 @@ def remove_player_dialogues(
         if not isinstance(dialogue, dict):
             continue
 
-        speaker = dialogue.get("speaker")
+        speaker = ensure_string(
+            dialogue.get("speaker")
+        )
 
         if speaker == player_character_id:
             continue
 
+        dialogue["speaker"] = speaker
         filtered_dialogues.append(dialogue)
 
     scene_result["dialogues"] = filtered_dialogues
@@ -196,11 +230,14 @@ def remove_invalid_dialogues(
         if not isinstance(dialogue, dict):
             continue
 
-        speaker = dialogue.get("speaker")
+        speaker = ensure_string(
+            dialogue.get("speaker")
+        )
 
         if speaker not in valid_character_ids:
             continue
 
+        dialogue["speaker"] = speaker
         valid_dialogues.append(dialogue)
 
     scene_result["dialogues"] = valid_dialogues
@@ -222,10 +259,30 @@ def remove_invalid_actions(
         if not isinstance(action, dict):
             continue
 
-        character = action.get("character")
+        character = ensure_string(
+            action.get("character")
+        )
 
         if character not in valid_character_ids:
             continue
+
+        action_type = ensure_string(
+            action.get("type")
+        )
+
+        if not action_type:
+            continue
+
+        target = ensure_string(
+            action.get("target")
+        )
+
+        if target and target not in valid_character_ids:
+            continue
+
+        action["character"] = character
+        action["type"] = action_type
+        action["target"] = target
 
         valid_actions.append(action)
 
@@ -253,11 +310,31 @@ def remove_invalid_events(
         valid_participants = []
 
         for participant in participants:
+            participant = ensure_string(participant)
+
             if participant in valid_character_ids:
                 valid_participants.append(participant)
 
         if not valid_participants:
             continue
+
+        event_type = ensure_string(
+            event.get("type")
+        )
+
+        if not event_type:
+            continue
+
+        summary = ensure_string(
+            event.get("summary")
+        )
+
+        event["type"] = event_type
+
+        if summary:
+            event["summary"] = summary
+        elif "summary" in event:
+            event.pop("summary")
 
         # On garde l'evenement, mais seulement avec ses participants valides.
         event["participants"] = valid_participants
@@ -284,14 +361,22 @@ def remove_invalid_relationship_updates(
         if not isinstance(update, dict):
             continue
 
-        source = update.get("source")
-        target = update.get("target")
+        source = ensure_string(
+            update.get("source")
+        )
+
+        target = ensure_string(
+            update.get("target")
+        )
 
         if source not in valid_character_ids:
             continue
 
         if target not in valid_character_ids:
             continue
+
+        update["source"] = source
+        update["target"] = target
 
         valid_updates.append(update)
 
@@ -309,6 +394,8 @@ def clamp_relationship_updates(
         scene_result.get("relationship_updates", [])
     )
 
+    valid_relationship_updates = []
+
     for update in relationship_updates:
         if not isinstance(update, dict):
             continue
@@ -317,7 +404,12 @@ def clamp_relationship_updates(
         valid_changes = {}
 
         for key, value in changes.items():
-            if not isinstance(value, int):
+            key = ensure_string(key)
+
+            if not key:
+                continue
+
+            if isinstance(value, bool) or not isinstance(value, int):
                 continue
 
             limits = RELATIONSHIP_DELTA_LIMITS.get(
@@ -340,10 +432,70 @@ def clamp_relationship_updates(
             valid_changes[key] = value
 
         update["changes"] = valid_changes
+        valid_relationship_updates.append(update)
 
-    scene_result["relationship_updates"] = relationship_updates
+    scene_result["relationship_updates"] = valid_relationship_updates
 
     return scene_result
+
+
+def remove_invalid_contact_updates(
+    scene_result: Dict[str, Any],
+    valid_character_ids: list[str],
+) -> Dict[str, Any]:
+    """Supprime les mises a jour de contacts invalides."""
+
+    valid_updates = []
+
+    contact_updates = ensure_list(
+        scene_result.get("contact_updates", [])
+    )
+
+    for update in contact_updates:
+        if not isinstance(update, dict):
+            continue
+
+        source = ensure_string(
+            update.get("source")
+        )
+
+        target = ensure_string(
+            update.get("target")
+        )
+
+        if source not in valid_character_ids:
+            continue
+
+        if target not in valid_character_ids:
+            continue
+
+        changes = ensure_dict(
+            update.get("changes", {})
+        )
+
+        valid_changes = {}
+
+        for key, value in changes.items():
+            key = ensure_string(key)
+
+            if key not in CONTACT_UPDATE_FIELDS:
+                continue
+
+            if not isinstance(value, bool):
+                continue
+
+            valid_changes[key] = value
+
+        update["source"] = source
+        update["target"] = target
+        update["changes"] = valid_changes
+
+        valid_updates.append(update)
+
+    scene_result["contact_updates"] = valid_updates
+
+    return scene_result
+
 
 def remove_invalid_memory_updates(
     scene_result: Dict[str, Any],
@@ -361,23 +513,59 @@ def remove_invalid_memory_updates(
         if not isinstance(memory, dict):
             continue
 
-        owner = memory.get("owner")
-        content = memory.get("content")
+        owner = ensure_string(
+            memory.get("owner")
+        )
 
         if owner not in valid_character_ids:
             continue
 
-        if not isinstance(content, str):
+        content = ensure_string(
+            memory.get("content")
+        )
+
+        if not content:
             continue
 
-        if not content.strip():
-            continue
+        memory_type = ensure_string(
+            memory.get("type")
+        )
+
+        if not memory_type:
+            memory_type = "memory"
+
+        age = ensure_int(
+            memory.get("age"),
+            0,
+        )
+
+        if age < 0:
+            age = 0
+
+        tags = ensure_list(
+            memory.get("tags", [])
+        )
+
+        cleaned_tags = []
+
+        for tag in tags:
+            tag = ensure_string(tag)
+
+            if tag:
+                cleaned_tags.append(tag)
+
+        memory["owner"] = owner
+        memory["type"] = memory_type
+        memory["content"] = content
+        memory["age"] = age
+        memory["tags"] = cleaned_tags
 
         valid_memories.append(memory)
 
     scene_result["memory_updates"] = valid_memories
 
     return scene_result
+
 
 def clamp_memory_importance(
     scene_result: Dict[str, Any],
@@ -394,10 +582,10 @@ def clamp_memory_importance(
         if not isinstance(memory, dict):
             continue
 
-        importance = memory.get("importance", min_value)
-
-        if not isinstance(importance, int):
-            importance = min_value
+        importance = ensure_int(
+            memory.get("importance"),
+            min_value,
+        )
 
         if importance < min_value:
             importance = min_value
@@ -410,6 +598,7 @@ def clamp_memory_importance(
     scene_result["memory_updates"] = memory_updates
 
     return scene_result
+
 
 def validate_world_updates(
     scene_result: Dict[str, Any],
@@ -438,25 +627,25 @@ def validate_world_updates(
         )
     )
 
-    new_location = world_updates.get(
-        "new_location",
-        "",
+    new_location = ensure_string(
+        world_updates.get(
+            "new_location",
+            "",
+        )
     )
 
     if new_location:
         if new_location not in valid_location_ids:
-            world_updates["new_location"] = ""
+            new_location = ""
+
+    world_updates["new_location"] = new_location
 
     time_advance_minutes = world_updates.get(
         "time_advance_minutes",
         0,
     )
 
-    if not isinstance(
-        time_advance_minutes,
-        int,
-    ):
-        time_advance_minutes = 0
+    time_advance_minutes = ensure_int(time_advance_minutes)
 
     if time_advance_minutes < 0:
         time_advance_minutes = 0
@@ -480,6 +669,9 @@ def validate_world_updates(
     for character_id, location_id in (
         character_movements.items()
     ):
+        character_id = ensure_string(character_id)
+        location_id = ensure_string(location_id)
+
         if character_id not in valid_character_ids:
             continue
 
@@ -502,6 +694,7 @@ def validate_world_updates(
     ] = world_updates
 
     return scene_result
+
 
 def validate_scene_pacing(
     scene_result: Dict[str, Any],
