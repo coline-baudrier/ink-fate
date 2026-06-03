@@ -287,6 +287,27 @@ Objectif :
   - 10 personnages simultanés
   - simulation avancée
 
+Pour le MVP, le moteur ne simule pas toute une journée en détail. Il va seulement simuler lors des ellipses explicites :
+
+- Je vais dormir.
+- Je passe l’après-midi en cours.
+- Je rentre au dortoir.
+- Je laisse passer deux jours.
+
+Pas de simulation permanente, c'est beaucoup plus simple.
+
+Pour la première version :
+
+- pas de frontend ;
+- pas de FastAPI ;
+- pas de vraie base SQLite ;
+- stockage JSON local ;
+- interface CLI ;
+- une scène active ;
+- trois personnages ;
+- un seul univers ;
+- un seul scénario de départ.
+
 ---
 
 # Objectif final
