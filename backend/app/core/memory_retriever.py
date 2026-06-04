@@ -5,6 +5,7 @@ def score_memory(
     memory: Dict[str, Any],
     player_input: str | None,
     scene_history: str | None,
+    context_terms: list[str] | None = None,
 ) -> int:
     """Calcule un score de pertinence pour un souvenir."""
 
@@ -25,6 +26,7 @@ def score_memory(
         [
             player_input or "",
             scene_history or "",
+            " ".join(context_terms or []),
         ]
     ).lower()
 
@@ -60,6 +62,7 @@ def select_relevant_memories(
     """Selectionne les souvenirs les plus pertinents par personnage."""
 
     selected_memories = {}
+    context_terms = build_scene_context_terms(scene_context)
 
     for character in scene_context["participants"]:
         character_id = character["id"]
@@ -78,6 +81,7 @@ def select_relevant_memories(
                 memory,
                 player_input,
                 scene_history,
+                context_terms,
             )
 
             scored_memories.append(
@@ -99,3 +103,73 @@ def select_relevant_memories(
             selected_memories[character_id] = top_memories
 
     return selected_memories
+
+
+def build_scene_context_terms(
+    scene_context: Dict[str, Any],
+) -> list[str]:
+    """Construit des mots utiles a partir du lieu et des relations."""
+
+    terms = []
+    location = scene_context.get(
+        "location",
+        {},
+    )
+
+    if isinstance(location, dict):
+        for key in [
+            "id",
+            "name",
+            "description",
+        ]:
+            value = location.get(key)
+
+            if isinstance(value, str):
+                terms.append(value)
+
+    for character in scene_context.get("participants", []):
+        if not isinstance(character, dict):
+            continue
+
+        character_id = character.get("id")
+
+        if isinstance(character_id, str):
+            terms.append(character_id)
+
+        relationships = character.get(
+            "relationships",
+            {},
+        )
+
+        if not isinstance(relationships, dict):
+            continue
+
+        for target_id, relationship in relationships.items():
+            if isinstance(target_id, str):
+                terms.append(target_id)
+
+            if not isinstance(relationship, dict):
+                continue
+
+            for dimension, value in relationship.items():
+                if isinstance(dimension, str):
+                    terms.append(dimension)
+
+                if isinstance(value, int) and value >= 50:
+                    terms.append(f"high_{dimension}")
+
+    recent_events = scene_context.get(
+        "recent_events",
+        [],
+    )
+
+    if isinstance(recent_events, list):
+        for event in recent_events:
+            if not isinstance(event, dict):
+                continue
+
+            for value in event.values():
+                if isinstance(value, str):
+                    terms.append(value)
+
+    return terms

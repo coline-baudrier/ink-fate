@@ -2,7 +2,7 @@
 
 Le world simulation engine gere ce qui se passe lorsque le joueur n'est pas directement implique dans une scene.
 
-Cette fonctionnalite est importante pour la vision finale, mais elle doit rester limitee dans le MVP.
+Cette fonctionnalite est importante pour la vision finale, mais elle doit rester limitee dans le MVP. Aujourd'hui, Ink & Fate a deja un Message Engine MVP deterministe ; la simulation hors champ avancee reste future.
 
 ## 🎭 Role
 
@@ -33,6 +33,8 @@ Je laisse passer deux jours.
 ```
 
 Pour le MVP, il ne doit pas y avoir de simulation permanente. La simulation se produit seulement sur ellipse explicite.
+
+Note actuelle : le Message Engine peut aussi generer un SMS hors scene sans ellipse longue, quand une opportunite narrative claire existe deja.
 
 ## 🔁 Boucle Cible
 
@@ -100,6 +102,22 @@ Un personnage envoie un message.
   "sender": "dean",
   "receiver": "garrett",
   "content": "Did Beau ever mention he had a sister?"
+}
+```
+
+Dans le backend actuel, les messages sont stockes dans `world.messages` avec un format plus proche de :
+
+```json
+{
+  "id": "dean-elina-skating_lesson_followup-d1-1035",
+  "from": "dean",
+  "to": "elina",
+  "channel": "sms",
+  "content": "Demain matin. Patinoire. 7h.",
+  "sent_at_day": 1,
+  "sent_at_time": "10:35",
+  "status": "unread",
+  "trigger": "skating_lesson_followup"
 }
 ```
 
@@ -197,10 +215,12 @@ Valeurs :
 
 Pour le MVP 1, cette fonctionnalite peut rester minimale :
 
+- generer certains messages hors scene deterministes ;
+- generer certaines reponses SMS PNJ avec un fallback deterministe et un texte LLM optionnel ;
 - detecter quelques ellipses explicites ;
 - avancer l'heure ;
 - generer au maximum quelques evenements hors champ ;
 - sauvegarder ces evenements ;
 - creer des souvenirs simples.
 
-La simulation sociale avancee viendra plus tard.
+La simulation sociale avancee viendra plus tard. Le joueur peut deja envoyer une reponse SMS hors scene, et Dean peut confirmer le rendez-vous patinoire. Cette confirmation peut garder son texte deterministe ou etre ecrite par le LLM quand l'option SMS LLM est active. Le prochain palier logique est de generaliser les reponses PNJ avec une vraie logique narrative au-dela du cas Dean/patinoire.

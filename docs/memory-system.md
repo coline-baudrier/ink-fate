@@ -15,8 +15,9 @@ Le moteur peut :
 - verifier que le contenu est une chaine non vide ;
 - limiter l'importance entre `1` et `10` ;
 - ajouter les souvenirs au personnage concerne ;
-- sauvegarder les souvenirs dans les fichiers personnages ;
-- selectionner les souvenirs pertinents selon importance, age, tags et contexte ;
+- eviter les doublons textuels exacts ;
+- sauvegarder les souvenirs dans les fichiers personnages runtime ;
+- selectionner les souvenirs pertinents selon importance, age, tags, lieu, relations, evenements et contexte ;
 - reinjecter les souvenirs selectionnes dans le prompt ;
 - augmenter l'age des souvenirs.
 
@@ -36,7 +37,7 @@ Le moteur peut :
 Champs :
 
 - `owner` : id du personnage qui possede le souvenir.
-- `type` : type libre pour l'instant.
+- `type` : type normalise par le validator.
 - `content` : souvenir subjectif.
 - `importance` : entier entre `1` et `10`.
 - `age` : age du souvenir.
@@ -50,7 +51,7 @@ SceneResult
 -> clamp_memory_importance
 -> apply_memory_updates
 -> increase_memory_age
--> save_characters
+-> save_runtime_state
 ```
 
 ## 🧵 Recuperation Dans Le Prompt
@@ -63,7 +64,11 @@ Le score d'un souvenir prend en compte :
 - son age ;
 - ses tags ;
 - les mots presents dans l'action du joueur ;
-- les mots presents dans l'historique de scene.
+- les mots presents dans l'historique de scene ;
+- le lieu actif ;
+- les participants ;
+- les relations ;
+- les evenements recents.
 
 Les souvenirs retenus sont ajoutes dans :
 
@@ -75,10 +80,9 @@ Cela aide le LLM a rester coherent sur plusieurs tours.
 
 ## 🚧 Limites Actuelles
 
-- Les doublons ne sont pas encore detectes.
 - La recuperation reste simple et locale aux participants actifs.
-- Les types de souvenirs ne sont pas encore stricts.
 - Il n'y a pas encore d'id unique de souvenir.
+- Les types restent peu specialises.
 
 ## 🔮 Direction Future
 
@@ -86,7 +90,6 @@ Plus tard, le moteur pourra :
 
 - creer des souvenirs avec un id stable ;
 - distinguer `core`, `episodic`, `emotional`, `secret` ;
-- eviter les doublons ;
-- ameliorer le scoring selon les relations, les lieux et les evenements ;
+- ameliorer encore le scoring narratif ;
 - reduire l'importance des vieux souvenirs ;
 - proteger les secrets.

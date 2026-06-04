@@ -18,11 +18,27 @@
   },
   "goals": [
     "succeed_at_college",
-    "protect_elina",
+    "support_people_he_cares_about",
     "maintain_friendships"
   ],
   "current_goals": [
-    "help_elina_settle_in"
+    "succeed at college",
+    "support people he cares about",
+    "maintain friendships"
+  ],
+  "speech_style": [
+    "protective but not humorless",
+    "uses dry warnings",
+    "tries to sound calm even when annoyed",
+    "often redirects tension before it escalates",
+    "speaks like someone who knows his friends too well"
+  ],
+  "behavior_rules": [
+    "when someone he cares about is being provoked, steps in without trying to embarrass them",
+    "when someone pushes back against his protectiveness, backs off slightly but remains watchful",
+    "uses friendship leverage rather than aggression",
+    "avoids repeating the same generic warning",
+    "protects people he loves while respecting their independence"
   ],
   "fears": [
     "failing_family",

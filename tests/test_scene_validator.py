@@ -1,9 +1,11 @@
 from backend.app.core.scene_validator import (
+    remove_dialogues_from_nonparticipants,
     remove_invalid_actions,
     remove_invalid_contact_updates,
     remove_invalid_events,
     remove_invalid_memory_updates,
     remove_invalid_relationship_updates,
+    remove_player_internal_state_from_narration,
     validate_scene,
     validate_world_updates,
 )
@@ -110,6 +112,212 @@ def test_validate_scene_removes_invalid_participants():
     )
 
     assert validated["scene"]["participants"] == ["elina"]
+
+
+def test_validate_scene_adds_player_when_missing_from_participants():
+    world = build_world()
+
+    scene_result = {
+        "scene": {
+            "location": "campus",
+            "time": "10:20",
+            "participants": [
+                "beau",
+                "dean",
+            ],
+        }
+    }
+
+    validated = validate_scene(
+        scene_result,
+        world,
+    )
+
+    assert validated["scene"]["participants"] == [
+        "elina",
+        "beau",
+        "dean",
+    ]
+
+
+def test_validate_scene_removes_participants_not_at_scene_location():
+    world = build_world()
+    world["active_scene"] = {
+        "location": "dormitory",
+        "participants": [
+            "elina",
+        ],
+    }
+    world["character_locations"] = {
+        "elina": "dormitory",
+        "beau": "campus",
+        "dean": "campus",
+    }
+
+    scene_result = {
+        "scene": {
+            "location": "dormitory",
+            "time": "10:20",
+            "participants": [
+                "elina",
+                "beau",
+                "dean",
+            ],
+        },
+        "world_updates": {
+            "new_location": "",
+            "character_movements": {},
+        },
+    }
+
+    validated = validate_scene(
+        scene_result,
+        world,
+    )
+
+    assert validated["scene"]["participants"] == [
+        "elina",
+    ]
+
+
+def test_validate_scene_allows_npc_moved_to_scene_location():
+    world = build_world()
+    world["active_scene"] = {
+        "location": "dormitory",
+        "participants": [
+            "elina",
+        ],
+    }
+    world["character_locations"] = {
+        "elina": "dormitory",
+        "beau": "campus",
+        "dean": "campus",
+    }
+
+    scene_result = {
+        "scene": {
+            "location": "dormitory",
+            "time": "10:20",
+            "participants": [
+                "elina",
+                "beau",
+            ],
+        },
+        "world_updates": {
+            "new_location": "",
+            "character_movements": {
+                "beau": "dormitory",
+            },
+        },
+    }
+
+    validated = validate_scene(
+        scene_result,
+        world,
+    )
+
+    assert validated["scene"]["participants"] == [
+        "elina",
+        "beau",
+    ]
+
+
+def test_remove_dialogues_from_nonparticipants():
+    scene_result = {
+        "scene": {
+            "participants": [
+                "elina",
+            ],
+        },
+        "dialogues": [
+            {
+                "speaker": "dean",
+                "text": "Tu m'entends quand meme ?",
+            },
+            {
+                "speaker": "elina",
+                "text": "Invalid later by player filter.",
+            },
+        ],
+    }
+
+    validated = remove_dialogues_from_nonparticipants(
+        scene_result,
+    )
+
+    assert validated["dialogues"] == [
+        {
+            "speaker": "elina",
+            "text": "Invalid later by player filter.",
+        },
+    ]
+
+
+def test_remove_player_internal_state_from_narration_removes_feelings():
+    scene_result = {
+        "narration": [
+            (
+                "Elina tire sa valise dans le couloir. "
+                "Elle ressent un melange d'excitation et de nervosite. "
+                "Les portes ouvertes laissent passer des rires."
+            ),
+            "Elina se demande si elle va trouver sa chambre.",
+        ],
+    }
+
+    validated = remove_player_internal_state_from_narration(
+        scene_result,
+        "elina",
+    )
+
+    assert validated["narration"] == [
+        (
+            "Elina tire sa valise dans le couloir. "
+            "Les portes ouvertes laissent passer des rires."
+        ),
+    ]
+
+
+def test_remove_player_internal_state_from_narration_keeps_visible_actions():
+    scene_result = {
+        "narration": [
+            (
+                "Elina avance vers les escaliers. "
+                "Elle tire sa valise derriere elle. "
+                "Une porte claque au bout du couloir."
+            ),
+        ],
+    }
+
+    validated = remove_player_internal_state_from_narration(
+        scene_result,
+        "elina",
+    )
+
+    assert validated["narration"] == [
+        (
+            "Elina avance vers les escaliers. "
+            "Elle tire sa valise derriere elle. "
+            "Une porte claque au bout du couloir."
+        ),
+    ]
+
+
+def test_remove_player_internal_state_from_narration_keeps_npc_feelings():
+    scene_result = {
+        "narration": [
+            "Dean semble amuse par la reponse d'Elina.",
+        ],
+    }
+
+    validated = remove_player_internal_state_from_narration(
+        scene_result,
+        "elina",
+    )
+
+    assert validated["narration"] == [
+        "Dean semble amuse par la reponse d'Elina.",
+    ]
 
 
 def test_validate_scene_uses_active_scene_when_scene_is_missing():
@@ -377,6 +585,29 @@ def test_validate_world_updates_removes_player_movement():
     }
 
 
+def test_validate_world_updates_keeps_new_location_when_cleaning_movements():
+    world = build_world()
+
+    scene_result = {
+        "world_updates": {
+            "new_location": "dormitory",
+            "time_advance_minutes": 5,
+            "character_movements": {
+                "elina": "campus",
+                "beau": "moon",
+            },
+        }
+    }
+
+    validated = validate_world_updates(
+        scene_result,
+        world,
+    )
+
+    assert validated["world_updates"]["new_location"] == "dormitory"
+    assert validated["world_updates"]["character_movements"] == {}
+
+
 def test_validate_world_updates_handles_invalid_secondary_types():
     world = build_world()
 
@@ -536,6 +767,52 @@ def test_remove_invalid_memory_updates_cleans_secondary_fields():
     ]
 
 
+def test_remove_invalid_memory_updates_keeps_allowed_type():
+    scene_result = {
+        "memory_updates": [
+            {
+                "owner": "dean",
+                "type": "promise",
+                "content": "Dean promised a skating lesson.",
+            }
+        ]
+    }
+
+    validated = remove_invalid_memory_updates(
+        scene_result,
+        [
+            "elina",
+            "beau",
+            "dean",
+        ],
+    )
+
+    assert validated["memory_updates"][0]["type"] == "promise"
+
+
+def test_remove_invalid_memory_updates_normalizes_unknown_type():
+    scene_result = {
+        "memory_updates": [
+            {
+                "owner": "dean",
+                "type": "random_type",
+                "content": "Dean noticed something.",
+            }
+        ]
+    }
+
+    validated = remove_invalid_memory_updates(
+        scene_result,
+        [
+            "elina",
+            "beau",
+            "dean",
+        ],
+    )
+
+    assert validated["memory_updates"][0]["type"] == "memory"
+
+
 def test_clamp_relationship_updates_limits_attraction():
     scene_result = {
         "relationship_updates": [
@@ -657,6 +934,7 @@ def test_validate_scene_pacing_limits_dialogues():
             {"speaker": "beau", "text": "2"},
             {"speaker": "dean", "text": "3"},
             {"speaker": "beau", "text": "4"},
+            {"speaker": "dean", "text": "5"},
         ],
     }
 
@@ -666,6 +944,7 @@ def test_validate_scene_pacing_limits_dialogues():
         {"speaker": "dean", "text": "1"},
         {"speaker": "beau", "text": "2"},
         {"speaker": "dean", "text": "3"},
+        {"speaker": "beau", "text": "4"},
     ]
 
 
@@ -707,6 +986,35 @@ def test_validate_scene_pacing_removes_invalid_dialogues():
     assert validated["dialogues"] == [
         {"speaker": "dean", "text": "Hello"},
         {"speaker": "beau", "text": "Valid"},
+    ]
+
+
+def test_validate_scene_pacing_strips_enclosing_dialogue_quotes():
+    scene_result = {
+        "narration": [],
+        "dialogues": [
+            {
+                "speaker": "beau",
+                "text": "\"\"T'es vraiment insupportable parfois.\"\"",
+            },
+            {
+                "speaker": "dean",
+                "text": "« J'adore quand tu fais cette tete. »",
+            },
+        ],
+    }
+
+    validated = validate_scene_pacing(scene_result)
+
+    assert validated["dialogues"] == [
+        {
+            "speaker": "beau",
+            "text": "T'es vraiment insupportable parfois.",
+        },
+        {
+            "speaker": "dean",
+            "text": "J'adore quand tu fais cette tete.",
+        },
     ]
 
 

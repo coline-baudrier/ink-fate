@@ -3,6 +3,7 @@ from backend.app.core.world_engine import (
     update_world_after_scene,
     update_world_after_turn,
 )
+from backend.app.core.player_intent_parser import apply_player_intent_hints
 
 
 def build_world():
@@ -56,6 +57,40 @@ def test_apply_world_updates_moves_player_to_valid_location():
 
     assert updated_world["active_scene"]["location"] == "dormitory"
     assert updated_world["character_locations"]["elina"] == "dormitory"
+    assert updated_world["active_scene"]["participants"] == ["elina"]
+
+
+def test_apply_world_updates_follows_player_when_npcs_left_behind():
+    world = build_world()
+
+    scene_result = {
+        "world_updates": {
+            "new_location": "",
+            "character_movements": {
+                "beau": "dormitory",
+                "dean": "campus",
+            },
+        }
+    }
+
+    scene_result = apply_player_intent_hints(
+        scene_result,
+        world,
+        {
+            "detected_movement": "dormitory",
+            "leaves_npcs_behind": True,
+        },
+    )
+
+    updated_world = apply_world_updates(
+        world,
+        scene_result,
+    )
+
+    assert updated_world["active_scene"]["location"] == "dormitory"
+    assert updated_world["character_locations"]["elina"] == "dormitory"
+    assert updated_world["character_locations"]["beau"] == "campus"
+    assert updated_world["character_locations"]["dean"] == "campus"
     assert updated_world["active_scene"]["participants"] == ["elina"]
 
 
@@ -462,9 +497,63 @@ def test_update_world_after_turn_does_not_override_narrative_npc_move():
     )
 
     assert updated_world["character_locations"]["dean"] == "dormitory"
-    assert updated_world["active_scene"]["participants"] == [
-        "elina",
-        "dean",
-    ]
 
-    assert updated_world["event_log"] == []
+
+def test_update_world_after_turn_updates_story_arc_state():
+    world = build_world()
+    characters = {
+        "elina": {},
+        "dean": {},
+        "beau": {},
+    }
+    scenario = {
+        "story_arcs": [
+            {
+                "id": "dean_elina_slow_burn",
+                "status": "active",
+                "phase": "initial_tension",
+                "participants": [
+                    "dean",
+                    "elina",
+                ],
+            }
+        ]
+    }
+    scene_result = {
+        "scene": {
+            "location": "campus",
+            "participants": [
+                "dean",
+                "elina",
+            ],
+        },
+        "events": [
+            {
+                "type": "challenge",
+                "participants": [
+                    "dean",
+                    "elina",
+                ],
+                "summary": "Dean lance un defi patinoire a Elina.",
+            }
+        ],
+        "dialogues": [],
+        "actions": [],
+        "memory_updates": [],
+        "world_updates": {
+            "new_location": "",
+            "time_advance_minutes": 0,
+            "character_movements": {},
+        },
+    }
+
+    updated_world = update_world_after_turn(
+        world,
+        characters,
+        scene_result,
+        scenario,
+    )
+
+    assert updated_world["arc_state"]["dean_elina_slow_burn"]["signals"] == [
+        "playful_challenge_seen",
+    ]

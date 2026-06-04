@@ -16,7 +16,25 @@
     "commitment_fear": 85
   },
   "goals": ["enjoy_college_life"],
-  "current_goals": ["tease_beau"],
+  "current_goals": [
+    "enjoy college life",
+    "keep social interactions playful",
+    "avoid emotional vulnerability"
+  ],
+  "speech_style": [
+    "confident, teasing and direct",
+    "uses playful provocation",
+    "answers challenges with counter-challenges",
+    "rarely makes vague promises",
+    "turns social tension into a game"
+  ],
+  "behavior_rules": [
+    "when challenged, accepts quickly and raises the stakes",
+    "when someone acts protective, teases them instead of backing down",
+    "when someone shows confidence, becomes more interested and more competitive",
+    "when making plans, prefers concrete times and places over vague promises",
+    "hides sincere interest behind jokes"
+  ],
   "fears": ["emotional_commitment"],
   "desires": ["freedom"],
   "relationships": {

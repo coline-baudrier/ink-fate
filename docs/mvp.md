@@ -25,16 +25,21 @@ Le MVP 1 vise une boucle jouable simple dans la CLI.
 - temps qui avance ;
 - passage au jour suivant apres minuit ;
 - changements simples de lieu ;
-- positions des personnages dans `world.json` ;
+- positions des personnages dans le world runtime ;
 - validation des mouvements de PNJ ;
-- sauvegarde de `world.json` et des personnages.
+- sauvegarde runtime separee du canon ;
+- `save_id` CLI pour choisir une partie ;
+- SMS hors scene MVP ;
+- consultation des SMS stockes ;
+- reponses SMS joueur stockees et loggees ;
+- directives HRP runtime.
 
 ## 🚧 Encore Partiel
 
 - selection encore plus fine des souvenirs/evenements ;
 - progression romance plus structuree sur le long terme ;
 - detection d'ellipses ;
-- sauvegarde de partie separee.
+- reponses SMS PNJ encore plus contextuelles, avec decisions narratives plus fines avant appel LLM.
 
 ## ⛔ Exclu Du MVP
 
@@ -56,9 +61,11 @@ Joueur
 -> scene_result_parser.py
 -> scene_validator.py
 -> relationship_engine.py
+-> contact_engine.py
 -> memory_engine.py
 -> world_engine.py
--> sauvegarde JSON
+-> message_engine.py
+-> runtime_save.py
 -> renderer.py
 -> Joueur
 ```

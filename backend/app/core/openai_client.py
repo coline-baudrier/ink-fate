@@ -32,8 +32,10 @@ def generate_text(prompt: str) -> str:
                 "content": prompt,
             }
         ],
-        # Plus la temperature est basse, plus la reponse est stable.
-        temperature=0.4,
+        temperature=0.75,
+        top_p=0.9,
+        frequency_penalty=0.35,
+        presence_penalty=0.25,
     )
 
     return response.choices[0].message.content

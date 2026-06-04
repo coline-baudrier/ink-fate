@@ -18,8 +18,12 @@ Structure cible :
   "fears": [],
   "desires": [],
   "relationships": {},
+  "contacts": {},
   "current_goals": [],
+  "speech_style": [],
+  "behavior_rules": [],
   "private_thoughts": [],
+  "schedule": [],
   "memories": []
 }
 ```
@@ -115,6 +119,31 @@ Relations asymetriques vers d'autres personnages.
 
 Voir [relationship-system.md](relationship-system.md).
 
+## contacts
+
+Moyens de contact asymetriques vers d'autres personnages.
+
+Ils indiquent si un personnage peut appeler, envoyer un SMS ou DM un autre personnage hors scene.
+
+## speech_style
+
+Style de parole stable du personnage.
+
+Exemples :
+
+- `confident, teasing and direct` ;
+- `protective but not humorless`.
+
+## behavior_rules
+
+Regles comportementales stables et reutilisables.
+
+Elles ne doivent pas dependre d'un scenario precis. Les dynamiques specifiques, comme "Elina est la petite soeur de Beau", restent dans `scenario.json`.
+
+## schedule
+
+Planning simple utilise par le moteur pour deplacer les PNJ hors scene.
+
 ## 🔒 private_thoughts
 
 Informations internes au personnage.
@@ -140,7 +169,8 @@ Pour le MVP, un personnage doit au minimum avoir :
 - `personality` ;
 - `goals` ;
 - `current_goals` ;
-- `relationships`.
+- `relationships` ;
+- `contacts`.
 
 La memoire peut etre ajoutee progressivement.
 

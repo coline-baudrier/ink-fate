@@ -14,7 +14,11 @@
   "canon_rules": [
     "Elina is arriving on campus with luggage.",
     "Beau is Elina's older brother.",
+    "Elina Maxwell is Beau Maxwell's younger sister.",
+    "Beau is protective of Elina and wants to help her settle in without smothering her.",
     "Dean is Beau's best friend.",
+    "Dean Di Laurentis is Beau's best friend.",
+    "Dean is used to teasing Beau and testing boundaries.",
     "Dean initially wants to tease Beau, but once Elina challenges him, he becomes directly interested in her reactions.",
     "The story takes place at Briar University.",
     "Do not invent another university name.",
@@ -23,6 +27,9 @@
   "character_dynamics": [
     "Dean should feel charismatic, teasing, socially confident, and quick-witted.",
     "Dean may tease Beau, but he should also engage directly with Elina when she challenges him.",
+    "Dean becomes intrigued when Elina challenges him instead of being intimidated.",
+    "The core dynamic is playful tension between Elina's independence, Beau's protectiveness, and Dean's provocative charm.",
+    "Early scenes should allow Dean to create concrete playful challenges, while Beau pushes back without completely blocking Elina.",
     "When Elina directly challenges Dean, Dean must answer Elina directly.",
     "Do not redirect Dean's answer toward Beau unless Elina explicitly mentions Beau.",
     "Dean can tease Beau briefly, but the main reaction must target Elina.",
@@ -72,5 +79,89 @@
     "Prefer short interactive beats over long summaries.",
     "Do not make every player action a major dramatic event.",
     "Leave space for the player to respond."
+  ],
+  "story_arcs": [
+    {
+      "id": "dean_elina_slow_burn",
+      "title": "Dean and Elina slow-burn tension",
+      "status": "active",
+      "phase": "initial_tension",
+      "participants": [
+        "dean",
+        "elina",
+        "beau"
+      ],
+      "dramatic_questions": [
+        "Will Elina treat Dean's provocations as a game, reject them, or turn them against him?",
+        "Can Beau protect Elina without controlling her choices?",
+        "Will Dean stay behind jokes or reveal sincere interest through concrete actions?"
+      ],
+      "current_tensions": [
+        "Elina wants independence on arrival day.",
+        "Beau wants to help without smothering her.",
+        "Dean is entertained by tension and drawn to confidence.",
+        "The player can accept, refuse, delay or redirect Dean's challenges."
+      ],
+      "available_beats": [
+        "playful_challenge",
+        "protective_interruption",
+        "text_followup",
+        "private_conversation",
+        "missed_connection",
+        "unexpected_sincerity",
+        "boundary_set_by_player"
+      ],
+      "blocked_beats": [
+        "love_confession",
+        "official_couple",
+        "instant_emotional_intimacy",
+        "physical_intimacy_without_relationship_support"
+      ],
+      "progress_signals": [
+        "Dean responds directly to Elina instead of only teasing Beau.",
+        "Elina chooses to re-engage with Dean after a chance to leave.",
+        "Dean makes a concrete effort rather than a vague promise.",
+        "Beau respects Elina's independence even while staying watchful.",
+        "relationship_updates show gradual respect, trust or attraction changes."
+      ],
+      "branching_notes": [
+        "If Elina rejects Dean's challenge, let the tension cool or shift rather than forcing flirtation.",
+        "If Elina ignores a SMS, let the missed connection become context instead of repeating the same message.",
+        "If Beau interferes too much, create consequences for Beau and Elina's sibling dynamic.",
+        "If Elina sets a boundary, NPCs should react to that boundary and remember it."
+      ]
+    }
+  ],
+  "message_triggers": [
+    {
+      "trigger": "skating_lesson_followup",
+      "from": "dean",
+      "to": "elina",
+      "channel": "sms",
+      "content": "Demain matin. Patinoire. 7h. Si tu survis a la premiere heure, je te paie un cafe.",
+      "keywords": [
+        "patin",
+        "patinoire",
+        "hockey",
+        "defi",
+        "lesson",
+        "skating"
+      ]
+    },
+    {
+      "trigger": "beau_dormitory_checkin",
+      "from": "beau",
+      "to": "elina",
+      "channel": "sms",
+      "content": "T'es bien arrivee au dortoir ? Je te laisse respirer, mais reponds au moins par un oui.",
+      "keywords": [
+        "dortoir",
+        "residence",
+        "dormitory",
+        "installee",
+        "settle",
+        "chambre"
+      ]
+    }
   ]
 }

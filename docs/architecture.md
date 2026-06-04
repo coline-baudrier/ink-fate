@@ -6,7 +6,7 @@ Cette documentation decrit l'architecture actuelle du prototype Ink & Fate.
 
 Le moteur garde la verite.
 
-Le LLM propose une scene sous forme de JSON. Le moteur parse, valide, filtre, applique uniquement les effets autorises, puis sauvegarde les donnees modifiees.
+Le LLM propose une scene sous forme de JSON. Le moteur parse, valide, filtre, applique uniquement les effets autorises, puis sauvegarde les donnees modifiees dans l'etat runtime de la partie.
 
 ```md
 World + Characters
@@ -22,7 +22,8 @@ World + Characters
 -> ContactEngine
 -> MemoryEngine
 -> WorldEngine
--> JSON Save
+-> MessageEngine
+-> RuntimeSave
 ```
 
 ## 🗂️ Architecture Actuelle
@@ -49,6 +50,9 @@ backend/
       memory_retriever.py
       npc_schedule_engine.py
       event_log_engine.py
+      planned_event_engine.py
+      story_arc_engine.py
+      story_arc_state_engine.py
       time_engine.py
       world_engine.py
 
@@ -61,6 +65,11 @@ data/
         elina.json
         beau.json
         dean.json
+  saves/
+    off-campus/
+      default/
+        world.json
+        characters/
 ```
 
 ## 🧩 Modules
@@ -71,13 +80,13 @@ Point d'entree CLI du prototype.
 
 Il orchestre la partie jouable :
 
-- charger le monde ;
-- charger les personnages ;
+- charger le monde canon ou runtime ;
+- charger les personnages canon ou runtime ;
 - construire le contexte de scene ;
 - generer une scene ;
 - lire l'action du joueur ;
 - appliquer les effets persistants ;
-- sauvegarder le monde et les personnages ;
+- sauvegarder l'etat runtime de la partie ;
 - afficher la scene.
 
 ### app/core/scene_pipeline.py
@@ -87,9 +96,11 @@ Pipeline de generation d'une scene.
 Responsabilites :
 
 - construire le prompt ;
+- construire les indices deterministes d'intention joueur et contact ;
 - appeler OpenAI ;
 - parser la reponse JSON ;
-- valider le `SceneResult`.
+- valider le `SceneResult` ;
+- appliquer les corrections deterministes issues des intentions detectees.
 
 ### app/core/world_engine.py
 
@@ -104,8 +115,9 @@ Responsabilites :
 - appliquer les plannings PNJ ;
 - proteger les participants actifs contre les mouvements automatiques de schedule ;
 - enregistrer les mouvements PNJ hors champ ;
+- deduire certains evenements planifies depuis une scene ;
+- observer les signaux d'arcs narratifs apres une scene ;
 - avancer le temps apres une scene ;
-- sauvegarder `world.json` ;
 - reconstruire le contexte de scene.
 
 ### app/core/character_state_engine.py
@@ -143,7 +155,7 @@ Selection des souvenirs pertinents pour le prompt.
 
 Responsabilites actuelles :
 
-- calculer un score selon importance, age, tags et contexte joueur ;
+- calculer un score selon importance, age, tags, lieu, relations, evenements et contexte joueur ;
 - choisir les souvenirs les plus utiles par participant actif ;
 - eviter d'envoyer toute la memoire au LLM.
 
@@ -188,6 +200,42 @@ Responsabilites actuelles :
 - creer un resume court ;
 - ajouter les evenements dans `world.event_log`.
 
+### app/core/planned_event_engine.py
+
+Gestion MVP des evenements prevus.
+
+Responsabilites actuelles :
+
+- stocker des rendez-vous concrets dans `world.planned_events` ;
+- eviter les doublons par `id` ;
+- creer le rendez-vous patinoire Dean/Elina depuis une scene parlee claire ;
+- fournir un contexte prompt lisible des evenements planifies ;
+- servir de couche commune entre SMS, scene face-a-face et futurs moteurs hors champ.
+
+### app/core/story_arc_engine.py
+
+Construction du contexte d'arcs narratifs.
+
+Responsabilites actuelles :
+
+- lire `scenario.story_arcs` ;
+- filtrer les arcs actifs ;
+- formater les questions dramatiques, tensions, beats disponibles et beats bloques ;
+- rappeler au prompt que les beats sont des opportunites, pas une checklist ;
+- garder l'issue ouverte, y compris romance qui progresse, stagne, bifurque ou echoue.
+
+### app/core/story_arc_state_engine.py
+
+Observation runtime des arcs narratifs.
+
+Responsabilites actuelles :
+
+- stocker les signaux observes dans `world.arc_state` ;
+- detecter des beats deja joues depuis les scenes et SMS ;
+- eviter les doublons de signaux ;
+- exposer un contexte prompt des beats deja vus ;
+- aider le LLM a eviter les repetitions sans forcer la suite.
+
 ### app/core/npc_schedule_engine.py
 
 Gestion simple des plannings PNJ.
@@ -200,6 +248,53 @@ Responsabilites actuelles :
 - ignorer les PNJ deplaces narrativement pendant le tour ;
 - ignorer les PNJ presents dans la scene active pendant le tour ;
 - retourner les mouvements effectues pour les enregistrer dans `event_log`.
+
+### app/core/message_engine.py
+
+Moteur SMS MVP hors scene.
+
+Responsabilites actuelles :
+
+- detecter une opportunite narrative claire de message ;
+- generer des SMS PNJ inities par `scenario.message_triggers` ;
+- conserver le SMS Dean -> Elina pour le suivi patinoire comme trigger configure ;
+- eviter les doublons par `trigger` ;
+- stocker les messages dans `world.messages` ;
+- lister les messages du joueur ;
+- marquer les messages du joueur comme lus ;
+- parser et appliquer les reponses SMS du joueur ;
+- journaliser les reponses SMS dans `event_log` ;
+- creer des consequences narratives simples depuis certains SMS, comme un `planned_meeting` et un `planned_event` durable ;
+- noter certains signaux d'arcs depuis les SMS ajoutes au monde ;
+- creer un souvenir simple chez un PNJ qui repond par SMS ;
+- generer une confirmation Dean -> Elina apres une reponse au rendez-vous patinoire ;
+- utiliser un texte deterministe par defaut ou un texte LLM optionnel si `INK_FATE_ENABLE_LLM_SMS=1` ;
+- utiliser le meme principe LLM optionnel/fallback pour les SMS PNJ inities par trigger ;
+- generer une reponse SMS PNJ generique via LLM quand le joueur envoie un SMS significatif a un PNJ contactable ;
+- eviter les doublons de reponses generiques avec un trigger derive du SMS joueur.
+
+### app/core/runtime_save.py
+
+Gestion des sauvegardes runtime.
+
+Responsabilites actuelles :
+
+- charger le canon si aucune sauvegarde runtime n'existe ;
+- charger `data/saves/<universe>/<save_id>` si elle existe ;
+- sauvegarder `world.json` et les personnages runtime ensemble ;
+- normaliser les `save_id` ;
+- supprimer une sauvegarde runtime.
+
+### app/core/runtime_directives.py
+
+Directives HRP runtime.
+
+Responsabilites actuelles :
+
+- parser `/hrp`, `/rule` et `/context` ;
+- stocker les directives dans `world.runtime_directives` ;
+- eviter les doublons ;
+- construire une section de prompt dediee.
 
 ### app/core/scene_validator.py
 
@@ -233,7 +328,12 @@ Responsabilites :
 - injecter les statuts relationnels ;
 - injecter les moyens de contact disponibles ;
 - injecter les evenements recents ;
+- injecter les evenements planifies ;
+- injecter les indices deterministes joueur/contact ;
+- injecter les directives HRP runtime ;
 - injecter le contexte de scenario ;
+- injecter les arcs narratifs actifs ;
+- injecter l'etat observe des arcs narratifs ;
 - injecter l'action joueur ;
 - demander un JSON `SceneResult`.
 
@@ -252,30 +352,35 @@ Lecture et ecriture JSON.
 
 ### app/core/character_loader.py
 
-Chargement et sauvegarde des personnages.
+Chargement et sauvegarde des personnages. En jeu, les sauvegardes passent par `runtime_save.py` pour ne pas modifier les personnages canon.
 
 ## 🔁 Flux Actuel
 
 ```md
-1. main.py charge world.json.
-2. main.py charge les personnages.
-3. scene_context construit le contexte de scene.
-4. scene_pipeline genere et valide une scene d'ouverture.
-5. renderer affiche la scene.
-6. Le joueur ecrit une action.
-7. scene_pipeline genere et valide la suite.
-8. character_state_engine applique les effets personnages.
-9. relationship_engine applique les relations.
-10. contact_engine applique les moyens de contact.
-11. memory_engine applique et vieillit les souvenirs.
-12. world_engine applique les consequences du tour.
-13. world_engine enregistre les evenements.
-14. world_engine avance le temps.
-15. world_engine applique les plannings PNJ hors scene.
-16. world_engine sauvegarde le monde.
-17. character_loader sauvegarde les personnages.
-18. world_engine reconstruit le contexte.
-19. renderer affiche la scene suivante.
+1. main.py determine le `save_id`.
+2. main.py charge le world runtime s'il existe, sinon le world canon.
+3. main.py charge les personnages runtime s'ils existent, sinon les personnages canon.
+4. scene_context construit le contexte de scene.
+5. scene_pipeline genere et valide une scene d'ouverture.
+6. renderer affiche la scene.
+7. Le joueur ecrit une action ou une commande CLI.
+8. Les commandes runtime (`messages`, `/hrp`, `reset`, etc.) sont traitees sans appel LLM.
+9. scene_pipeline genere et valide la suite.
+10. character_state_engine applique les effets personnages.
+11. relationship_engine applique les relations.
+12. contact_engine applique les moyens de contact.
+13. memory_engine applique et vieillit les souvenirs.
+14. world_engine applique les consequences du tour.
+15. world_engine enregistre les evenements.
+16. world_engine deduit les planned events depuis la scene.
+17. world_engine observe les signaux d'arcs narratifs depuis la scene.
+18. world_engine avance le temps.
+19. world_engine applique les plannings PNJ hors scene.
+20. message_engine genere les messages hors scene si les conditions sont reunies.
+21. message_engine observe les signaux d'arcs narratifs depuis les SMS.
+22. runtime_save sauvegarde le world et les personnages runtime.
+23. world_engine reconstruit le contexte.
+24. renderer affiche la scene suivante.
 ```
 
 ## 🛡️ Regles Techniques
@@ -286,5 +391,6 @@ Chargement et sauvegarde des personnages.
 - Les relations finales restent entre `0` et `100`.
 - Le joueur ne doit jamais recevoir de dialogue genere par le LLM.
 - Les souvenirs doivent avoir un proprietaire valide et un contenu non vide.
-- Les lieux proposes par le LLM doivent exister dans `world.json`.
-- Le monde et les personnages sont sauvegardes separement.
+- Les lieux proposes par le LLM doivent exister dans le world charge.
+- Le canon dans `data/universes` ne doit pas etre modifie pendant une partie.
+- Le monde runtime et les personnages runtime sont sauvegardes ensemble dans `data/saves`.

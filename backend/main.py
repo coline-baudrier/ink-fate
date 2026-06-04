@@ -7,20 +7,38 @@ appliquer les relations et afficher le resultat.
 
 from pathlib import Path
 from typing import Any, Dict
-import shutil
-import tempfile
+import argparse
+import os
 
-from app.core.character_loader import (
-    load_characters,
-    save_characters,
-)
 from app.core.json_loader import load_json
 from app.core.renderer import render_scene_result
+from app.core.runtime_directives import (
+    add_runtime_directive,
+    clear_runtime_directives,
+    get_runtime_directives,
+    parse_runtime_directive_command,
+)
+from app.core.runtime_save import (
+    DEFAULT_SAVE_ID,
+    build_runtime_save_path,
+    clear_runtime_save,
+    load_runtime_characters,
+    load_runtime_world,
+    normalize_save_id,
+    save_runtime_state,
+)
 from app.core.scene_context import build_scene_context
 from app.core.scene_pipeline import generate_scene
+from app.core.message_engine import (
+    append_pending_messages,
+    apply_player_sms_reply,
+    generate_pending_messages,
+    get_player_messages,
+    mark_player_messages_read,
+    parse_sms_reply_command,
+)
 from app.core.world_engine import (
     rebuild_scene_context,
-    save_world,
     update_world_after_turn,
 )
 from app.core.character_state_engine import update_characters_after_scene
@@ -29,62 +47,47 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 UNIVERSE_PATH = PROJECT_ROOT / "data" / "universes" / "off-campus"
 
 
-def create_session_backup(
-    universe_path: Path,
-) -> Dict[str, Path]:
-    """Cree une sauvegarde temporaire des JSON au debut de session."""
+def parse_args() -> argparse.Namespace:
+    """Lit les options CLI du prototype."""
 
-    temp_dir = Path(
-        tempfile.mkdtemp()
+    parser = argparse.ArgumentParser(
+        description="Ink & Fate CLI prototype",
+    )
+    parser.add_argument(
+        "--save-id",
+        default=None,
+        help="Runtime save id to load and write.",
     )
 
-    backup_world_path = temp_dir / "world.json"
+    return parser.parse_args()
 
-    shutil.copy(
-        universe_path / "world.json",
-        backup_world_path,
+
+def resolve_save_id(
+    cli_save_id: str | None = None,
+) -> str:
+    """Determine la sauvegarde runtime a utiliser."""
+
+    if cli_save_id:
+        return normalize_save_id(cli_save_id)
+
+    env_save_id = os.getenv(
+        "INK_FATE_SAVE_ID",
+        DEFAULT_SAVE_ID,
     )
 
-    backup_characters_path = temp_dir / "characters"
-
-    shutil.copytree(
-        universe_path / "characters",
-        backup_characters_path,
-    )
-
-    return {
-        "world": backup_world_path,
-        "characters": backup_characters_path,
-    }
+    return normalize_save_id(env_save_id)
 
 
-def restore_session_backup(
-    universe_path: Path,
-    backup_paths: Dict[str, Path],
+def print_project_header(
+    world: Dict[str, Any],
+    save_id: str,
 ) -> None:
-    """Restaure les JSON dans leur etat du debut de session."""
-
-    shutil.copy(
-        backup_paths["world"],
-        universe_path / "world.json",
-    )
-
-    shutil.rmtree(
-        universe_path / "characters",
-    )
-
-    shutil.copytree(
-        backup_paths["characters"],
-        universe_path / "characters",
-    )
-
-
-def print_project_header(world: Dict[str, Any]) -> None:
     """Affiche le titre du projet et le nom de l'univers charge."""
 
     print("Ink & Fate")
     print("----------")
     print(f"Universe: {world['universe']['name']}")
+    print(f"Save: {save_id}")
 
 
 def print_loaded_characters(
@@ -137,19 +140,183 @@ def print_rendered_scene(
     print(rendered_scene)
 
 
+def print_new_player_messages(
+    messages: list[Dict[str, Any]],
+    world: Dict[str, Any],
+) -> None:
+    """Affiche les nouveaux messages non lus envoyes au joueur."""
+
+    player_character = world["player_character"]
+
+    for message in messages:
+        if message.get("to") != player_character:
+            continue
+
+        if message.get("status") != "unread":
+            continue
+
+        sender = message.get(
+            "from",
+            "Unknown",
+        )
+        content = message.get(
+            "content",
+            "",
+        )
+
+        print()
+        print(f"New message from {sender.title()}:")
+        print(f'"{content}"')
+
+
+def print_player_message_inbox(
+    world: Dict[str, Any],
+) -> None:
+    """Affiche les messages deja stockes pour le personnage joueur."""
+
+    messages = get_player_messages(world)
+
+    print()
+    print("Messages")
+    print("--------")
+
+    if not messages:
+        print("No messages yet.")
+        return
+
+    for message in messages:
+        sender = message.get(
+            "from",
+            "Unknown",
+        )
+        status = message.get(
+            "status",
+            "unknown",
+        )
+        sent_day = message.get(
+            "sent_at_day",
+            "?",
+        )
+        sent_time = message.get(
+            "sent_at_time",
+            "??:??",
+        )
+        content = message.get(
+            "content",
+            "",
+        )
+
+        print(f"[{status}] Day {sent_day}, {sent_time} - {sender.title()}:")
+        print(f'"{content}"')
+
+
+def print_runtime_directives(
+    world: Dict[str, Any],
+) -> None:
+    """Affiche les directives HRP actives."""
+
+    directives = get_runtime_directives(world)
+
+    print()
+    print("Runtime directives")
+    print("------------------")
+
+    if not directives:
+        print("No runtime directives.")
+        return
+
+    for index, directive in enumerate(
+        directives,
+        start=1,
+    ):
+        directive_type = directive.get(
+            "type",
+            "note",
+        )
+        content = directive.get(
+            "content",
+            "",
+        )
+
+        print(f"{index}. [{directive_type}] {content}")
+
+
+def print_sms_reply_result(
+    result: Dict[str, Any],
+) -> None:
+    """Affiche le resultat d'une commande de reponse SMS."""
+
+    print()
+
+    if result.get("sent") is not True:
+        print("SMS not sent: no valid SMS access to that character.")
+        return
+
+    message = result.get(
+        "message",
+        {},
+    )
+
+    recipient = message.get(
+        "to",
+        "Unknown",
+    )
+    content = message.get(
+        "content",
+        "",
+    )
+
+    print(f"SMS sent to {recipient.title()}:")
+    print(f'"{content}"')
+
+    npc_replies = result.get(
+        "npc_replies",
+        [],
+    )
+
+    if isinstance(npc_replies, list):
+        for reply in npc_replies:
+            if not isinstance(reply, dict):
+                continue
+
+            sender = reply.get(
+                "from",
+                "Unknown",
+            )
+            reply_content = reply.get(
+                "content",
+                "",
+            )
+
+            print()
+            print(f"New message from {sender.title()}:")
+            print(f'"{reply_content}"')
+
+
 def main() -> None:
     """Lance le prototype CLI."""
 
-    # Chargement initial : monde, personnages, puis contexte de scene.
-    world = load_json(UNIVERSE_PATH / "world.json")
+    args = parse_args()
+    save_id = resolve_save_id(args.save_id)
+    runtime_save_path = build_runtime_save_path(
+        PROJECT_ROOT,
+        "off-campus",
+        save_id,
+    )
+
+    # Chargement initial : canon si aucune sauvegarde runtime n'existe.
+    world = load_runtime_world(
+        UNIVERSE_PATH / "world.json",
+        runtime_save_path,
+    )
     scenario = load_json(UNIVERSE_PATH / "scenario.json")
-    backup_paths = create_session_backup(UNIVERSE_PATH)
 
     character_ids = world["characters"]
 
-    characters = load_characters(
+    characters = load_runtime_characters(
         UNIVERSE_PATH / "characters",
         character_ids,
+        runtime_save_path,
     )
 
     scene_context = build_scene_context(
@@ -157,7 +324,10 @@ def main() -> None:
         characters,
     )
 
-    print_project_header(world)
+    print_project_header(
+        world,
+        save_id,
+    )
     print_loaded_characters(characters)
     print_active_scene(scene_context)
 
@@ -182,13 +352,70 @@ def main() -> None:
             print("Fin de la session.")
             break
 
+        if player_input.lower() in ["messages", "sms", "inbox"]:
+            print_player_message_inbox(world)
+            world = mark_player_messages_read(world)
+            save_runtime_state(
+                runtime_save_path,
+                world,
+                characters,
+            )
+            continue
+
+        if player_input.lower() in ["directives", "rules", "hrp"]:
+            print_runtime_directives(world)
+            continue
+
+        if player_input.lower() in ["clear_directives", "clear rules"]:
+            world = clear_runtime_directives(world)
+            save_runtime_state(
+                runtime_save_path,
+                world,
+                characters,
+            )
+            print("Runtime directives cleared.")
+            continue
+
+        sms_reply = parse_sms_reply_command(player_input)
+
+        if sms_reply:
+            world, sms_result = apply_player_sms_reply(
+                world,
+                characters,
+                sms_reply,
+            )
+            save_runtime_state(
+                runtime_save_path,
+                world,
+                characters,
+            )
+            print_sms_reply_result(sms_result)
+            continue
+
+        runtime_directive = parse_runtime_directive_command(player_input)
+
+        if runtime_directive:
+            world = add_runtime_directive(
+                world,
+                runtime_directive,
+            )
+            save_runtime_state(
+                runtime_save_path,
+                world,
+                characters,
+            )
+            print("Runtime directive added.")
+            continue
+
         if player_input.lower() in ["reset"]:
-            restore_session_backup(
-                UNIVERSE_PATH,
-                backup_paths,
+            clear_runtime_save(
+                runtime_save_path,
             )
 
-            print("Session annulee. JSON restaures.")
+            print(
+                f"Sauvegarde runtime '{save_id}' supprimee. "
+                "Le canon reste intact."
+            )
             break
 
         next_scene = generate_scene(
@@ -208,11 +435,29 @@ def main() -> None:
             world,
             characters,
             next_scene,
+            scenario,
         )
 
-        save_world(
-            UNIVERSE_PATH / "world.json",
+        new_messages = generate_pending_messages(
             world,
+            characters,
+            next_scene,
+            scenario,
+            {
+                "player_input": player_input,
+                "scene_history": scene_history,
+            },
+        )
+        world = append_pending_messages(
+            world,
+            new_messages,
+            scenario,
+        )
+
+        save_runtime_state(
+            runtime_save_path,
+            world,
+            characters,
         )
 
         scene_context = rebuild_scene_context(
@@ -220,15 +465,14 @@ def main() -> None:
             characters,
         )
 
-        # Les changements persistants sont sauvegardes directement dans les JSON.
-        save_characters(
-            UNIVERSE_PATH / "characters",
-            characters,
-        )
-
         print_rendered_scene(
             "Next scene",
             next_scene,
+        )
+
+        print_new_player_messages(
+            new_messages,
+            world,
         )
 
         scene_history += "\n\n"

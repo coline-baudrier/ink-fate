@@ -11,7 +11,9 @@ from typing import Any, Dict
 from app.core.event_log_engine import update_event_log_after_scene
 from app.core.json_loader import save_json
 from app.core.npc_schedule_engine import apply_npc_schedule_movements
+from app.core.planned_event_engine import apply_planned_events_after_scene
 from app.core.scene_context import build_scene_context
+from app.core.story_arc_state_engine import apply_story_arc_state_after_scene
 from app.core.time_engine import advance_time
 
 
@@ -320,6 +322,7 @@ def update_world_after_turn(
     world: Dict[str, Any],
     characters: Dict[str, Dict[str, Any]],
     scene_result: Dict[str, Any],
+    scenario: Dict[str, Any] | None = None,
 ) -> Dict[str, Any]:
     """Applique toutes les consequences monde d'un tour joueur."""
 
@@ -335,6 +338,17 @@ def update_world_after_turn(
 
     world = update_event_log_after_scene(
         world,
+        scene_result,
+    )
+
+    world = apply_planned_events_after_scene(
+        world,
+        scene_result,
+    )
+
+    world = apply_story_arc_state_after_scene(
+        world,
+        scenario,
         scene_result,
     )
 

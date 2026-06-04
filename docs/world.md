@@ -2,6 +2,8 @@
 
 Le world state represente l'etat courant du monde.
 
+Dans `data/universes`, il sert de canon de depart. Pendant une partie, l'etat courant vit dans `data/saves/<universe>/<save_id>/world.json`.
+
 Il ne doit pas decrire tout l'univers en detail. Il doit contenir seulement les informations utiles au moteur pour savoir :
 
 - ou se passe l'histoire ;
@@ -36,7 +38,9 @@ Il ne doit pas decrire tout l'univers en detail. Il doit contenir seulement les 
     "beau": "campus",
     "dean": "campus"
   },
-  "event_log": []
+  "event_log": [],
+  "messages": [],
+  "runtime_directives": []
 }
 ```
 
@@ -165,6 +169,31 @@ Chaque entree contient :
 
 Les mouvements PNJ produits par les schedules sont aussi enregistres avec le type `npc_schedule_move`.
 
+## Messages
+
+`messages` stocke les SMS hors scene.
+
+Regles actuelles :
+
+- les messages vivent dans le world runtime ;
+- le moteur evite les doublons via `trigger` ;
+- la commande `messages` / `sms` / `inbox` affiche les messages du joueur ;
+- consulter les messages les marque comme lus ;
+- la commande `reply dean: texte` ajoute une reponse SMS du joueur ;
+- les reponses SMS du joueur sont aussi journalisees dans `event_log` ;
+- Dean peut generer une confirmation automatique deterministe pour le rendez-vous patinoire.
+
+## Directives HRP Runtime
+
+`runtime_directives` stocke les consignes ajoutees pendant une partie avec `/hrp`, `/rule` ou `/context`.
+
+Ces directives :
+
+- sont sauvegardees dans le runtime ;
+- sont reinjectees dans le prompt ;
+- ne modifient pas `scenario.json` ;
+- ne peuvent pas annuler les contraintes du moteur.
+
 ## 🚧 Ce Que Le World State Ne Contient Pas Encore
 
 Pour le MVP actuel, le world state ne gere pas :
@@ -176,6 +205,7 @@ Pour le MVP actuel, le world state ne gere pas :
 - carte complete ;
 - simulation permanente ;
 - historique de partie sauvegarde ;
+- reponses PNJ generalisees ou generees par LLM aux SMS ;
 - dates calendaires avancees.
 
 ## 📖 Scenario

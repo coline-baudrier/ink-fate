@@ -11,7 +11,7 @@ Le projet est actuellement un prototype CLI jouable.
 ✅ Ce qui existe deja :
 
 - chargement d'un univers depuis des fichiers JSON ;
-- chargement et sauvegarde des personnages ;
+- chargement des personnages ;
 - construction du contexte de scene active ;
 - pipeline de generation et validation de scene ;
 - generation d'un prompt structure pour le LLM ;
@@ -22,6 +22,8 @@ Le projet est actuellement un prototype CLI jouable.
 - souvenirs pertinents selectionnes puis reinjectes au prompt ;
 - statut relationnel des participants reinjecte au prompt ;
 - evenements recents reinjectes au prompt ;
+- arcs narratifs souples reinjectes au prompt ;
+- etat observe des arcs narratifs reinjecte au prompt ;
 - regles de scenario, de romance progressive et de pacing dans `scenario.json` ;
 - module central pour appliquer les effets personnages ;
 - rendu texte simple ;
@@ -33,22 +35,24 @@ Le projet est actuellement un prototype CLI jouable.
 - limitation des deltas relationnels par dimension ;
 - application et sauvegarde des mises a jour relationnelles ;
 - creation et sauvegarde de souvenirs ;
-- avancee et sauvegarde du temps dans `world.json` ;
+- avancee et sauvegarde du temps dans la sauvegarde runtime ;
 - passage au jour suivant apres minuit ;
 - changements simples de lieu via `world_updates` ;
-- positions des personnages sauvegardees dans `world.json` ;
+- positions des personnages sauvegardees dans la sauvegarde runtime ;
 - plannings simples pour les PNJ ;
 - mouvements PNJ hors champ sauvegardes dans `event_log` ;
 - protection des PNJ presents en scene contre les mouvements automatiques de schedule ;
 - validation des mouvements de personnages proposes par le LLM ;
-- journal d'evenements persistant.
+- journal d'evenements persistant ;
+- evenements planifies runtime pour les rendez-vous concrets ;
+- sauvegardes runtime separees dans `data/saves` avec `save_id` ;
+- SMS hors scene stockes, consultables et repondables depuis le CLI.
+- directives HRP runtime avec `/hrp`, `/rule` et `/context`.
 
 🚧 Ce qui n'existe pas encore :
 
-- rapport de validation lisible pour comprendre ce que le moteur a nettoye ;
 - selection encore plus fine des souvenirs/evenements ;
 - simulation hors champ avancee ;
-- sauvegarde de partie separee ;
 - interface frontend ;
 - API FastAPI.
 
@@ -127,4 +131,25 @@ Depuis la racine du projet :
 py .\backend\main.py
 ```
 
-Le prototype charge l'univers `off-campus`, genere une scene d'ouverture, attend une action du joueur, genere la suite, valide la reponse, applique les relations, les souvenirs, certains changements de monde et le journal d'evenements, avance le temps, puis sauvegarde les personnages et le monde.
+Pour choisir une sauvegarde runtime :
+
+```powershell
+py .\backend\main.py --save-id partie-1
+```
+
+Dans la boucle CLI, les commandes `messages`, `sms` ou `inbox` affichent les SMS stockes pour le joueur. La commande `reply dean: texte` envoie une reponse SMS hors scene et l'ajoute a `event_log`. Certains SMS peuvent aussi creer des consequences narratives simples, comme un rendez-vous planifie ou un souvenir PNJ. Les rendez-vous concrets sont stockes dans `planned_events` et peuvent aussi venir d'une conversation a voix haute claire. Les PNJ peuvent envoyer des SMS hors scene depuis des `message_triggers` configurables dans `scenario.json`, avec anti-spam par trigger. Dean peut envoyer une confirmation automatique pour le rendez-vous patinoire. Par defaut, les SMS configures utilisent un fallback deterministe ; avec `INK_FATE_ENABLE_LLM_SMS=1`, leur texte peut etre ecrit par le LLM, puis nettoye et valide avant stockage. Quand cette option est active, un PNJ contactable peut aussi repondre via LLM a un SMS joueur significatif. Les commandes `/hrp`, `/rule` et `/context` ajoutent des directives d'auteur dans la sauvegarde runtime, sans modifier `scenario.json`. La commande `directives` les affiche, `clear_directives` les supprime, et `reset` supprime seulement la sauvegarde runtime active en laissant le canon dans `data/universes` intact.
+
+Le prototype charge l'univers `off-campus`, genere une scene d'ouverture, attend une action du joueur, genere la suite, valide la reponse, applique les relations, les souvenirs, certains changements de monde et le journal d'evenements, avance le temps, puis sauvegarde l'etat de partie dans `data/saves`.
+
+## Tests LLM optionnels
+
+Les tests qui appellent l'API OpenAI sont marques `llm` et sont ignores par defaut.
+
+Pour les lancer explicitement depuis PowerShell :
+
+```powershell
+$env:INK_FATE_RUN_LLM_TESTS="1"
+py -m pytest tests/llm
+```
+
+Ils necessitent aussi `OPENAI_API_KEY`.

@@ -200,7 +200,7 @@ Regles actuelles :
 
 ## world_updates
 
-`world_updates` permet au LLM de proposer des changements persistants dans `world.json`.
+`world_updates` permet au LLM de proposer des changements persistants dans le world runtime.
 
 ```json
 {
@@ -227,12 +227,20 @@ Regles actuelles :
 - `time_advance_minutes` peut remplacer l'avance de temps par defaut ;
 - les participants de la scene sont recalcules selon les positions actuelles.
 
+Notes moteur :
+
+- si le joueur indique clairement un deplacement vers un lieu connu, le Player Intent Parser peut forcer `new_location` si le LLM l'oublie ;
+- si le joueur indique qu'il laisse les PNJ derriere, le moteur retire les mouvements PNJ incoherents vers la destination du joueur ;
+- dans ce cas, les dialogues PNJ sont limites a une reaction breve pour eviter une scene prolongee sans le joueur.
+
 ## Champs Encore Partiels
 
 Le moteur ne se sert pas encore de :
 
 - `scene.time` pour regler directement l'heure ;
 - `next_hooks`.
+
+Le `SceneResult` ne contient pas directement les SMS hors scene. Les messages sont generes apres application du tour par `message_engine.py`, a partir du world runtime, des personnages runtime, du scenario et du contexte recent.
 
 Pour changer le monde, le moteur utilise d'abord `world_updates`.
 `scene.location` sert seulement de securite si le LLM a place le bon lieu dans la scene mais a oublie `world_updates.new_location`.

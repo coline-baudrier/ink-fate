@@ -57,3 +57,32 @@ def test_increase_memory_age_resets_invalid_age():
     memory = updated_characters["dean"]["memories"][0]
 
     assert memory["age"] == 1
+
+
+def test_apply_memory_updates_skips_duplicate_content():
+    characters = {
+        "dean": {
+            "memories": [
+                {
+                    "content": "Elina challenged Dean.",
+                    "age": 1,
+                }
+            ]
+        }
+    }
+    scene_result = {
+        "memory_updates": [
+            {
+                "owner": "dean",
+                "content": "  elina challenged dean! ",
+                "age": 0,
+            }
+        ]
+    }
+
+    updated = apply_memory_updates(
+        scene_result,
+        characters,
+    )
+
+    assert len(updated["dean"]["memories"]) == 1

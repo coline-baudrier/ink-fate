@@ -161,3 +161,68 @@ def test_select_relevant_memories_ignores_invalid_memory_list():
     )
 
     assert selected == {}
+
+
+def test_select_relevant_memories_uses_location_context():
+    scene_context = {
+        "location": {
+            "id": "library",
+            "name": "University Library",
+        },
+        "participants": [
+            {
+                "id": "dean",
+                "memories": [
+                    {
+                        "content": "Dean saw Elina in the library.",
+                        "importance": 1,
+                        "age": 0,
+                        "tags": [
+                            "library",
+                        ],
+                    }
+                ],
+            }
+        ],
+    }
+
+    selected = select_relevant_memories(
+        scene_context,
+    )
+
+    assert selected["dean"][0]["content"] == (
+        "Dean saw Elina in the library."
+    )
+
+
+def test_select_relevant_memories_uses_relationship_context():
+    scene_context = {
+        "participants": [
+            {
+                "id": "dean",
+                "relationships": {
+                    "elina": {
+                        "attraction": 60,
+                    }
+                },
+                "memories": [
+                    {
+                        "content": "Dean felt romantic tension.",
+                        "importance": 1,
+                        "age": 0,
+                        "tags": [
+                            "high_attraction",
+                        ],
+                    }
+                ],
+            }
+        ],
+    }
+
+    selected = select_relevant_memories(
+        scene_context,
+    )
+
+    assert selected["dean"][0]["content"] == (
+        "Dean felt romantic tension."
+    )

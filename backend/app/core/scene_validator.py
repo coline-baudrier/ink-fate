@@ -5,6 +5,8 @@ moteur sait verifier avant d'appliquer des effets au monde.
 """
 
 from typing import Any, Dict
+import re
+import unicodedata
 
 RELATIONSHIP_DELTA_LIMITS = {
     "attraction": {
@@ -39,8 +41,44 @@ CONTACT_UPDATE_FIELDS = {
     "instagram_connected",
 }
 
+MEMORY_TYPES = {
+    "memory",
+    "relationship",
+    "event",
+    "promise",
+    "conflict",
+    "preference",
+}
+
 MAX_NARRATION_PARAGRAPHS = 3
-MAX_DIALOGUES = 3
+MAX_DIALOGUES = 4
+
+PLAYER_INTERNAL_STATE_PATTERNS = [
+    "se sent",
+    "ressent",
+    "pense",
+    "songe",
+    "se demande",
+    "comprend",
+    "realise",
+    "realise",
+    "sait que",
+    "veut",
+    "espere",
+    "redoute",
+    "craint",
+    "decide",
+    "a envie",
+    "est excitee",
+    "est nerveuse",
+    "est determinee",
+    "est curieuse",
+    "est soulagee",
+    "est troublee",
+    "est attiree",
+    "est effrayee",
+    "fait ressentir",
+]
 
 
 def ensure_list(value: Any) -> list:
@@ -124,6 +162,10 @@ def validate_scene(
 
     active_scene = world["active_scene"]
     timeline = world["timeline"]
+    player_character_id = world.get(
+        "player_character",
+        "",
+    )
     scene = ensure_dict(
         scene_result.get(
             "scene",
@@ -159,13 +201,28 @@ def validate_scene(
         )
     )
 
+    participant_location_ids = get_allowed_participant_location_ids(
+        scene_result,
+        world,
+        location,
+    )
     valid_participants = []
 
     for character_id in participant_ids:
         character_id = ensure_string(character_id)
 
-        if character_id in valid_character_ids:
-            valid_participants.append(character_id)
+        if character_id not in valid_character_ids:
+            continue
+
+        if not can_character_participate_at_location(
+            world,
+            character_id,
+            location,
+            participant_location_ids,
+        ):
+            continue
+
+        valid_participants.append(character_id)
 
     if not valid_participants:
         valid_participants = [
@@ -176,6 +233,15 @@ def validate_scene(
             )
             if character_id in valid_character_ids
         ]
+
+    if (
+        player_character_id in valid_character_ids
+        and player_character_id not in valid_participants
+    ):
+        valid_participants.insert(
+            0,
+            player_character_id,
+        )
 
     scene_result["scene"] = {
         "location": location,
@@ -439,6 +505,256 @@ def clamp_relationship_updates(
     return scene_result
 
 
+def remove_player_internal_state_from_narration(
+    scene_result: Dict[str, Any],
+    player_character_id: str,
+) -> Dict[str, Any]:
+    """Retire les phrases qui decident l'interiorite du joueur."""
+
+    narration = ensure_list(
+        scene_result.get(
+            "narration",
+            [],
+        )
+    )
+    filtered_narration = []
+    player_names = build_player_reference_names(
+        player_character_id,
+    )
+
+    for paragraph in narration:
+        if not isinstance(paragraph, str):
+            continue
+
+        cleaned_paragraph = remove_player_internal_state_sentences(
+            paragraph,
+            player_names,
+        )
+
+        if cleaned_paragraph:
+            filtered_narration.append(cleaned_paragraph)
+
+    scene_result["narration"] = filtered_narration
+
+    return scene_result
+
+
+def build_player_reference_names(
+    player_character_id: str,
+) -> set[str]:
+    """Construit les references textuelles simples au joueur."""
+
+    names = set()
+    player_character_id = ensure_string(
+        player_character_id,
+    )
+
+    if player_character_id:
+        names.add(
+            normalize_text(player_character_id)
+        )
+
+    return names
+
+
+def remove_player_internal_state_sentences(
+    paragraph: str,
+    player_names: set[str],
+) -> str:
+    """Supprime les phrases qui attribuent une pensee ou emotion au joueur."""
+
+    sentences = split_narration_sentences(
+        paragraph,
+    )
+    kept_sentences = []
+
+    for sentence in sentences:
+        if is_player_internal_state_sentence(
+            sentence,
+            player_names,
+        ):
+            continue
+
+        kept_sentences.append(
+            sentence.strip()
+        )
+
+    return " ".join(
+        sentence
+        for sentence in kept_sentences
+        if sentence
+    ).strip()
+
+
+def split_narration_sentences(
+    paragraph: str,
+) -> list[str]:
+    """Decoupe un paragraphe en phrases en gardant la ponctuation."""
+
+    paragraph = paragraph.strip()
+
+    if not paragraph:
+        return []
+
+    return [
+        sentence.strip()
+        for sentence in re.split(
+            r"(?<=[.!?])\s+",
+            paragraph,
+        )
+        if sentence.strip()
+    ]
+
+
+def is_player_internal_state_sentence(
+    sentence: str,
+    player_names: set[str],
+) -> bool:
+    """Detecte une phrase qui decrit l'interiorite du joueur."""
+
+    normalized_sentence = normalize_text(
+        sentence,
+    )
+
+    mentions_player = any(
+        player_name in normalized_sentence
+        for player_name in player_names
+    )
+    uses_player_pronoun = bool(
+        re.search(
+            r"\belle\b",
+            normalized_sentence,
+        )
+    )
+
+    if not mentions_player and not uses_player_pronoun:
+        return False
+
+    return any(
+        pattern in normalized_sentence
+        for pattern in PLAYER_INTERNAL_STATE_PATTERNS
+    )
+
+
+def remove_dialogues_from_nonparticipants(
+    scene_result: Dict[str, Any],
+) -> Dict[str, Any]:
+    """Supprime les dialogues de personnages absents de la scene validee."""
+
+    scene = ensure_dict(
+        scene_result.get(
+            "scene",
+            {},
+        )
+    )
+    participants = {
+        ensure_string(participant)
+        for participant in ensure_list(
+            scene.get(
+                "participants",
+                [],
+            )
+        )
+    }
+    filtered_dialogues = []
+
+    for dialogue in ensure_list(scene_result.get("dialogues", [])):
+        if not isinstance(dialogue, dict):
+            continue
+
+        speaker = ensure_string(
+            dialogue.get("speaker")
+        )
+
+        if speaker not in participants:
+            continue
+
+        dialogue["speaker"] = speaker
+        filtered_dialogues.append(dialogue)
+
+    scene_result["dialogues"] = filtered_dialogues
+
+    return scene_result
+
+
+def get_allowed_participant_location_ids(
+    scene_result: Dict[str, Any],
+    world: Dict[str, Any],
+    scene_location: str,
+) -> Dict[str, str]:
+    """Retourne les destinations proposees qui autorisent une presence."""
+
+    world_updates = ensure_dict(
+        scene_result.get(
+            "world_updates",
+            {},
+        )
+    )
+    character_movements = ensure_dict(
+        world_updates.get(
+            "character_movements",
+            {},
+        )
+    )
+    player_character_id = world.get(
+        "player_character",
+        "",
+    )
+    new_location = ensure_string(
+        world_updates.get(
+            "new_location",
+            "",
+        )
+    )
+
+    allowed_locations = {}
+
+    for character_id, location_id in character_movements.items():
+        character_id = ensure_string(character_id)
+        location_id = ensure_string(location_id)
+
+        if character_id and location_id:
+            allowed_locations[character_id] = location_id
+
+    if new_location == scene_location and player_character_id:
+        allowed_locations[player_character_id] = new_location
+
+    return allowed_locations
+
+
+def can_character_participate_at_location(
+    world: Dict[str, Any],
+    character_id: str,
+    scene_location: str,
+    proposed_locations: Dict[str, str],
+) -> bool:
+    """Verifie qu'un participant peut etre present dans cette scene."""
+
+    if "character_locations" not in world:
+        return True
+
+    character_locations = world.get(
+        "character_locations",
+        {},
+    )
+
+    if not isinstance(character_locations, dict):
+        return True
+
+    player_character_id = world.get(
+        "player_character",
+        "",
+    )
+
+    if character_id == player_character_id:
+        return True
+
+    if proposed_locations.get(character_id) == scene_location:
+        return True
+
+    return character_locations.get(character_id) == scene_location
+
+
 def remove_invalid_contact_updates(
     scene_result: Dict[str, Any],
     valid_character_ids: list[str],
@@ -531,7 +847,7 @@ def remove_invalid_memory_updates(
             memory.get("type")
         )
 
-        if not memory_type:
+        if memory_type not in MEMORY_TYPES:
             memory_type = "memory"
 
         age = ensure_int(
@@ -747,7 +1063,7 @@ def validate_scene_pacing(
             continue
 
         dialogue["speaker"] = speaker
-        dialogue["text"] = text
+        dialogue["text"] = strip_enclosing_dialogue_quotes(text)
         valid_dialogues.append(dialogue)
 
     scene_result["narration"] = valid_narration[
@@ -759,3 +1075,51 @@ def validate_scene_pacing(
     ]
 
     return scene_result
+
+
+def strip_enclosing_dialogue_quotes(text: str) -> str:
+    """Supprime uniquement les guillemets qui encadrent toute la replique."""
+
+    quote_pairs = [
+        ('"', '"'),
+        ("'", "'"),
+        ("“", "”"),
+        ("‘", "’"),
+        ("«", "»"),
+    ]
+
+    cleaned_text = text.strip()
+
+    changed = True
+
+    while changed and len(cleaned_text) >= 2:
+        changed = False
+
+        for opening_quote, closing_quote in quote_pairs:
+            if cleaned_text.startswith(
+                opening_quote
+            ) and cleaned_text.endswith(closing_quote):
+                cleaned_text = cleaned_text[
+                    len(opening_quote) : -len(closing_quote)
+                ].strip()
+                changed = True
+                break
+
+    return cleaned_text
+
+
+def normalize_text(value: str) -> str:
+    """Normalise les accents et la casse pour les detections simples."""
+
+    normalized = value.lower()
+    normalized = unicodedata.normalize(
+        "NFKD",
+        normalized,
+    )
+    normalized = "".join(
+        character
+        for character in normalized
+        if not unicodedata.combining(character)
+    )
+
+    return normalized

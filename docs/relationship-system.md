@@ -2,7 +2,7 @@
 
 Le relationship system suit ce qu'un personnage ressent envers un autre.
 
-Les relations sont asymetriques, multidimensionnelles et stockees directement dans les fichiers personnages.
+Les relations sont asymetriques, multidimensionnelles et stockees dans les fichiers personnages. Pendant une partie, les changements sont ecrits dans les personnages runtime de `data/saves`, pas dans les personnages canon.
 
 ## 📐 Dimensions
 
@@ -95,7 +95,7 @@ SceneResult
 -> remove_invalid_relationship_updates
 -> clamp_relationship_updates
 -> apply_relationship_updates
--> save_characters
+-> save_runtime_state
 ```
 
 Regles actuelles :
@@ -106,7 +106,7 @@ Regles actuelles :
 - `source` et `target` doivent etre des personnages existants ;
 - la relation `source -> target` doit deja exister ;
 - la valeur finale est limitee entre `0` et `100` ;
-- les personnages modifies sont sauvegardes en JSON.
+- les personnages modifies sont sauvegardes en JSON runtime.
 
 Limites de deltas actuelles :
 
@@ -155,8 +155,8 @@ Etat apres application :
 
 - Le moteur ne cree pas encore une relation manquante.
 - Le moteur n'affiche pas encore un resume joli des changements.
-- Les changements sont sauvegardes directement dans les fichiers personnages.
-- Il n'y a pas encore de sauvegarde de partie separee.
+- Les changements sont sauvegardes dans la sauvegarde runtime.
+- Les reponses SMS ne produisent pas encore de changements relationnels dedies.
 
 ## ✨ Regles Narratives
 

@@ -14,8 +14,8 @@ Action joueur
 -> LLM
 -> SceneResult JSON
 -> Validation
--> Relations / Memoires / Monde / Event Log / Temps
--> Sauvegarde JSON
+-> Relations / Contacts / Memoires / Monde / Event Log / Temps / SMS
+-> Sauvegarde runtime
 -> Affichage
 ```
 
@@ -33,7 +33,7 @@ data/
 
 Le code Python est le moteur.
 
-Les fichiers JSON sont la verite du monde.
+Les fichiers JSON canon de `data/universes` decrivent le depart. Les fichiers runtime dans `data/saves` sont la verite de la partie en cours.
 
 ## 🚪 Point D'Entree
 
@@ -47,19 +47,19 @@ py .\backend\main.py
 
 Son role est surtout d'orchestrer :
 
-1. charger le monde ;
-2. charger les personnages ;
+1. charger le monde canon ou runtime ;
+2. charger les personnages canon ou runtime ;
 3. generer une scene ;
 4. lire l'action du joueur ;
 5. appliquer les consequences ;
-6. sauvegarder ;
+6. sauvegarder l'etat runtime ;
 7. afficher la suite.
 
 ## 🗂️ Les Donnees
 
 ### `data/universes/off-campus/world.json`
 
-Contient l'etat global :
+Contient l'etat global canon de depart :
 
 - nom de l'univers ;
 - date ;
@@ -84,6 +84,18 @@ Un personnage contient :
 - souvenirs.
 
 Quand les relations, contacts ou souvenirs changent, ces fichiers sont sauvegardes.
+
+En jeu, ces changements sont sauvegardes dans `data/saves/<universe>/<save_id>/characters`, pas dans les fichiers canon.
+
+### `data/saves/off-campus/<save_id>/`
+
+Contient l'etat de partie :
+
+- `world.json` runtime ;
+- personnages runtime ;
+- messages ;
+- directives HRP ;
+- positions, temps courant, event_log.
 
 ## 💾 Chargement Et Sauvegarde
 
@@ -148,7 +160,9 @@ Il inclut :
 - souvenirs pertinents ;
 - statuts relationnels ;
 - moyens de contact disponibles ;
+- indices deterministes de mouvement/contact ;
 - contexte du scenario ;
+- directives HRP runtime ;
 - action du joueur ;
 - format JSON attendu.
 
@@ -268,7 +282,7 @@ Il ajoute des souvenirs aux personnages.
 
 Selectionne les souvenirs les plus pertinents pour la scene.
 
-Il tient compte de l'importance, de l'age, des tags, de l'action du joueur et de l'historique.
+Il tient compte de l'importance, de l'age, des tags, de l'action du joueur, de l'historique, du lieu, des participants, des relations et des evenements recents.
 
 ### `time_engine.py`
 
@@ -285,8 +299,37 @@ Regroupe les operations persistantes sur le monde :
 - appliquer les plannings PNJ ;
 - proteger les participants actifs pour qu'ils ne soient pas deplaces par leur schedule pendant la scene ;
 - enregistrer les mouvements PNJ hors champ ;
-- sauvegarder `world.json` ;
 - reconstruire le contexte de scene.
+
+### `message_engine.py`
+
+Genere et gere les messages hors scene.
+
+Aujourd'hui, il sait :
+
+- generer un SMS Dean -> Elina si Dean connait son numero, qu'ils ne sont pas au meme lieu et qu'un contexte patinoire/defi existe ;
+- eviter les doublons via `trigger` ;
+- stocker les messages dans `world.messages` ;
+- afficher les messages du joueur via le CLI ;
+- marquer les messages comme lus ;
+- envoyer une reponse SMS joueur avec `reply dean: texte` ;
+- enregistrer cette reponse dans `event_log`.
+
+### `runtime_save.py`
+
+Charge et sauvegarde l'etat runtime.
+
+Il evite de modifier le canon dans `data/universes`.
+
+### `runtime_directives.py`
+
+Gere les commandes HRP :
+
+- `/hrp texte` ;
+- `/rule texte` ;
+- `/context texte`.
+
+Les directives sont stockees dans `world.runtime_directives` et reinjectees dans le prompt.
 
 ### `npc_schedule_engine.py`
 
@@ -332,8 +375,8 @@ Voici ce qui se passe quand le joueur ecrit une action :
 12. event_log_engine.py enregistre les evenements importants.
 13. world_engine.py avance le temps.
 14. npc_schedule_engine.py applique les plannings PNJ hors scene.
-15. world_engine.py sauvegarde le monde.
-16. character_loader.py sauvegarde les personnages.
+15. message_engine.py genere les SMS hors scene eventuels.
+16. runtime_save.py sauvegarde le world et les personnages runtime.
 17. renderer.py affiche la scene.
 18. main.py ajoute la scene a l'historique.
 ```
@@ -350,7 +393,9 @@ Actuellement, sont persistants :
 - heure du monde ;
 - lieu actif ;
 - position des personnages ;
-- journal d'evenements.
+- journal d'evenements ;
+- messages ;
+- directives HRP runtime.
 
 Ne sont pas encore persistants :
 
@@ -370,13 +415,18 @@ Si tu es perdue, lis dans cet ordre :
 7. `backend/app/core/contact_engine.py`
 8. `backend/app/core/memory_engine.py`
 9. `backend/app/core/world_engine.py`
+10. `backend/app/core/message_engine.py`
+11. `backend/app/core/runtime_save.py`
+12. `backend/app/core/runtime_directives.py`
 
 Puis regarde les JSON :
 
 1. `data/universes/off-campus/world.json`
-2. `data/universes/off-campus/characters/dean.json`
-3. `data/universes/off-campus/characters/elina.json`
-4. `data/universes/off-campus/characters/beau.json`
+2. `data/universes/off-campus/scenario.json`
+3. `data/universes/off-campus/characters/dean.json`
+4. `data/universes/off-campus/characters/elina.json`
+5. `data/universes/off-campus/characters/beau.json`
+6. `data/saves/off-campus/<save_id>/world.json` si une partie existe.
 
 ## 🧠 Regle A Garder En Tete
 
@@ -384,4 +434,4 @@ Le LLM propose.
 
 Le moteur decide.
 
-Les JSON stockent la verite.
+Les JSON runtime stockent la verite de la partie. Les JSON canon stockent le depart propre.
