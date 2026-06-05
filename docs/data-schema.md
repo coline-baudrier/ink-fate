@@ -51,11 +51,16 @@ Structure actuelle :
   "active_events": [],
   "active_scene": {},
   "character_locations": {},
+  "character_positions": {},
+  "character_activities": {},
+  "active_tasks": [],
+  "scene_props": {},
   "event_log": [],
   "planned_events": [],
   "arc_state": {},
   "messages": [],
-  "runtime_directives": []
+  "runtime_directives": [],
+  "scene_history": []
 }
 ```
 
@@ -69,13 +74,18 @@ Champs :
 - `active_events` : evenements importants en cours.
 - `active_scene` : scene actuellement jouee.
 - `character_locations` : position actuelle de chaque personnage.
+- `character_positions` : position fine d'un personnage a l'interieur du lieu courant.
+- `character_activities` : activite persistante en cours pour chaque personnage.
+- `active_tasks` : taches partagees avec progression et participants.
+- `scene_props` : details physiques persistants par lieu.
 - `event_log` : journal des evenements importants deja arrives.
 - `planned_events` : evenements concrets prevus pour plus tard dans la sauvegarde runtime.
 - `arc_state` : signaux narratifs observes pour les arcs actifs pendant cette partie.
 - `messages` : messages hors scene stockes dans la sauvegarde runtime.
 - `runtime_directives` : directives HRP ajoutees pendant la partie.
+- `scene_history` : derniers tours narratifs, limites a 20 dans les interfaces actuelles.
 
-Important : les champs `messages`, `planned_events`, `arc_state`, `runtime_directives`, les positions, le temps courant et le journal d'evenements appartiennent a l'etat runtime. Ils ne doivent pas salir le canon dans `data/universes`.
+Important : les champs runtime evoluent dans `data/saves`. Le canon peut fournir des valeurs initiales, mais une partie ne doit jamais reecrire directement `data/universes`.
 
 ## 📍 Location
 

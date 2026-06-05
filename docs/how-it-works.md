@@ -19,23 +19,28 @@ Action joueur
 -> Affichage
 ```
 
-## 🧱 Les Deux Grandes Parties
+## 🧱 Les Trois Grandes Parties
 
-Le projet est separe en deux grandes zones.
+Le projet est separe en trois grandes zones.
 
 ```md
 backend/
-  code Python du moteur
+  moteur Python, CLI et API FastAPI
 
 data/
   donnees de l'univers et des personnages
+
+frontend/
+  interface React/Vite
 ```
 
 Le code Python est le moteur.
 
 Les fichiers JSON canon de `data/universes` decrivent le depart. Les fichiers runtime dans `data/saves` sont la verite de la partie en cours.
 
-## 🚪 Point D'Entree
+Le frontend appelle l'API FastAPI. Vite proxifie `/game` vers `http://localhost:8000` en developpement.
+
+## 🚪 Points D'Entree
 
 ### `backend/main.py`
 
@@ -54,6 +59,24 @@ Son role est surtout d'orchestrer :
 5. appliquer les consequences ;
 6. sauvegarder l'etat runtime ;
 7. afficher la suite.
+
+### `backend/api_main.py`
+
+Expose le moteur a l'interface web avec FastAPI.
+
+Routes actuelles :
+
+- `POST /game/start` ;
+- `POST /game/action` ;
+- `POST /game/action/stream` en SSE ;
+- `GET /game/messages` ;
+- `POST /game/sms` ;
+- `POST /game/reset` ;
+- `GET /health`.
+
+### `frontend/src/App.jsx`
+
+Charge ou reprend la partie, affiche le fil narratif, envoie les actions, lit le flux SSE et gere le panneau SMS.
 
 ## 🗂️ Les Donnees
 
@@ -397,10 +420,12 @@ Actuellement, sont persistants :
 - messages ;
 - directives HRP runtime.
 
-Ne sont pas encore persistants :
+Ne sont pas persistants sans limite :
 
-- historique complet de partie ;
-- arcs narratifs.
+- l'historique est tronque aux 20 derniers tours ;
+- les donnees restent en JSON, puisqu'il n'y a pas encore de base SQLite.
+
+L'historique recent (`scene_history`) et l'etat observe des arcs (`arc_state`) sont bien persistants dans le world runtime.
 
 ## 🗺️ Comment Lire Le Projet
 

@@ -122,13 +122,13 @@ Ainsi, le meme moteur pourra fonctionner avec un univers original, une romance u
 
 Le MVP 1 reste volontairement simple :
 
-- pas de frontend ;
-- pas de FastAPI ;
 - pas de base SQLite ;
 - stockage JSON local ;
-- interface CLI ;
+- interfaces CLI et web ;
+- API FastAPI ;
 - un seul univers ;
 - une seule scene active ;
-- trois personnages.
+- neuf fiches personnages, avec un scenario initial centre sur Elina, Beau et Dean ;
+- une seule sauvegarde exposee par l'interface web.
 
 La vision finale est un systeme capable de generer des histoires longues, sur plusieurs semaines ou mois, ou les personnages restent coherents et ou les relations evoluent naturellement.

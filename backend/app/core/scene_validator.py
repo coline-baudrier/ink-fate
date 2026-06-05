@@ -54,48 +54,54 @@ MAX_NARRATION_PARAGRAPHS = 3
 MAX_DIALOGUES = 4
 
 FILLER_NARRATION_PATTERNS = [
+    # Phrases méta-narratives sur la pause de la scène elle-même
     "la scene marque une pause",
-    "la scene s'installe",
     "la scene se suspend",
-    "la scene reprend",
     "l'echange marque une pause",
     "la conversation marque une pause",
     "l'instant marque une pause",
     "l'instant se suspend",
     "le moment marque une pause",
+    # Reprendre ses repères — idiome filler caractéristique
     "reprenne ses reperes",
     "reprend ses reperes",
     "retrouve ses reperes",
     "retrouve ses marques",
     "reprennent leurs reperes",
     "retrouvent leurs reperes",
-    "chacun reprend",
-    "chacun retrouve",
+    # Phrases collectives méta — uniquement les combinaisons spécifiques
     "chacun se repositionne",
-    "chacun s'installe",
     "chacun reprend son souffle",
     "le temps que chacun",
     "le temps que tout le monde",
-    "le groupe reprend",
     "le groupe se reajuste",
+    # Atmosphère qui se réinstalle / retombe
     "l'atmosphere retombe",
     "l'atmosphere se reinstalle",
     "l'atmosphere se reequilibre",
-    "le silence retombe",
-    "le silence se reinstalle",
+    # Silence collectif de remplissage
     "nul n'ajoute rien",
     "personne n'ajoute rien",
     "plus personne ne dit",
     "plus personne n'ajoute",
 ]
 
+# Patterns d'état intérieur — s'appliquent si le nom du joueur OU le pronom "elle" est présent.
+# Restent peu ambigus car ces états sont rares dans la narration d'un PNJ.
 PLAYER_INTERNAL_STATE_PATTERNS = [
-    "se sent",
-    "ressent",
+    # Pensées / cognition
     "pense",
     "songe",
     "se demande",
     "sait que",
+    "comprend que",
+    "realise que",
+    "consciente que",
+    "remarque que",
+    "note que",
+    # Émotions / états intérieurs
+    "se sent",
+    "ressent",
     "espere",
     "redoute",
     "craint",
@@ -108,18 +114,38 @@ PLAYER_INTERNAL_STATE_PATTERNS = [
     "est troublee",
     "est attiree",
     "est effrayee",
+    "est amusee",
+    "est agacee",
+    "est surprise",
     "fait ressentir",
-    # Patterns d'attribution d'état implicite — "semble", "paraît", "comme si elle"
+    # Attribution implicite d'état
     "semble",
     "parait",
     "comme si elle",
     "donne l'impression",
     "on dirait qu'elle",
-    "consciente que",
     "anticipant",
-    "realise que",
     "profitant",
     "savourant",
+]
+
+# Patterns d'action volontaire — s'appliquent SEULEMENT si le nom du joueur est explicitement
+# mentionné dans la phrase. "elle" seul est insuffisant car n'importe quel PNJ féminin peut
+# "décider de", "s'apprêter à", etc.
+PLAYER_ACTION_PATTERNS = [
+    "decide de",
+    "choisit de",
+    "s'apprete a",
+    "a l'intention de",
+    "compte partir",
+    "compte rejoindre",
+    "prend conge",
+    "tourne les talons",
+    "regagne sa chambre",
+    "rentre dans sa chambre",
+    "rentre chez elle",
+    "se dirige vers sa chambre",
+    "monte vers sa chambre",
 ]
 
 
@@ -714,10 +740,16 @@ def is_player_internal_state_sentence(
     if not mentions_player and not uses_player_pronoun:
         return False
 
-    return any(
-        pattern in normalized_sentence
-        for pattern in PLAYER_INTERNAL_STATE_PATTERNS
-    )
+    # Patterns d'état intérieur : suffisant d'avoir le nom ou le pronom.
+    if any(pattern in normalized_sentence for pattern in PLAYER_INTERNAL_STATE_PATTERNS):
+        return True
+
+    # Patterns d'action volontaire : exige que le nom du joueur soit explicitement présent,
+    # car "elle" seul peut désigner n'importe quel PNJ féminin.
+    if mentions_player and any(pattern in normalized_sentence for pattern in PLAYER_ACTION_PATTERNS):
+        return True
+
+    return False
 
 
 def remove_narration_about_absent_characters(

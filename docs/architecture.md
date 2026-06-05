@@ -30,8 +30,12 @@ World + Characters
 
 ```md
 backend/
+  api_main.py
   main.py
   app/
+    api/
+      game.py
+      schemas.py
     core/
       json_loader.py
       character_loader.py
@@ -65,11 +69,24 @@ data/
         elina.json
         beau.json
         dean.json
+        garrett.json
+        hannah.json
+        logan.json
+        allie.json
+        jules.json
+        tucker.json
   saves/
     off-campus/
       default/
         world.json
         characters/
+
+frontend/
+  src/
+    App.jsx
+    styles/
+      app.css
+  vite.config.js
 ```
 
 ## 🧩 Modules
@@ -88,6 +105,32 @@ Il orchestre la partie jouable :
 - appliquer les effets persistants ;
 - sauvegarder l'etat runtime de la partie ;
 - afficher la scene.
+
+### backend/api_main.py et app/api/
+
+Interface HTTP FastAPI du moteur.
+
+Responsabilites actuelles :
+
+- charger ou creer la sauvegarde runtime `default` ;
+- exposer la scene courante et les metadonnees ;
+- traiter une action joueur ;
+- streamer les entrees narratives en SSE ;
+- exposer les SMS ;
+- reinitialiser la sauvegarde par defaut.
+
+### frontend/
+
+Interface React/Vite.
+
+Responsabilites actuelles :
+
+- afficher le fil narratif ;
+- envoyer les actions du joueur ;
+- consommer le flux SSE ;
+- afficher date, heure et personnage joueur ;
+- afficher et envoyer les SMS ;
+- reinitialiser la partie.
 
 ### app/core/scene_pipeline.py
 

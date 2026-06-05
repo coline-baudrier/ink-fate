@@ -197,10 +197,24 @@ La roadmap separe ce qui existe deja, ce qui est partiel et les extensions futur
 
 ## 🖥️ Phase 8 - API Et Interface
 
-**Statut : futur.**
+**Statut : prototype fonctionnel, encore partiel.**
+
+✅ Deja fait :
 
 - API FastAPI ;
+- routes de demarrage, action, action SSE, messages, SMS et reset ;
+- frontend React/Vite ;
+- fil narratif et panneau SMS ;
+- proxy Vite vers le backend ;
+- script `start.ps1` pour lancer les deux serveurs ;
+- lint et build frontend operationnels.
+
+🔮 Reste a faire :
+
+- tests automatises des routes API ;
+- tests du frontend ;
+- gestion des erreurs de chargement initial cote interface ;
+- sauvegardes multiples dans l'interface ;
+- selection d'univers ;
 - base SQLite ;
-- frontend React ou Vue ;
-- sauvegardes multiples ;
-- selection d'univers.
+- authentification si l'application sort du cadre local.

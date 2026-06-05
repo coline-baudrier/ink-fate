@@ -341,6 +341,8 @@ async def player_action_stream(request: ActionRequest) -> StreamingResponse:
         return raw_entries, msgs, timeline.get("current_date", ""), timeline.get("current_time", "")
 
     raw_entries, new_message_entries, updated_date, updated_time = await asyncio.to_thread(compute)
+    import logging
+    logging.getLogger("uvicorn").info(f"[stream] {len(raw_entries)} entries à envoyer")
 
     async def event_gen():
         for entry in raw_entries:

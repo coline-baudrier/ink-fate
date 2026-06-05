@@ -36,7 +36,7 @@ La game loop definit ce qui se passe a chaque interaction entre le joueur et Ink
 
 ## ✍️ Entree Joueur
 
-Le joueur ecrit librement dans la CLI.
+Le joueur ecrit librement dans la CLI ou dans le frontend.
 
 Exemples :
 
@@ -53,6 +53,8 @@ Dean, tu es ou ?
 ```
 
 Les entrees RP sont envoyees au prompt comme des actions libres. Les commandes runtime sont interceptees avant le LLM.
+
+Dans le frontend, `POST /game/action/stream` renvoie les entrees de scene sous forme d'evenements SSE. La sauvegarde est effectuee avant l'envoi du flux au navigateur.
 
 Commandes runtime actuelles :
 
@@ -102,9 +104,9 @@ Pendant un tour, les PNJ presents dans la scene active ne sont pas deplaces par 
 
 La boucle ne gere pas encore :
 
-- generalisation des reponses SMS PNJ au-dela du cas patinoire Dean ;
 - ellipses longues ;
-- simulation hors champ avancee.
+- simulation hors champ avancee ;
+- choix du `save_id` et de l'univers depuis le frontend.
 
 ## 🎯 Objectif Du Prochain Palier
 

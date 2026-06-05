@@ -1,15 +1,18 @@
 # 🎮 MVP 1
 
-Le MVP 1 vise une boucle jouable simple dans la CLI.
+Le MVP 1 vise une boucle jouable simple, disponible en CLI et dans une interface web.
 
 ## ✅ Inclus Aujourd'hui
 
 - un seul univers : `off-campus` ;
-- trois personnages : Elina, Beau et Dean ;
+- neuf fiches personnages dans l'univers, avec Elina, Beau et Dean comme trio central initial ;
 - une scene active ;
 - stockage local en JSON ;
 - generation de scene par LLM ;
 - boucle CLI avec entree joueur ;
+- API FastAPI ;
+- frontend React/Vite ;
+- streaming SSE des scenes dans l'interface web ;
 - historique de scene ;
 - validation du `SceneResult` ;
 - rendu texte ;
@@ -43,10 +46,10 @@ Le MVP 1 vise une boucle jouable simple dans la CLI.
 
 ## ⛔ Exclu Du MVP
 
-- frontend ;
-- API FastAPI ;
 - base SQLite ;
 - plusieurs univers jouables ;
+- selection de sauvegarde dans le frontend ;
+- authentification et multi-utilisateur ;
 - simulation permanente ;
 - systeme d'arcs narratifs complet.
 
@@ -54,7 +57,7 @@ Le MVP 1 vise une boucle jouable simple dans la CLI.
 
 ```md
 Joueur
--> main.py
+-> CLI `main.py` ou API `api_main.py`
 -> scene_pipeline.py
 -> prompt_builder.py
 -> OpenAI
@@ -66,7 +69,7 @@ Joueur
 -> world_engine.py
 -> message_engine.py
 -> runtime_save.py
--> renderer.py
+-> renderer.py / reponse API
 -> Joueur
 ```
 

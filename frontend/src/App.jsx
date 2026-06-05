@@ -70,8 +70,13 @@ function useGame() {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState(null);
+  const startedRef = useRef(false);
 
   useEffect(() => {
+    // Guard against React StrictMode double-invocation in development.
+    if (startedRef.current) return;
+    startedRef.current = true;
+
     fetch("/game/start", { method: "POST" })
       .then((r) => r.json())
       .then((data) => {

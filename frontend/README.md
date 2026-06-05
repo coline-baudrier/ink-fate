@@ -1,16 +1,49 @@
-# React + Vite
+# Frontend Ink & Fate
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interface React/Vite du prototype.
 
-Currently, two official plugins are available:
+## Fonctionnalites
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- reprise ou creation de la sauvegarde runtime `default` ;
+- affichage du fil narratif ;
+- envoi d'actions avec streaming SSE ;
+- syntaxe visuelle pour actions, dialogues, intentions et textos ;
+- affichage de la date et de l'heure du monde ;
+- panneau de conversations SMS ;
+- remise a zero de la partie.
 
-## React Compiler
+## Developpement
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+L'API FastAPI doit tourner sur `http://localhost:8000`.
+Vite proxifie les requetes `/game` vers cette adresse.
 
-## Expanding the ESLint configuration
+Depuis ce dossier :
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```powershell
+npm install
+npm run dev
+```
+
+Ou depuis la racine du depot :
+
+```powershell
+.\start.ps1
+```
+
+## Verification
+
+```powershell
+npm run lint
+npm run build
+```
+
+## API utilisee
+
+- `POST /game/start`
+- `POST /game/action`
+- `POST /game/action/stream`
+- `GET /game/messages`
+- `POST /game/sms`
+- `POST /game/reset`
+
+Limites actuelles : univers `off-campus` fixe, sauvegarde `default`, pas d'authentification.
