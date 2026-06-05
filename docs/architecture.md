@@ -145,6 +145,38 @@ Responsabilites :
 - valider le `SceneResult` ;
 - appliquer les corrections deterministes issues des intentions detectees.
 
+### app/core/player_intent_parser.py
+
+Detection deterministe du mouvement du joueur.
+
+Responsabilites :
+
+- detecter les verbes de deplacement explicites dans l'entree joueur (`je vais`, `je pars`, `je monte`, etc.) ;
+- identifier la destination mentionnee parmi les lieux existants ;
+- signaler si le joueur laisse les PNJ derriere ;
+- forcer `world_updates.new_location` si le LLM l'oublie ;
+- eviter les faux positifs (une question ou une aide ne declenche pas de deplacement).
+
+### app/core/contact_intent_parser.py
+
+Detection deterministe du partage de contact.
+
+Responsabilites :
+
+- detecter les formulations explicites de remise de numero dans l'entree joueur ;
+- identifier le PNJ destinataire ;
+- forcer un `contact_update` dans le `SceneResult` si le LLM l'oublie.
+
+### app/core/validation_report.py
+
+Rapport de validation lisible.
+
+Responsabilites :
+
+- comparer le `SceneResult` brut et le `SceneResult` valide ;
+- lister les champs modifies, supprimes ou corriges ;
+- utile pour debug et tests.
+
 ### app/core/world_engine.py
 
 Gestion simple du monde.
@@ -382,12 +414,12 @@ Responsabilites :
 
 ### app/core/renderer.py
 
-Rendu CLI.
+Rendu du `SceneResult`.
 
 Responsabilites :
 
-- afficher la narration ;
-- afficher les dialogues.
+- convertir la narration et les dialogues en texte plat pour la CLI (`render_scene_result`) ;
+- convertir la narration et les dialogues en liste d'entries structurees pour l'API SSE (`scene_result_to_entries`) — chaque entry a un `id`, un `type` (`narration` ou `dialogue`), un `character` et un `text`.
 
 ### app/core/json_loader.py
 

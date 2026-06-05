@@ -20,10 +20,15 @@ Le LLM propose. Le moteur decide.
   "relationship_updates": [],
   "contact_updates": [],
   "memory_updates": [],
+  "npc_knowledge_updates": {},
   "world_updates": {
     "new_location": "",
     "time_advance_minutes": 0,
-    "character_movements": {}
+    "character_movements": {},
+    "character_position_updates": {},
+    "character_activity_updates": {},
+    "task_updates": {},
+    "new_scene_props": []
   }
 }
 ```
@@ -232,6 +237,91 @@ Notes moteur :
 - si le joueur indique clairement un deplacement vers un lieu connu, le Player Intent Parser peut forcer `new_location` si le LLM l'oublie ;
 - si le joueur indique qu'il laisse les PNJ derriere, le moteur retire les mouvements PNJ incoherents vers la destination du joueur ;
 - dans ce cas, les dialogues PNJ sont limites a une reaction breve pour eviter une scene prolongee sans le joueur.
+
+## npc_knowledge_updates
+
+Mise a jour de ce qu'un PNJ sait sur le personnage joueur.
+
+Utilise quand un PNJ apprend le nom du joueur pendant la scene (introduction, badge, tiers qui presente).
+
+```json
+{
+  "hannah": {
+    "knows_name": true,
+    "known_name": "Elina"
+  }
+}
+```
+
+Regles :
+
+- la cle est un ID de PNJ existant ;
+- `knows_name` doit etre un booleen ;
+- `known_name` est le nom tel qu'il a ete entendu dans la fiction ;
+- le moteur persiste cette connaissance dans le personnage runtime ;
+- une fois que `knows_name` est `true`, le PNJ peut utiliser le prenom du joueur dans les scenes suivantes.
+
+## world_updates — champs supplementaires
+
+En plus de `new_location`, `time_advance_minutes` et `character_movements`, `world_updates` accepte quatre champs supplementaires.
+
+### character_position_updates
+
+Position fine d'un personnage a l'interieur du lieu courant.
+
+```json
+{
+  "hannah": "dans le couloir devant sa chambre",
+  "garrett": "au bout du couloir pres de l'ascenseur"
+}
+```
+
+Utilise quand un personnage se deplace au sein du meme lieu (ouvre sa porte, descend un etage, s'installe a un bureau).
+Ne pas remplir si personne ne bouge.
+
+### character_activity_updates
+
+Activite en cours d'un personnage, persistee pour les scenes suivantes.
+
+```json
+{
+  "garrett": "finit de vider les cartons, commence a monter les etageres"
+}
+```
+
+Utilise quand l'activite d'un PNJ change reellement (tache qui avance, debut d'une nouvelle occupation).
+Ne pas mettre a jour si le PNJ fait la meme chose qu'avant.
+
+### task_updates
+
+Avancee d'une tache partagee presente dans `world.active_tasks`.
+
+```json
+{
+  "demenagement_garrett": {
+    "progress": 60,
+    "note": "cartons dans la chambre, etageres a monter",
+    "status": "active"
+  }
+}
+```
+
+- `progress` : entier de 0 a 100 ;
+- `note` : description courte de l'etat courant ;
+- `status` : `"active"` ou `"completed"` (a 100%).
+
+N'inclure une tache que si elle a clairement avance pendant la scene.
+
+### new_scene_props
+
+Details physiques nouveaux et persistants introduits dans le lieu courant.
+
+```json
+["une grande fenetre donnant sur la cour", "un bureau en bois sombre contre le mur"]
+```
+
+Seulement pour des details specifiques et ancres (un meuble precis, un objet nomme, un element structurel).
+Ne pas ajouter d'atmosphere generale. Si rien de nouveau n'est introduit, liste vide.
 
 ## Champs Encore Partiels
 

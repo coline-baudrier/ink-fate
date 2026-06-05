@@ -38,25 +38,43 @@ La game loop definit ce qui se passe a chaque interaction entre le joueur et Ink
 
 Le joueur ecrit librement dans la CLI ou dans le frontend.
 
+### Syntaxe joueur dans le frontend
+
+Le frontend reconnait une syntaxe structuree pour distinguer les types d'entree :
+
+```md
+— texte         → dialogue (em-dash ou en-dash)
+*texte*         → action physique
+[texte]         → intention ou pensee partagee
+> texte         → envoi d'un SMS dans la scene
+texte libre     → entree generique
+```
+
 Exemples :
 
 ```md
-Je souris a Dean.
+— Salut, tu t'appelles comment ?
 ```
 
 ```md
-Je recupere ma valise et je leve les yeux au ciel.
+*Je recupere ma valise et je leve les yeux au ciel.*
 ```
 
 ```md
-Dean, tu es ou ?
+[Je prefere rester discrete pour l'instant.]
 ```
 
-Les entrees RP sont envoyees au prompt comme des actions libres. Les commandes runtime sont interceptees avant le LLM.
+```md
+> Tu arrives bientot ?
+```
 
-Dans le frontend, `POST /game/action/stream` renvoie les entrees de scene sous forme d'evenements SSE. La sauvegarde est effectuee avant l'envoi du flux au navigateur.
+Chaque segment est tokenise separement et affiche avec un style visuel different dans le fil narratif. Les boutons de syntaxe dans la zone de saisie inserent automatiquement les marqueurs.
 
-Commandes runtime actuelles :
+Dans la CLI, la syntaxe structuree est optionnelle — le moteur accepte n'importe quelle entree libre.
+
+### Commandes runtime (CLI uniquement)
+
+Les commandes runtime sont disponibles uniquement dans la boucle CLI. Elles sont interceptees avant tout appel LLM.
 
 - `messages`, `sms`, `inbox` : consulter les SMS du joueur et les marquer comme lus ;
 - `reply dean: texte`, `sms dean: texte`, `text dean: texte` : envoyer une reponse SMS hors scene ;
@@ -67,6 +85,8 @@ Commandes runtime actuelles :
 - `clear_directives`, `clear rules` : supprimer les directives runtime ;
 - `reset` : supprimer la sauvegarde runtime active ;
 - `quit`, `exit` : quitter.
+
+Dans le frontend, le reset est accessible via le bouton ↺ en haut a droite. Les SMS sont geres depuis le panneau telephonique.
 
 ## 🧪 ScenePipeline
 
