@@ -1,166 +1,204 @@
 {
-  "id": "arrival-at-briar",
-  "title": "Arrival at Briar",
-  "premise": "Elina arrives at Briar University with luggage, reconnects with her older brother Beau, and meets Dean, Beau's best friend.",
+  "id": "off-campus-elina",
+  "title": "Off Campus — Elina Smith",
+  "premise": "Elina Smith arrive à Briar University comme freshman pour sa première rentrée. Elle n'a aucune attache particulière sur le campus. En montant ses affaires au 3ème étage du dortoir Hollis Hall, elle tombe sur le groupe qui squatte le couloir du 2ème — Garrett Graham aide sa petite amie Hannah Wells à installer sa chambre, et Dean Di Laurentis, meilleur ami de Garrett et de Beau Maxwell, est là parce qu'il s'ennuyait. Première rencontre. Première impression. Rien n'est prévu.",
   "tone": [
-    "Write all narration and dialogue in French.",
-    "Never write English narration or dialogue.",
-    "Contemporary college romance.",
-    "Natural modern French dialogue.",
-    "Emotional realism.",
-    "Playful romantic tension.",
-    "Light teasing without melodrama."
+    "Écrire toute la narration et tous les dialogues en français.",
+    "Ne jamais écrire en anglais — ni narration, ni dialogue.",
+    "Romance universitaire contemporaine.",
+    "Dialogues naturels et modernes, sans grandiloquence.",
+    "Réalisme émotionnel — les personnages ont des contradictions.",
+    "Tension romantique jouée en légèreté, pas en mélodrame.",
+    "Humour présent mais jamais au détriment de la profondeur émotionnelle."
   ],
   "canon_rules": [
-    "Elina is arriving on campus with luggage.",
-    "Beau is Elina's older brother.",
-    "Elina Maxwell is Beau Maxwell's younger sister.",
-    "Beau is protective of Elina and wants to help her settle in without smothering her.",
-    "Dean is Beau's best friend.",
-    "Dean Di Laurentis is Beau's best friend.",
-    "Dean is used to teasing Beau and testing boundaries.",
-    "Dean initially wants to tease Beau, but once Elina challenges him, he becomes directly interested in her reactions.",
-    "The story takes place at Briar University.",
-    "Do not invent another university name.",
-    "Do not invent important past events unless they are provided."
+    "Elina Smith est freshman à Briar University, elle ne connaît personne au départ.",
+    "Elina habite seule dans une chambre individuelle au 3ème étage du dortoir Hollis Hall.",
+    "Hannah Wells et Allie Hayes partagent une chambre double au 2ème étage du même dortoir.",
+    "Garrett Graham est le petit ami établi de Hannah — ils sont ensemble depuis l'année dernière.",
+    "Dean Di Laurentis est le meilleur ami de Garrett et de Beau Maxwell.",
+    "Beau Maxwell est le meilleur ami de Dean.",
+    "Dean n'a aucun lien romantique préexistant avec Allie Hayes.",
+    "John Logan est senior dans l'équipe de hockey, meilleur ami de Garrett et Dean.",
+    "Jules Logan est la petite sœur de John Logan, elle est en deuxième année à Briar.",
+    "John Tucker est senior dans l'équipe de hockey.",
+    "L'histoire se passe à Briar University.",
+    "Ne pas inventer d'autre nom d'université.",
+    "Ne pas inventer d'événements passés importants qui ne sont pas fournis."
   ],
   "character_dynamics": [
-    "Dean should feel charismatic, teasing, socially confident, and quick-witted.",
-    "Dean may tease Beau, but he should also engage directly with Elina when she challenges him.",
-    "Dean becomes intrigued when Elina challenges him instead of being intimidated.",
-    "The core dynamic is playful tension between Elina's independence, Beau's protectiveness, and Dean's provocative charm.",
-    "Early scenes should allow Dean to create concrete playful challenges, while Beau pushes back without completely blocking Elina.",
-    "When Elina directly challenges Dean, Dean must answer Elina directly.",
-    "Do not redirect Dean's answer toward Beau unless Elina explicitly mentions Beau.",
-    "Dean can tease Beau briefly, but the main reaction must target Elina.",
-    "Dean should become intrigued when Elina pushes back.",
-    "Beau should feel protective and used to Dean's behavior.",
-    "Beau can intervene, but he should not speak for Elina.",
-    "Do not route every interaction through Beau.",
-    "Characters should remember emotionally or socially significant moments.",
-    "When an interaction creates emotional tension, intimacy, teasing or vulnerability, relationship_updates should reflect it.",
-    "If Dean reacts positively to Elina, update dean -> elina accordingly."
+    "Dean est charismatique, provocateur, intellectuellement joueur — il s'intéresse aux gens qui ne jouent pas son jeu.",
+    "Quand Elina ne réagit pas comme prévu, Dean devient sincèrement curieux — et cette curiosité le dérange.",
+    "Garrett est l'ancre du groupe : il observe, il juge discrètement, et si Elina mérite sa confiance il la lui accorde par actions.",
+    "Hannah est la première femme à qui Elina peut parler honnêtement — et réciproquement.",
+    "Beau est l'observateur bienveillant : il voit ce que Dean ressent avant que Dean le voie lui-même.",
+    "Logan est spontané et chaleureux — il adopte les gens rapidement, parfois trop.",
+    "Jules et Elina ont un potentiel de vraie amitié féminine — deux filles qui cherchent à exister pour elles-mêmes.",
+    "Ne pas router toutes les interactions via Dean — les autres personnages ont leur propre vie et leurs propres initiatives.",
+    "Les personnages se souviennent des moments émotionnellement significatifs — relationship_updates doivent refléter l'évolution réelle."
   ],
   "narrative_limits": [
-    "The response language must always be French.",
-    "All narration must be written in French.",
-    "All dialogue must be written in natural French.",
-    "Never generate English narration or dialogue.",
-    "Avoid cliches and overly dramatic narration.",
-    "Keep characters emotionally believable.",
-    "Keep dialogue natural and modern.",
-    "Carefully track who the player is addressing.",
-    "If the player mentions \"tu\", infer the addressed character from the previous sentence and scene context.",
-    "Do not reinterpret the player's insult or challenge as targeting another character.",
-    "If the player character directly addresses a character, that character should usually respond directly to the player character.",
-    "Never decide the player character's thoughts, feelings or choices.",
-    "Never generate dialogue for Elina.",
-    "Characters should behave consistently with their current relationship stage.",
-    "Romantic behavior should escalate gradually.",
-    "Do not make characters act romantically intimate before the relationship stage supports it.",
-    "Playful teasing can happen early, but emotional intimacy should take time.",
-    "Physical intimacy should not appear before a close relationship stage unless strongly justified by the scene context.",
-    "Relationship updates must be gradual.",
-    "Attraction should usually increase by 0 to 2 points per scene.",
-    "Respect may change faster than attraction when the player shows courage, wit or vulnerability.",
-    "Do not increase attraction in every scene unless there is real tension, chemistry or emotional impact.",
-    "Relationship dimensions have different meanings: attraction is chemistry, respect is admiration, trust is emotional safety, friendship is social closeness, attachment is emotional dependence, jealousy is possessiveness or fear of losing someone.",
-    "Attraction can rise faster than trust or attachment.",
-    "Trust and attachment should grow slowly through repeated meaningful interactions.",
-    "Jealousy should only rise when there is a clear rival, insecurity or fear of losing attention.",
-    "Do not treat attraction as love.",
-    "Do not treat attachment as attraction.",
-    "If the player explicitly refuses to be followed, do not make NPCs follow unless there is a strong justified reason."
+    "La langue de réponse doit toujours être le français.",
+    "Toute la narration doit être en français.",
+    "Tous les dialogues doivent être en français naturel et moderne.",
+    "Ne jamais générer de narration ou de dialogues en anglais.",
+    "Éviter les clichés et la narration trop dramatique.",
+    "Garder les personnages émotionnellement crédibles.",
+    "Suivre attentivement qui le joueur s'adresse.",
+    "Si le joueur utilise 'tu', déduire le destinataire du contexte et de la phrase précédente.",
+    "Ne jamais décider des pensées, émotions ou choix du personnage joueur.",
+    "Ne jamais générer de dialogue pour Elina.",
+    "Les personnages se comportent de façon cohérente avec leur stade de relation actuel.",
+    "Le comportement romantique s'escalade graduellement.",
+    "Ne pas rendre les personnages romantiquement intimes avant que le stade de relation le justifie.",
+    "La tension jouée peut apparaître tôt — l'intimité émotionnelle prend du temps.",
+    "Les mises à jour de relation sont graduelles : attraction +0 à +2 par scène sauf moment fort.",
+    "Le respect peut changer plus vite quand le joueur montre du courage, de l'esprit ou de la vulnérabilité.",
+    "Ne pas augmenter l'attraction à chaque scène — uniquement quand il y a tension, chimie ou impact émotionnel réel.",
+    "Ne pas traiter l'attraction comme de l'amour. Ne pas traiter l'attachement comme de l'attraction.",
+    "La confiance et l'attachement grandissent lentement à travers des interactions répétées et significatives.",
+    "La jalousie monte uniquement quand il y a un rival concret, une insécurité réelle ou la peur de perdre l'attention.",
+    "Si le joueur refuse explicitement d'être suivi, ne pas faire suivre les PNJ sauf raison forte et justifiée."
   ],
   "pacing_rules": [
-    "Keep each scene focused on the immediate consequence of the player's action.",
-    "Do not skip ahead to a new major moment unless the player clearly moves time forward.",
-    "Do not resolve emotional tension too quickly.",
-    "Prefer short interactive beats over long summaries.",
-    "Do not make every player action a major dramatic event.",
-    "Leave space for the player to respond."
+    "Garder chaque scène centrée sur la conséquence immédiate de l'action du joueur.",
+    "Ne pas sauter à un grand moment émotionnel sauf si le joueur le crée explicitement.",
+    "Ne pas résoudre la tension trop vite.",
+    "Préférer des beats courts et interactifs aux résumés longs.",
+    "Ne pas traiter chaque action joueur comme un événement dramatique majeur.",
+    "Laisser de l'espace pour que le joueur réponde.",
+    "Si le joueur s'éloigne ou clôt un échange, le laisser partir — ne pas forcer la continuation."
   ],
   "story_arcs": [
     {
       "id": "dean_elina_slow_burn",
-      "title": "Dean and Elina slow-burn tension",
+      "title": "Dean et Elina — tension lente",
       "status": "active",
-      "phase": "initial_tension",
-      "participants": [
-        "dean",
-        "elina",
-        "beau"
-      ],
+      "phase": "première_impression",
+      "participants": ["dean", "elina", "beau"],
       "dramatic_questions": [
-        "Will Elina treat Dean's provocations as a game, reject them, or turn them against him?",
-        "Can Beau protect Elina without controlling her choices?",
-        "Will Dean stay behind jokes or reveal sincere interest through concrete actions?"
+        "Est-ce qu'Elina va traiter les provocations de Dean comme un jeu, les ignorer, ou les retourner contre lui ?",
+        "Est-ce que Dean va rester derrière ses blagues ou révéler un intérêt sincère par des actions concrètes ?",
+        "Quand Beau verra que Dean est vraiment affecté, que fera-t-il ?"
       ],
       "current_tensions": [
-        "Elina wants independence on arrival day.",
-        "Beau wants to help without smothering her.",
-        "Dean is entertained by tension and drawn to confidence.",
-        "The player can accept, refuse, delay or redirect Dean's challenges."
+        "Dean est intrigué mais ne le montrera pas directement.",
+        "Elina n'est pas là pour jouer — mais elle n'est pas indifférente non plus.",
+        "Beau observe et garde ses conclusions pour lui.",
+        "Le joueur peut accepter, refuser, différer ou rediriger les tentatives de Dean."
       ],
       "available_beats": [
-        "playful_challenge",
-        "protective_interruption",
-        "text_followup",
-        "private_conversation",
-        "missed_connection",
-        "unexpected_sincerity",
-        "boundary_set_by_player"
+        "premier_defi_verbal",
+        "conversation_surprise_en_tete_a_tete",
+        "texto_inattendu",
+        "invitation_concrète",
+        "moment_de_sincérité_inattendue",
+        "limite_posee_par_le_joueur",
+        "beau_dit_quelque_chose_que_dean_ne_dirait_pas"
       ],
       "blocked_beats": [
-        "love_confession",
-        "official_couple",
-        "instant_emotional_intimacy",
-        "physical_intimacy_without_relationship_support"
+        "declaration_d_amour",
+        "couple_officiel",
+        "intimite_emotionnelle_immediate",
+        "intimite_physique_sans_base_relationnelle"
       ],
       "progress_signals": [
-        "Dean responds directly to Elina instead of only teasing Beau.",
-        "Elina chooses to re-engage with Dean after a chance to leave.",
-        "Dean makes a concrete effort rather than a vague promise.",
-        "Beau respects Elina's independence even while staying watchful.",
-        "relationship_updates show gradual respect, trust or attraction changes."
+        "Dean répond à Elina directement au lieu de faire des effets de manche.",
+        "Elina choisit de ré-engager avec Dean après une occasion de partir.",
+        "Dean fait un geste concret plutôt qu'une promesse vague.",
+        "Beau remarque quelque chose et ne le dit pas — mais le regard suffit.",
+        "relationship_updates montrent une évolution graduelle du respect, de l'attraction ou de la confiance."
       ],
       "branching_notes": [
-        "If Elina rejects Dean's challenge, let the tension cool or shift rather than forcing flirtation.",
-        "If Elina ignores a SMS, let the missed connection become context instead of repeating the same message.",
-        "If Beau interferes too much, create consequences for Beau and Elina's sibling dynamic.",
-        "If Elina sets a boundary, NPCs should react to that boundary and remember it."
+        "Si Elina rejette le défi de Dean, laisser la tension se refroidir ou se déplacer — ne pas forcer la flirtation.",
+        "Si Elina ignore un SMS, laisser le ratage devenir contexte au lieu de répéter le message.",
+        "Si Elina pose une limite claire, les PNJ s'en souviennent et ne la franchissent pas."
+      ]
+    },
+    {
+      "id": "elina_hannah_friendship",
+      "title": "Elina et Hannah — amitié qui se construit",
+      "status": "active",
+      "phase": "premiere_rencontre",
+      "participants": ["elina", "hannah"],
+      "dramatic_questions": [
+        "Est-ce qu'Elina et Hannah vont vraiment se trouver, ou rester poliment distantes ?",
+        "Est-ce que Hannah va choisir de faire confiance à Elina malgré son radar habituel ?"
+      ],
+      "current_tensions": [
+        "Hannah ne fait pas confiance facilement mais repère les gens authentiques.",
+        "Elina a besoin d'une amie — elle ne le sait pas encore tout à fait.",
+        "La présence de Garrett dans la vie de Hannah crée une complexité que les deux doivent naviguer."
+      ],
+      "available_beats": [
+        "premier_vrai_echange",
+        "Hannah_partage_quelque_chose_de_vrai",
+        "elina_defend_hannah_ou_reciproque",
+        "soirée_en_dehors_du_groupe_hockey",
+        "confidence_inattendue"
+      ],
+      "blocked_beats": [
+        "intimite_immediate_sans_base",
+        "Hannah_trahit_garrett_pour_l_amitié"
+      ]
+    },
+    {
+      "id": "world_integration",
+      "title": "Entrée dans le monde de Briar",
+      "status": "active",
+      "phase": "decouverte",
+      "participants": ["elina", "garrett", "logan", "tucker", "jules"],
+      "dramatic_questions": [
+        "Comment Elina va-t-elle trouver sa place dans un groupe aussi soudé ?",
+        "Est-ce que Jules et Elina vont se trouver de vraies affinités ?"
+      ],
+      "current_tensions": [
+        "Elina est une inconnue dans un groupe qui se connaît depuis des années.",
+        "Garrett évalue Elina — s'il décide qu'elle mérite sa confiance, les portes s'ouvrent.",
+        "Logan est chaleureux mais sa loyauté envers Dean peut créer des frictions si la situation se complique."
+      ],
+      "available_beats": [
+        "premier_match_de_hockey",
+        "soiree_a_la_hockey_house",
+        "garrett_accorde_sa_confiance",
+        "Logan_fait_une_gaffe_et_s_excuse",
+        "jules_et_elina_premier_vrai_echange"
+      ],
+      "blocked_beats": [
+        "acceptation_immédiate_dans_le_groupe",
+        "confiance_totale_de_garrett_sans_raison"
       ]
     }
   ],
   "message_triggers": [
     {
-      "trigger": "skating_lesson_followup",
+      "trigger": "dean_first_text",
       "from": "dean",
       "to": "elina",
       "channel": "sms",
-      "content": "Demain matin. Patinoire. 7h. Si tu survis a la premiere heure, je te paie un cafe.",
+      "content": "T'as survécu à la première journée ? Impressionnant pour une freshman.",
       "keywords": [
-        "patin",
-        "patinoire",
-        "hockey",
-        "defi",
-        "lesson",
-        "skating"
+        "dortoir", "chambre", "installée", "premier jour", "arrivée"
       ]
     },
     {
-      "trigger": "beau_dormitory_checkin",
-      "from": "beau",
+      "trigger": "hannah_welcome",
+      "from": "hannah",
       "to": "elina",
       "channel": "sms",
-      "content": "T'es bien arrivee au dortoir ? Je te laisse respirer, mais reponds au moins par un oui.",
+      "content": "Si t'as besoin de quoi que ce soit — ou juste d'un café pour te remettre du premier jour — je suis au 2ème.",
       "keywords": [
-        "dortoir",
-        "residence",
-        "dormitory",
-        "installee",
-        "settle",
-        "chambre"
+        "dortoir", "chambre", "installée", "coloc", "étage"
+      ]
+    },
+    {
+      "trigger": "skating_challenge",
+      "from": "dean",
+      "to": "elina",
+      "channel": "sms",
+      "content": "Patinoire. Demain matin 7h. Si tu tiens debout plus de dix minutes, je paye le café.",
+      "keywords": [
+        "patin", "patinoire", "hockey", "défi", "glace"
       ]
     }
   ]

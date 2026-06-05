@@ -313,6 +313,52 @@ def apply_world_updates(
 
             world["character_locations"][character_id] = location_id
 
+    character_position_updates = world_updates.get("character_position_updates", {})
+    if isinstance(character_position_updates, dict):
+        if "character_positions" not in world:
+            world["character_positions"] = {}
+        for character_id, position in character_position_updates.items():
+            if isinstance(position, str):
+                world["character_positions"][character_id] = position
+
+    character_activity_updates = world_updates.get("character_activity_updates", {})
+    if isinstance(character_activity_updates, dict):
+        if "character_activities" not in world:
+            world["character_activities"] = {}
+        for character_id, activity in character_activity_updates.items():
+            if isinstance(activity, str) and activity.strip():
+                world["character_activities"][character_id] = activity.strip()
+
+    # Active tasks progress
+    task_updates_map = world_updates.get("task_updates", {})
+    if isinstance(task_updates_map, dict) and task_updates_map:
+        for task in world.get("active_tasks", []):
+            if not isinstance(task, dict):
+                continue
+            tid = task.get("id", "")
+            if tid in task_updates_map:
+                upd = task_updates_map[tid]
+                if isinstance(upd, dict):
+                    if "progress" in upd and isinstance(upd["progress"], (int, float)):
+                        task["progress"] = max(0, min(100, int(upd["progress"])))
+                    if "note" in upd and isinstance(upd["note"], str):
+                        task["note"] = upd["note"]
+                    if "status" in upd and upd["status"] in ("active", "completed", "paused"):
+                        task["status"] = upd["status"]
+
+    # New scene props for current location
+    new_props = world_updates.get("new_scene_props", [])
+    if isinstance(new_props, list) and new_props:
+        current_loc = world["active_scene"].get("location", "")
+        if current_loc:
+            if "scene_props" not in world:
+                world["scene_props"] = {}
+            existing = world["scene_props"].get(current_loc, [])
+            for prop in new_props:
+                if isinstance(prop, str) and prop.strip() and prop not in existing:
+                    existing.append(prop.strip())
+            world["scene_props"][current_loc] = existing
+
     world["active_scene"]["participants"] = resolve_scene_participants(world)
 
     return world

@@ -4,6 +4,7 @@ from backend.app.core.prompt_builder import (
     build_player_context,
     build_player_intent_context,
     build_scenario_context,
+    build_scene_history_context,
     build_structured_scene_prompt,
 )
 
@@ -126,6 +127,40 @@ def build_scenario():
             }
         ],
     }
+
+
+def test_build_scene_history_context_returns_empty_when_none():
+    assert build_scene_history_context(None) == "No previous scene yet."
+
+
+def test_build_scene_history_context_returns_empty_when_empty_list():
+    assert build_scene_history_context([]) == "No previous scene yet."
+
+
+def test_build_scene_history_context_formats_turns():
+    turns = [
+        {"player_input": None, "scene_text": "Opening scene text."},
+        {"player_input": "Je lui parle.", "scene_text": "Dean répond."},
+    ]
+
+    context = build_scene_history_context(turns)
+
+    assert "Opening scene text." in context
+    assert "Player: Je lui parle." in context
+    assert "Dean répond." in context
+
+
+def test_build_scene_history_context_limits_to_max_prompt():
+    turns = [
+        {"player_input": f"Action {i}", "scene_text": f"Scene {i}"}
+        for i in range(10)
+    ]
+
+    context = build_scene_history_context(turns)
+
+    assert "Scene 9" in context
+    assert "Scene 8" in context
+    assert "Scene 0" not in context
 
 
 def test_build_event_log_context_returns_empty_message():

@@ -1,4 +1,5 @@
 from backend.app.core.relationship_engine import (
+    apply_daily_relationship_decay,
     apply_relationship_updates,
     clamp_value,
 )
@@ -166,3 +167,77 @@ def test_apply_relationship_updates_ignores_unknown_target_relationship():
         updated_characters["dean"]["relationships"]["elina"]["respect"]
         == 50
     )
+
+
+def test_daily_decay_reduces_attraction_and_friendship():
+    characters = {
+        "dean": {
+            "relationships": {
+                "elina": {
+                    "attraction": 50,
+                    "friendship": 40,
+                    "trust": 60,
+                    "respect": 55,
+                }
+            }
+        }
+    }
+
+    updated = apply_daily_relationship_decay(characters, days=1)
+    rel = updated["dean"]["relationships"]["elina"]
+
+    assert rel["attraction"] == 49
+    assert rel["friendship"] == 39
+    assert rel["trust"] == 60
+    assert rel["respect"] == 55
+
+
+def test_daily_decay_respects_floor():
+    characters = {
+        "dean": {
+            "relationships": {
+                "elina": {
+                    "attraction": 6,
+                    "friendship": 5,
+                }
+            }
+        }
+    }
+
+    updated = apply_daily_relationship_decay(characters, days=10)
+    rel = updated["dean"]["relationships"]["elina"]
+
+    assert rel["attraction"] == 5
+    assert rel["friendship"] == 5
+
+
+def test_daily_decay_accumulates_over_multiple_days():
+    characters = {
+        "dean": {
+            "relationships": {
+                "elina": {
+                    "attraction": 30,
+                }
+            }
+        }
+    }
+
+    updated = apply_daily_relationship_decay(characters, days=5)
+
+    assert updated["dean"]["relationships"]["elina"]["attraction"] == 25
+
+
+def test_daily_decay_reduces_jealousy_to_zero():
+    characters = {
+        "dean": {
+            "relationships": {
+                "elina": {
+                    "jealousy": 3,
+                }
+            }
+        }
+    }
+
+    updated = apply_daily_relationship_decay(characters, days=5)
+
+    assert updated["dean"]["relationships"]["elina"]["jealousy"] == 0

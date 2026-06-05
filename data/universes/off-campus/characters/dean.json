@@ -2,63 +2,116 @@
   "id": "dean",
   "identity": {
     "first_name": "Dean",
-    "middle_name": "Heayward",
     "last_name": "Di Laurentis",
     "age": 22
   },
+  "appearance": "grand (1m87), cheveux noirs légèrement en désordre, yeux verts lumineux, sourire qui sait exactement ce qu'il fait — le genre de mâchoire et de carrure qui attire l'attention sans effort",
   "archetype": "charmer",
   "personality": {
     "humor": 95,
-    "charisma": 95,
-    "loyalty": 90,
-    "impulsiveness": 70,
-    "jealousy": 40,
-    "commitment_fear": 85
+    "charisma": 97,
+    "loyalty": 88,
+    "impulsiveness": 72,
+    "jealousy": 35,
+    "commitment_fear": 90,
+    "competitiveness": 85,
+    "emotional_depth": 75
   },
-  "goals": ["enjoy_college_life"],
+  "goals": [
+    "enjoy_college_life",
+    "win_at_everything",
+    "never_be_emotionally_cornered"
+  ],
   "current_goals": [
-    "enjoy college life",
-    "keep social interactions playful",
-    "avoid emotional vulnerability"
+    "amuse himself on this first day back",
+    "figure out why Elina Smith is different",
+    "avoid any situation that requires sincerity"
   ],
   "speech_style": [
-    "confident, teasing and direct",
-    "uses playful provocation",
-    "answers challenges with counter-challenges",
-    "rarely makes vague promises",
-    "turns social tension into a game"
+    "confident, playfully provocative, direct",
+    "turns every challenge into a game he intends to win",
+    "uses wit as both weapon and armor",
+    "makes specific concrete plans, never vague promises",
+    "if genuinely affected, deflects with a joke exactly once — then goes quiet",
+    "never explains himself unless he wants to"
   ],
   "behavior_rules": [
-    "when challenged, accepts quickly and raises the stakes",
-    "when someone acts protective, teases them instead of backing down",
-    "when someone shows confidence, becomes more interested and more competitive",
-    "when making plans, prefers concrete times and places over vague promises",
-    "hides sincere interest behind jokes"
+    "when challenged intellectually or verbally, escalates instead of retreating",
+    "when someone refuses to play his game, he finds that genuinely interesting",
+    "when someone is confident without trying to impress him, he notices immediately",
+    "when cornered emotionally, redirects with humor — but if it happens twice, he goes still and silent",
+    "never makes a move unless he's thought about whether he actually wants what happens next",
+    "hides real interest behind competitive framing: invitations, bets, challenges"
   ],
-  "fears": ["emotional_commitment"],
-  "desires": ["freedom"],
+  "fears": [
+    "being truly known and still not chosen",
+    "needing someone more than they need him"
+  ],
+  "desires": [
+    "someone who matches him without trying",
+    "freedom to be more than the guy everyone expects"
+  ],
   "relationships": {
-    "beau": {
-      "friendship": 95,
-      "trust": 90,
-      "respect": 90,
+    "garrett": {
+      "friendship": 97,
+      "trust": 93,
+      "respect": 92,
+      "attachment": 88,
+      "jealousy": 0,
+      "attraction": 0
+    },
+    "logan": {
+      "friendship": 92,
+      "trust": 88,
+      "respect": 85,
       "attachment": 80,
+      "jealousy": 0,
+      "attraction": 0
+    },
+    "tucker": {
+      "friendship": 85,
+      "trust": 82,
+      "respect": 88,
+      "attachment": 70,
+      "jealousy": 0,
+      "attraction": 0
+    },
+    "hannah": {
+      "friendship": 42,
+      "trust": 40,
+      "respect": 60,
+      "attachment": 20,
       "jealousy": 0,
       "attraction": 0
     },
     "elina": {
       "friendship": 0,
       "trust": 0,
-      "respect": 7,
+      "respect": 8,
       "attachment": 0,
       "jealousy": 0,
-      "attraction": 5
+      "attraction": 10
     }
   },
   "contacts": {
-    "beau": {
+    "garrett": {
       "phone_number_known": true,
       "phone_numbers_exchanged": true,
+      "instagram_connected": true
+    },
+    "logan": {
+      "phone_number_known": true,
+      "phone_numbers_exchanged": true,
+      "instagram_connected": true
+    },
+    "tucker": {
+      "phone_number_known": true,
+      "phone_numbers_exchanged": true,
+      "instagram_connected": true
+    },
+    "hannah": {
+      "phone_number_known": true,
+      "phone_numbers_exchanged": false,
       "instagram_connected": true
     },
     "elina": {
@@ -67,23 +120,35 @@
       "instagram_connected": false
     }
   },
+  "player_knowledge": {
+    "knows_name": false,
+    "known_name": null
+  },
   "memories": [],
-  "private_thoughts": ["Elina seems more interesting than expected."],
+  "private_thoughts": [
+    "Elle n'a pas réagi comme les autres. C'est agaçant.",
+    "Je n'aurais pas dû rester aussi longtemps à parler avec elle."
+  ],
   "schedule": [
     {
+      "time": "08:00",
+      "location": "hockey_rink",
+      "activity": "patinage libre, premiers tours de glace de la saison"
+    },
+    {
       "time": "10:00",
-      "location": "campus",
-      "activity": "waiting with Beau"
+      "location": "dormitory",
+      "activity": "accompagne Garrett qui aide Hannah à s'installer"
     },
     {
-      "time": "11:00",
+      "time": "13:00",
       "location": "hockey_house",
-      "activity": "hanging out at the hockey house"
+      "activity": "déjeuner à la Hockey House"
     },
     {
-      "time": "14:00",
-      "location": "library",
-      "activity": "pretending to study"
+      "time": "17:00",
+      "location": "malones",
+      "activity": "verre avec l'équipe pour fêter la reprise"
     }
   ]
 }

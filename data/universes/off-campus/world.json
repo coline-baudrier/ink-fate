@@ -11,50 +11,115 @@
   "player_character": "elina",
   "locations": [
     {
-      "id": "campus",
-      "name": "Briar University Campus",
-      "description": "Le campus de Briar University."
+      "id": "dormitory",
+      "name": "Dortoir Hollis Hall",
+      "description": "La résidence universitaire de Briar où habitent Elina (chambre individuelle, 3ème étage), Hannah et Allie (chambre double, 2ème étage). Couloirs de béton peints en blanc cassé, ascenseur en panne une fois sur deux, machine à café au rez-de-chaussée qui rend des services réels."
     },
     {
-      "id": "dormitory",
-      "name": "Briar Dormitory",
-      "description": "La residence universitaire principale de Briar University."
+      "id": "campus",
+      "name": "Campus de Briar University",
+      "description": "Le campus principal : grandes pelouses, bâtiments en brique rouge, chemins bordés d'érables. En septembre le soleil est encore chaud. Les freshmen se repèrent à leurs plans imprimés et à leurs regards perdus."
     },
     {
       "id": "hockey_house",
       "name": "Hockey House",
-      "description": "La maison partagée par plusieurs joueurs de hockey."
+      "description": "La maison partagée par Dean, Garrett et Beau à dix minutes du campus. Grand salon avec un canapé qui a vécu des choses, cuisine ouverte, une PlayStation vissée à la télé. Le genre d'endroit où tout le monde finit par traîner un soir ou l'autre."
+    },
+    {
+      "id": "hockey_rink",
+      "name": "Patinoire de Briar",
+      "description": "Le Fern Collins Arena — la patinoire universitaire où l'équipe de Briar s'entraîne. Odeur de glace fraîche et de caoutchouc. Les tribunes sont vides en dehors des matchs mais la piste en elle-même est magnifique."
+    },
+    {
+      "id": "malones",
+      "name": "Malone's",
+      "description": "Le bar off-campus où tout le monde se retrouve. Bière pression, juke-box, quelques tables en bois usées. La frontière entre la semaine et le week-end n'existe pas vraiment à Malone's."
     },
     {
       "id": "library",
-      "name": "University Library",
-      "description": "La bibliotheque universitaire de Briar."
+      "name": "Bibliothèque universitaire",
+      "description": "La bibliothèque principale de Briar : grande, silencieuse, avec des cabines de travail en bois sombre et une section périodiques que personne n'utilise vraiment. Allie y a ses tables favorites."
+    },
+    {
+      "id": "dining_hall",
+      "name": "Cafétéria Briar",
+      "description": "La cafétéria principale du campus. Plateaux en plastique, odeur de café trop longtemps chauffé, tables rectangulaires pouvant accueillir dix personnes. Lieu central de socialisation involontaire."
+    },
+    {
+      "id": "quad",
+      "name": "Le Quad",
+      "description": "La grande pelouse centrale du campus, lieu de passage, de détente et de drague involontaire. En septembre elle est encore verte. Les équipes sportives la traversent en short même quand il fait froid."
     }
   ],
   "characters": [
+    "elina",
     "dean",
     "beau",
-    "elina"
+    "garrett",
+    "hannah",
+    "logan",
+    "allie",
+    "jules",
+    "tucker"
   ],
+  "active_tasks": [
+    {
+      "id": "hannah_move_in",
+      "title": "Aider Hannah à s'installer",
+      "description": "Déballer les cartons et ranger les affaires dans la chambre de Hannah (chambre 204, 2ème étage). Une quinzaine de cartons en tout — certains dans le couloir, certains déjà dans la chambre. La moitié reste à faire.",
+      "primary_participant": "hannah",
+      "assigned_participants": ["hannah", "garrett"],
+      "progress": 0,
+      "status": "active",
+      "location": "dormitory",
+      "note": "Les cartons s'empilent dans le couloir du 2ème, Garrett porte et Hannah range."
+    }
+  ],
+  "scene_props": {},
   "active_events": [
     {
       "id": "arrival_day",
-      "title": "Elina arrives at Briar",
+      "title": "Premier jour de rentrée à Briar",
       "status": "active"
     }
   ],
   "active_scene": {
-    "location": "campus",
+    "location": "dormitory",
     "participants": [
       "elina",
+      "dean",
       "beau",
-      "dean"
+      "garrett",
+      "hannah"
     ]
   },
   "character_locations": {
-    "elina": "campus",
-    "beau": "campus",
-    "dean": "campus"
+    "elina": "dormitory",
+    "dean": "dormitory",
+    "beau": "dormitory",
+    "garrett": "dormitory",
+    "hannah": "dormitory",
+    "logan": "dining_hall",
+    "allie": "dormitory",
+    "jules": "campus",
+    "tucker": "hockey_house"
   },
-  "event_log": []
+  "character_positions": {
+    "elina": "couloir du 2ème étage, devant les boîtes encore fermées",
+    "dean": "couloir du 2ème étage",
+    "beau": "couloir du 2ème étage",
+    "garrett": "couloir du 2ème étage, devant la porte de Hannah",
+    "hannah": "dans sa chambre, 2ème étage (porte entrouverte)",
+    "allie": "dans sa chambre, 2ème étage"
+  },
+  "character_activities": {
+    "elina": "arrive dans le couloir, découvre la scène du déménagement",
+    "dean": "s'ennuie dans le couloir, cherche à tuer le temps",
+    "beau": "discute avec Dean, observe les allées et venues dans le couloir",
+    "garrett": "porte des cartons depuis le couloir vers la chambre de Hannah",
+    "hannah": "range ses affaires dans sa chambre (chambre 204) — vêtements, livres, petits meubles",
+    "allie": "s'installe dans sa chambre au 2ème étage"
+  },
+  "event_log": [],
+  "scene_history": []
 }

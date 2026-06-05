@@ -2,6 +2,8 @@
 
 from typing import Any, Dict, List
 
+EVENT_LOG_MAX_SIZE = 100
+
 
 def build_event_summary(
     event: Dict[str, Any],
@@ -71,5 +73,7 @@ def update_event_log_after_scene(
         }
 
         world["event_log"].append(log_entry)
+
+    world["event_log"] = world["event_log"][-EVENT_LOG_MAX_SIZE:]
 
     return world

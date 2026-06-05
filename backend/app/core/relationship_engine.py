@@ -6,6 +6,17 @@ Ce module les applique aux personnages, puis limite les valeurs entre 0 et 100.
 
 from typing import Any, Dict
 
+# Dimensions qui se dégradent passivement si non entretenues.
+# trust, respect, attachment restent stables (pas de decay).
+DAILY_DECAY = {
+    "attraction": 1,
+    "friendship": 1,
+    "jealousy": 1,
+}
+
+# Plancher minimal du decay : évite de tomber à 0 pour une vieille relation.
+DECAY_FLOOR = 5
+
 
 def apply_relationship_updates(
     scene_result: Dict[str, Any],
@@ -51,6 +62,35 @@ def apply_relationship_updates(
             target_relationship[stat_name] = clamp_value(
                 current_value + stat_delta
             )
+
+    return characters
+
+
+def apply_daily_relationship_decay(
+    characters: Dict[str, Dict[str, Any]],
+    days: int = 1,
+) -> Dict[str, Dict[str, Any]]:
+    """Applique une légère décroissance passive aux relations non entretenues."""
+
+    for character in characters.values():
+        relationships = character.get("relationships", {})
+
+        if not isinstance(relationships, dict):
+            continue
+
+        for relationship in relationships.values():
+            if not isinstance(relationship, dict):
+                continue
+
+            for dimension, decay_per_day in DAILY_DECAY.items():
+                current = relationship.get(dimension)
+
+                if not isinstance(current, int):
+                    continue
+
+                floor = 0 if dimension == "jealousy" else DECAY_FLOOR
+                total_decay = decay_per_day * days
+                relationship[dimension] = max(floor, current - total_decay)
 
     return characters
 

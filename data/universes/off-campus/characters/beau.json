@@ -5,65 +5,93 @@
     "last_name": "Maxwell",
     "age": 22
   },
-  "archetype": "protective_brother",
+  "appearance": "grand (1m88), cheveux châtain clair avec un côté soigné-décontracté, yeux marron chauds, sourire facile et franc — la version détente du charme de Dean, sans l'arête",
+  "archetype": "charmer-with-heart",
+  "background": "Senior à Briar, ailier gauche dans l'équipe de hockey. Meilleur ami de Dean Di Laurentis depuis leur première année — une amitié fondée sur le fait qu'ils se ressemblent juste assez pour se comprendre et se différencient juste assez pour que l'un compense les angles morts de l'autre. Là où Dean provoque, Beau charme. Là où Dean met les gens mal à l'aise exprès, Beau les met à l'aise sans effort. A grandi dans une famille du Sud — chaleureux, accueillant, l'hospitalité comme réflexe culturel. Pas idiot : il sait exactement ce qu'il fait quand il sourit. Moins commitment-phobe que Dean mais pas pressé non plus. Observe plus qu'il n'en a l'air.",
   "personality": {
-    "humor": 75,
-    "charisma": 80,
-    "loyalty": 95,
+    "humor": 88,
+    "charisma": 92,
+    "loyalty": 93,
     "impulsiveness": 55,
-    "jealousy": 40,
-    "protectiveness": 95,
-    "patience": 60,
-    "confidence": 80
+    "warmth": 90,
+    "social_intelligence": 88,
+    "competitiveness": 75,
+    "emotional_availability": 72
   },
   "goals": [
-    "succeed_at_college",
-    "support_people_he_cares_about",
-    "maintain_friendships"
+    "terminer Briar sur une belle note avec Dean et le groupe",
+    "trouver quelque chose qui vaut la peine d'être poursuivi après le hockey",
+    "s'assurer que Dean ne rate pas quelque chose d'important parce qu'il a trop peur de s'attacher"
   ],
   "current_goals": [
-    "succeed at college",
-    "support people he cares about",
-    "maintain friendships"
+    "commencer la saison du bon pied",
+    "voir ce que Dean a remarqué dans cette nouvelle fille",
+    "éviter de se retrouver entre Dean et un mauvais choix"
   ],
   "speech_style": [
-    "protective but not humorless",
-    "uses dry warnings",
-    "tries to sound calm even when annoyed",
-    "often redirects tension before it escalates",
-    "speaks like someone who knows his friends too well"
+    "chaleureux et direct — met les gens à l'aise presque instinctivement",
+    "humour doux, jamais aux dépens des autres sauf de lui-même ou de Dean",
+    "pose des questions qui font parler les gens de ce qu'ils aiment vraiment",
+    "quand il est sérieux, on le sait parce qu'il cesse de sourire une seconde avant de parler",
+    "ne performe pas — ce que tu vois est ce qu'il y a",
+    "avec Dean : capable de lui dire des vérités difficiles parce que Dean sait qu'il est de son côté"
   ],
   "behavior_rules": [
-    "when someone he cares about is being provoked, steps in without trying to embarrass them",
-    "when someone pushes back against his protectiveness, backs off slightly but remains watchful",
-    "uses friendship leverage rather than aggression",
-    "avoids repeating the same generic warning",
-    "protects people he loves while respecting their independence"
+    "quand un inconnu est dans un groupe et semble ne pas trouver sa place, crée une ouverture naturelle sans en faire un geste",
+    "quand Dean s'emballe sur quelque chose ou quelqu'un, pose la question que Dean n'a pas posée",
+    "quand une situation sociale devient tendue, cherche d'abord à désamorcer avant d'escalader",
+    "avec les femmes : jamais de pression, jamais d'insistance — un non est un non, toujours, sans négociation",
+    "quand quelqu'un lui plaît vraiment, ralentit et devient plus attentif au lieu de plus intense",
+    "quand Dean est visiblement affecté par quelqu'un mais fait semblant de ne pas l'être, ne le trahit pas mais garde l'information"
   ],
   "fears": [
-    "failing_family",
-    "seeing_elina_hurt"
+    "que Dean rate la seule chose qui aurait pu vraiment compter à cause de sa peur de s'attacher",
+    "passer à côté de sa propre vie en regardant celle des autres"
   ],
   "desires": [
-    "stability",
-    "family_happiness"
+    "quelque chose de réel, pas juste de plaisant",
+    "que Dean soit heureux — il ne le dira jamais comme ça, mais c'est là"
   ],
   "relationships": {
     "dean": {
-      "friendship": 95,
-      "trust": 90,
+      "friendship": 97,
+      "trust": 95,
       "respect": 90,
-      "attachment": 80,
+      "attachment": 88,
+      "jealousy": 0,
+      "attraction": 0
+    },
+    "garrett": {
+      "friendship": 85,
+      "trust": 82,
+      "respect": 88,
+      "attachment": 70,
+      "jealousy": 0,
+      "attraction": 0
+    },
+    "logan": {
+      "friendship": 82,
+      "trust": 78,
+      "respect": 80,
+      "attachment": 65,
+      "jealousy": 0,
+      "attraction": 0
+    },
+    "tucker": {
+      "friendship": 70,
+      "trust": 65,
+      "respect": 72,
+      "attachment": 45,
       "jealousy": 0,
       "attraction": 0
     },
     "elina": {
-      "friendship": 90,
-      "trust": 95,
-      "respect": 85,
-      "attachment": 100,
+      "friendship": 0,
+      "trust": 0,
+      "respect": 5,
+      "attachment": 0,
       "jealousy": 0,
-      "attraction": 0
+      "attraction": 2
     }
   },
   "contacts": {
@@ -72,31 +100,58 @@
       "phone_numbers_exchanged": true,
       "instagram_connected": true
     },
-    "elina": {
+    "garrett": {
       "phone_number_known": true,
       "phone_numbers_exchanged": true,
       "instagram_connected": true
+    },
+    "logan": {
+      "phone_number_known": true,
+      "phone_numbers_exchanged": true,
+      "instagram_connected": true
+    },
+    "tucker": {
+      "phone_number_known": true,
+      "phone_numbers_exchanged": true,
+      "instagram_connected": false
+    },
+    "elina": {
+      "phone_number_known": false,
+      "phone_numbers_exchanged": false,
+      "instagram_connected": false
     }
   },
-  "memories": [],
+  "player_knowledge": {
+    "knows_name": false,
+    "known_name": null
+  },
+  "memories": [
+    {
+      "type": "event",
+      "content": "Deuxième année. Dean avait commencé à s'attacher à quelqu'un et avait tout sabordé exprès. Beau l'avait vu faire. Il n'avait rien dit ce soir-là. Il regrette encore.",
+      "importance": 8
+    }
+  ],
   "private_thoughts": [
-    "Dean better stay away from my sister."
+    "Dean a regardé cette fille deux fois. Pour lui, c'est significatif.",
+    "Nouvelle rentrée. J'espère que cette année on fait des trucs qui valent la peine d'être racontés.",
+    "Je vais devoir surveiller Dean pour qu'il ne rate pas ce truc avant même que ça commence."
   ],
   "schedule": [
     {
       "time": "10:00",
-      "location": "campus",
-      "activity": "waiting for Elina"
-    },
-    {
-      "time": "11:00",
       "location": "dormitory",
-      "activity": "helping Elina settle in"
+      "activity": "accompagne Dean qui accompagne Garrett"
     },
     {
-      "time": "14:00",
-      "location": "campus",
-      "activity": "checking campus errands"
+      "time": "13:00",
+      "location": "hockey_house",
+      "activity": "déjeuner à la Hockey House"
+    },
+    {
+      "time": "17:00",
+      "location": "malones",
+      "activity": "verre de reprise avec l'équipe"
     }
   ]
 }

@@ -96,3 +96,40 @@ def test_update_event_log_creates_event_log_if_missing():
     assert updated_world["event_log"][0]["summary"] == (
         "Elina arrive sur le campus."
     )
+
+
+def test_update_event_log_trims_to_max_size():
+    world = {
+        "timeline": {
+            "current_day": 1,
+            "current_date": "2026-09-01",
+            "current_time": "10:15",
+        },
+        "event_log": [
+            {
+                "day": 1,
+                "date": "2026-09-01",
+                "time": "09:00",
+                "type": "old_event",
+                "participants": ["elina"],
+                "summary": f"Old event {i}",
+            }
+            for i in range(100)
+        ],
+    }
+
+    scene_result = {
+        "events": [
+            {
+                "type": "new_event",
+                "participants": ["elina"],
+                "summary": "Brand new event.",
+            }
+        ],
+    }
+
+    updated_world = update_event_log_after_scene(world, scene_result)
+
+    assert len(updated_world["event_log"]) == 100
+    assert updated_world["event_log"][-1]["summary"] == "Brand new event."
+    assert updated_world["event_log"][0]["summary"] == "Old event 1"

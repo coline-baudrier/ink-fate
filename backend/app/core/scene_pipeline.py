@@ -1,3 +1,4 @@
+import copy
 from typing import Any, Dict
 
 from app.core.contact_intent_parser import (
@@ -14,12 +15,14 @@ from app.core.scene_result_parser import parse_scene_result
 from app.core.scene_validator import (
     clamp_memory_importance,
     clamp_relationship_updates,
+    remove_filler_narration,
     remove_invalid_actions,
     remove_invalid_contact_updates,
     remove_invalid_dialogues,
     remove_invalid_events,
     remove_invalid_memory_updates,
     remove_invalid_relationship_updates,
+    remove_narration_about_absent_characters,
     remove_player_dialogues,
     remove_dialogues_from_nonparticipants,
     remove_player_internal_state_from_narration,
@@ -35,7 +38,7 @@ def generate_scene(
     scenario: Dict[str, Any],
     scene_context: Dict[str, Any],
     player_input: str | None = None,
-    scene_history: str | None = None,
+    scene_history: list[dict] | None = None,
 ) -> Dict[str, Any]:
     """Genere, parse et valide une scene produite par le LLM."""
 
@@ -132,9 +135,18 @@ def validate_scene_result(
         scene_result,
     )
 
+    scene_result = remove_narration_about_absent_characters(
+        scene_result,
+        valid_character_ids,
+    )
+
     scene_result = remove_player_internal_state_from_narration(
         scene_result,
         world["player_character"],
+    )
+
+    scene_result = remove_filler_narration(
+        scene_result,
     )
 
     scene_result = validate_scene_pacing(
@@ -175,7 +187,5 @@ def copy_scene_result(
     scene_result: Dict[str, Any],
 ) -> Dict[str, Any]:
     """Copie simple pour produire un rapport sans mutation de reference."""
-
-    import copy
 
     return copy.deepcopy(scene_result)

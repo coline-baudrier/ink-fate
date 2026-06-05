@@ -53,21 +53,52 @@ MEMORY_TYPES = {
 MAX_NARRATION_PARAGRAPHS = 3
 MAX_DIALOGUES = 4
 
+FILLER_NARRATION_PATTERNS = [
+    "la scene marque une pause",
+    "la scene s'installe",
+    "la scene se suspend",
+    "la scene reprend",
+    "l'echange marque une pause",
+    "la conversation marque une pause",
+    "l'instant marque une pause",
+    "l'instant se suspend",
+    "le moment marque une pause",
+    "reprenne ses reperes",
+    "reprend ses reperes",
+    "retrouve ses reperes",
+    "retrouve ses marques",
+    "reprennent leurs reperes",
+    "retrouvent leurs reperes",
+    "chacun reprend",
+    "chacun retrouve",
+    "chacun se repositionne",
+    "chacun s'installe",
+    "chacun reprend son souffle",
+    "le temps que chacun",
+    "le temps que tout le monde",
+    "le groupe reprend",
+    "le groupe se reajuste",
+    "l'atmosphere retombe",
+    "l'atmosphere se reinstalle",
+    "l'atmosphere se reequilibre",
+    "le silence retombe",
+    "le silence se reinstalle",
+    "nul n'ajoute rien",
+    "personne n'ajoute rien",
+    "plus personne ne dit",
+    "plus personne n'ajoute",
+]
+
 PLAYER_INTERNAL_STATE_PATTERNS = [
     "se sent",
     "ressent",
     "pense",
     "songe",
     "se demande",
-    "comprend",
-    "realise",
-    "realise",
     "sait que",
-    "veut",
     "espere",
     "redoute",
     "craint",
-    "decide",
     "a envie",
     "est excitee",
     "est nerveuse",
@@ -78,6 +109,17 @@ PLAYER_INTERNAL_STATE_PATTERNS = [
     "est attiree",
     "est effrayee",
     "fait ressentir",
+    # Patterns d'attribution d'état implicite — "semble", "paraît", "comme si elle"
+    "semble",
+    "parait",
+    "comme si elle",
+    "donne l'impression",
+    "on dirait qu'elle",
+    "consciente que",
+    "anticipant",
+    "realise que",
+    "profitant",
+    "savourant",
 ]
 
 
@@ -539,6 +581,48 @@ def remove_player_internal_state_from_narration(
     return scene_result
 
 
+def remove_filler_narration(
+    scene_result: Dict[str, Any],
+) -> Dict[str, Any]:
+    """Retire les phrases de narration qui ne font que combler un vide."""
+
+    narration = ensure_list(scene_result.get("narration", []))
+    filtered_narration = []
+
+    for paragraph in narration:
+        if not isinstance(paragraph, str):
+            continue
+
+        cleaned = remove_filler_sentences(paragraph)
+
+        if cleaned:
+            filtered_narration.append(cleaned)
+
+    scene_result["narration"] = filtered_narration
+    return scene_result
+
+
+def remove_filler_sentences(paragraph: str) -> str:
+    """Supprime les phrases de remplissage dans un paragraphe."""
+
+    sentences = split_narration_sentences(paragraph)
+    kept = []
+
+    for sentence in sentences:
+        if is_filler_sentence(sentence):
+            continue
+        kept.append(sentence.strip())
+
+    return " ".join(s for s in kept if s).strip()
+
+
+def is_filler_sentence(sentence: str) -> bool:
+    """Detecte une phrase de transition sans contenu narratif reel."""
+
+    normalized = normalize_text(sentence)
+    return any(pattern in normalized for pattern in FILLER_NARRATION_PATTERNS)
+
+
 def build_player_reference_names(
     player_character_id: str,
 ) -> set[str]:
@@ -634,6 +718,69 @@ def is_player_internal_state_sentence(
         pattern in normalized_sentence
         for pattern in PLAYER_INTERNAL_STATE_PATTERNS
     )
+
+
+def remove_narration_about_absent_characters(
+    scene_result: Dict[str, Any],
+    all_character_ids: list[str],
+) -> Dict[str, Any]:
+    """Retire les paragraphes de narration portant sur des personnages absents.
+
+    Un paragraphe est retire s'il mentionne uniquement des personnages absents
+    de la scene active, sans mentionner aucun participant present.
+    Les paragraphes neutres (pas de personnage) sont conserves.
+    """
+
+    scene = ensure_dict(scene_result.get("scene", {}))
+    participants = {
+        ensure_string(p)
+        for p in ensure_list(scene.get("participants", []))
+        if ensure_string(p)
+    }
+    absent = {cid for cid in all_character_ids if cid not in participants}
+
+    if not absent:
+        return scene_result
+
+    narration = ensure_list(scene_result.get("narration", []))
+    filtered = []
+
+    for paragraph in narration:
+        if not isinstance(paragraph, str) or not paragraph.strip():
+            continue
+
+        normalized = normalize_text(paragraph)
+        mentions_absent = any(normalize_text(cid) in normalized for cid in absent)
+
+        if not mentions_absent:
+            filtered.append(paragraph)
+            continue
+
+        # A participant counts as "mentioned" only when their name is NOT preceded by
+        # a French apostrophe — this avoids false positives like "d'Elina" (genitive
+        # reference) being mistaken for Elina being the subject of the sentence.
+        def _is_subject_mention(text: str, character_id: str) -> bool:
+            pattern = r"(?<!['’])" + re.escape(normalize_text(character_id))
+            return bool(re.search(pattern, text))
+
+        mentions_participant_as_subject = any(
+            _is_subject_mention(normalized, pid) for pid in participants
+        )
+
+        # If the paragraph starts with an absent character's name, it is primarily
+        # about that absent character and must be removed even if a participant
+        # appears later as an object/reference.
+        paragraph_starts_with_absent = any(
+            normalized.lstrip().startswith(normalize_text(cid)) for cid in absent
+        )
+
+        if paragraph_starts_with_absent or not mentions_participant_as_subject:
+            continue
+
+        filtered.append(paragraph)
+
+    scene_result["narration"] = filtered
+    return scene_result
 
 
 def remove_dialogues_from_nonparticipants(

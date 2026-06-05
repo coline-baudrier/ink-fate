@@ -11,7 +11,7 @@ import argparse
 import os
 
 from app.core.json_loader import load_json
-from app.core.renderer import render_scene_result
+from app.core.renderer import render_scene_result, scene_result_to_entries
 from app.core.runtime_directives import (
     add_runtime_directive,
     clear_runtime_directives,
@@ -28,6 +28,7 @@ from app.core.runtime_save import (
     save_runtime_state,
 )
 from app.core.scene_context import build_scene_context
+from app.core.prompt_builder import scene_history_to_text
 from app.core.scene_pipeline import generate_scene
 from app.core.message_engine import (
     append_pending_messages,
@@ -42,9 +43,33 @@ from app.core.world_engine import (
     update_world_after_turn,
 )
 from app.core.character_state_engine import update_characters_after_scene
+from app.core.relationship_engine import apply_daily_relationship_decay
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 UNIVERSE_PATH = PROJECT_ROOT / "data" / "universes" / "off-campus"
+
+SCENE_HISTORY_MAX_STORED = 20
+
+
+def _append_scene_turn(
+    turns: list[dict],
+    player_input: str | None,
+    scene_text: str,
+    entries: list[dict] | None = None,
+) -> list[dict]:
+    """Ajoute un tour a l'historique et tronque a SCENE_HISTORY_MAX_STORED."""
+
+    turn: dict = {
+        "player_input": player_input,
+        "scene_text": scene_text,
+    }
+
+    if entries is not None:
+        turn["entries"] = entries
+
+    turns.append(turn)
+
+    return turns[-SCENE_HISTORY_MAX_STORED:]
 
 
 def parse_args() -> argparse.Namespace:
@@ -331,18 +356,41 @@ def main() -> None:
     print_loaded_characters(characters)
     print_active_scene(scene_context)
 
-    opening_scene = generate_scene(
-        world,
-        scenario,
-        scene_context,
+    scene_history_turns: list[dict] = world.get(
+        "scene_history",
+        [],
     )
 
-    print_rendered_scene(
-        "Opening scene",
-        opening_scene,
-    )
+    if scene_history_turns:
+        last_scene_text = scene_history_turns[-1].get("scene_text", "")
+        print()
+        print("Last scene")
+        print("----------")
+        print(last_scene_text)
+    else:
+        opening_scene = generate_scene(
+            world,
+            scenario,
+            scene_context,
+        )
 
-    scene_history = render_scene_result(opening_scene)
+        print_rendered_scene(
+            "Opening scene",
+            opening_scene,
+        )
+
+        scene_history_turns = _append_scene_turn(
+            scene_history_turns,
+            None,
+            render_scene_result(opening_scene),
+            scene_result_to_entries(opening_scene, "opening"),
+        )
+        world["scene_history"] = scene_history_turns
+        save_runtime_state(
+            runtime_save_path,
+            world,
+            characters,
+        )
 
     while True:
         print()
@@ -423,13 +471,15 @@ def main() -> None:
             scenario,
             scene_context,
             player_input,
-            scene_history,
+            scene_history_turns,
         )
 
         characters = update_characters_after_scene(
             next_scene,
             characters,
         )
+
+        day_before = world["timeline"]["current_day"]
 
         world = update_world_after_turn(
             world,
@@ -438,6 +488,14 @@ def main() -> None:
             scenario,
         )
 
+        days_passed = world["timeline"]["current_day"] - day_before
+
+        if days_passed > 0:
+            characters = apply_daily_relationship_decay(
+                characters,
+                days_passed,
+            )
+
         new_messages = generate_pending_messages(
             world,
             characters,
@@ -445,7 +503,7 @@ def main() -> None:
             scenario,
             {
                 "player_input": player_input,
-                "scene_history": scene_history,
+                "scene_history": scene_history_to_text(scene_history_turns),
             },
         )
         world = append_pending_messages(
@@ -453,6 +511,15 @@ def main() -> None:
             new_messages,
             scenario,
         )
+
+        turn_id = f"turn_{len(scene_history_turns)}"
+        scene_history_turns = _append_scene_turn(
+            scene_history_turns,
+            player_input,
+            render_scene_result(next_scene),
+            scene_result_to_entries(next_scene, turn_id),
+        )
+        world["scene_history"] = scene_history_turns
 
         save_runtime_state(
             runtime_save_path,
@@ -474,11 +541,6 @@ def main() -> None:
             new_messages,
             world,
         )
-
-        scene_history += "\n\n"
-        scene_history += f"Player: {player_input}"
-        scene_history += "\n\n"
-        scene_history += render_scene_result(next_scene)
 
 
 if __name__ == "__main__":

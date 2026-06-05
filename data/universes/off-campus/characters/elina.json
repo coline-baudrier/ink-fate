@@ -2,62 +2,78 @@
   "id": "elina",
   "identity": {
     "first_name": "Elina",
-    "last_name": "Maxwell",
-    "age": 20
+    "last_name": "Smith",
+    "age": 18
   },
+  "appearance": "freshman, 18 ans — ne la décris jamais physiquement dans la narration, c'est le personnage du joueur",
   "archetype": "newcomer",
   "personality": {
-    "humor": 70,
-    "charisma": 75,
+    "humor": 72,
+    "charisma": 68,
     "loyalty": 90,
-    "impulsiveness": 45,
-    "jealousy": 30,
-    "independence": 90,
+    "impulsiveness": 50,
+    "independence": 88,
     "curiosity": 85,
-    "confidence": 70
+    "confidence": 65,
+    "stubbornness": 70
   },
   "goals": [
     "build_new_life",
     "find_true_friends",
-    "gain_independence"
+    "exist_outside_of_others_expectations"
   ],
   "current_goals": [
-    "survive_first_day"
+    "settle_into_dorm",
+    "figure_out_who_hannah_is",
+    "survive_first_impressions"
   ],
   "fears": [
-    "being_controlled",
-    "being_disappointed"
+    "being_invisible",
+    "being_defined_by_others"
   ],
   "desires": [
     "freedom",
     "belonging",
-    "love"
+    "something_real"
   ],
   "relationships": {
-    "beau": {
-      "friendship": 85,
-      "trust": 95,
-      "respect": 90,
-      "attachment": 95,
+    "hannah": {
+      "friendship": 2,
+      "trust": 5,
+      "respect": 10,
+      "attachment": 0,
       "jealousy": 0,
       "attraction": 0
     },
     "dean": {
       "friendship": 0,
       "trust": 0,
-      "respect": 1,
+      "respect": 2,
       "attachment": 0,
       "jealousy": 0,
-      "attraction": 1
+      "attraction": 3
+    },
+    "garrett": {
+      "friendship": 0,
+      "trust": 0,
+      "respect": 5,
+      "attachment": 0,
+      "jealousy": 0,
+      "attraction": 0
     }
   },
   "contacts": {
-    "beau": {
-      "phone_number_known": true,
-      "phone_numbers_exchanged": true,
-      "instagram_connected": true
+    "hannah": {
+      "phone_number_known": false,
+      "phone_numbers_exchanged": false,
+      "instagram_connected": false
     },
     "dean": {
+      "phone_number_known": false,
+      "phone_numbers_exchanged": false,
+      "instagram_connected": false
+    },
+    "garrett": {
       "phone_number_known": false,
       "phone_numbers_exchanged": false,
       "instagram_connected": false
@@ -65,23 +81,24 @@
   },
   "memories": [],
   "private_thoughts": [
-    "I want people to see me as more than Beau's little sister."
+    "Je suis là pour exister par moi-même, pas pour être quelqu'un d'autre.",
+    "Je n'avais aucune attente précise sur la fac. Mais je n'avais pas prévu ça non plus."
   ],
   "schedule": [
     {
       "time": "10:00",
-      "location": "campus",
-      "activity": "arriving at Briar with luggage"
-    },
-    {
-      "time": "11:00",
       "location": "dormitory",
-      "activity": "settling into the dormitory"
+      "activity": "arrivée au dortoir avec ses affaires"
     },
     {
-      "time": "14:00",
+      "time": "13:00",
+      "location": "dining_hall",
+      "activity": "premier repas à la cafétéria"
+    },
+    {
+      "time": "15:00",
       "location": "campus",
-      "activity": "exploring campus"
+      "activity": "exploration du campus"
     }
   ]
 }

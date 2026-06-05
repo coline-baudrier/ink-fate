@@ -6,6 +6,8 @@ les regles narratives et le format JSON attendu.
 
 from typing import Any, Dict, List
 from app.core.contact_engine import build_contact_context
+
+SCENE_HISTORY_MAX_PROMPT = 4
 from app.core.memory_retriever import select_relevant_memories
 from app.core.planned_event_engine import build_planned_events_context
 from app.core.relationship_stages import build_relationship_context
@@ -14,12 +16,33 @@ from app.core.story_arc_state_engine import build_story_arc_state_context
 from app.core.story_arc_engine import build_story_arcs_context
 
 
+def scene_history_to_text(scene_history: list[dict] | None) -> str | None:
+    """Convertit une liste de tours en texte plat pour le scoring mémoire."""
+
+    if not scene_history:
+        return None
+
+    lines = []
+
+    for turn in scene_history[-SCENE_HISTORY_MAX_PROMPT:]:
+        player_input = turn.get("player_input")
+        scene_text = turn.get("scene_text", "")
+
+        if player_input:
+            lines.append(player_input)
+
+        if scene_text:
+            lines.append(scene_text)
+
+    return "\n".join(lines) if lines else None
+
+
 def build_structured_scene_prompt(
     world: Dict[str, Any],
     scenario: Dict[str, Any],
     scene_context: Dict[str, Any],
     player_input: str | None = None,
-    scene_history: str | None = None,
+    scene_history: list[dict] | None = None,
 ) -> str:
     """
     Construit le prompt envoye au LLM pour generer une scene.
@@ -46,7 +69,7 @@ def build_structured_scene_prompt(
     memory_context = build_memory_context(
         scene_context,
         player_input,
-        scene_history,
+        scene_history_to_text(scene_history),
     )
     available_locations = build_available_locations(world)
     event_log_context = build_event_log_context(world)
@@ -59,6 +82,10 @@ def build_structured_scene_prompt(
     player_intent_context = build_player_intent_context(scene_context)
     contact_intent_context = build_contact_intent_context(scene_context)
     runtime_directives_context = build_runtime_directives_context(world)
+    absent_characters_context = build_absent_characters_context(world, scene_context)
+    phone_inbox_context = build_phone_inbox_context(world)
+    active_tasks_context = build_active_tasks_context(world, scene_context)
+    scene_props_context = build_scene_props_context(world, location.get("id", ""))
 
     # Le prompt est volontairement separe en sections lisibles.
     prompt = f"""
@@ -74,6 +101,11 @@ WORLD CONTEXT
 - Location: {location_name}
 - Location description: {location_description}
 
+ESTABLISHED SCENE DETAILS (physical details already set in this location)
+{scene_props_context}
+- Do not contradict these established details.
+- If you introduce a new specific physical detail that should persist (a piece of furniture, a named object, a decoration), add a short one-line description to world_updates.new_scene_props. Do not add general atmosphere — only specific anchors that matter.
+
 AVAILABLE LOCATIONS
 {available_locations}
 
@@ -87,9 +119,22 @@ PLAYER CHARACTER
 ACTIVE PARTICIPANTS
 {participant_lines}
 - Only the character IDs listed above are physically present in the current active scene.
-- Scene history may mention other characters, but they are not present now unless they are listed above or world_updates.character_movements explicitly moves them into the current location.
-- Do not describe absent NPCs as nearby, watching, smiling, speaking, reacting, leaning on a wall, following, or otherwise physically present.
 - scene.participants and dialogues.speaker must stay limited to current active participants, except for NPCs explicitly moved into the scene by character_movements.
+- Not every participant needs to speak every scene. A character who has nothing new, surprising, or meaningful to contribute should remain silent or receive only a brief non-verbal mention in narration. Avoid reflexive or predictable reactions (e.g., a sibling always stepping in to defend, a friend always agreeing). Silence and presence are valid narrative choices.
+
+ABSENT CHARACTERS
+{absent_characters_context}
+- These characters are physically elsewhere. They cannot enter this scene, see what happens here, or hear what is said.
+- Do not write narration, dialogue, reactions, thoughts or physical presence for any absent character.
+- Do not describe an absent character reacting to an SMS, looking at their phone, receiving news, or doing anything in response to events in this scene.
+- Narration must describe only what the player character can directly observe in their current location.
+
+ACTIVE TASKS
+{active_tasks_context}
+- NPCs assigned to an active task are primarily focused on it. Their presence in the scene should reflect the task — they carry boxes, arrange things, give instructions, check progress.
+- At least once per scene where an assigned NPC appears, show them doing something concrete for the task — not just commenting on other characters.
+- When a task clearly advances, update it via world_updates.task_updates with the new progress (0–100) and a short note describing the current state.
+- A task at 100% should be set to status: "completed".
 
 SCENE HISTORY
 {scene_history_context}
@@ -108,6 +153,11 @@ RELATIONSHIP STATUS
 
 CONTACT ACCESS
 {contact_context}
+
+PHONE INBOX (unread messages waiting for the player)
+{phone_inbox_context}
+- If the player's action involves checking their phone, reading messages, or texting, and PHONE INBOX is not empty, the scene MUST reveal those messages — show what the player reads on screen.
+- If PHONE INBOX is empty, the phone has no new messages to show.
 
 PLAYER INPUT
 {player_context}
@@ -153,6 +203,11 @@ NPC AUTONOMY RULES
 - Never write dialogue, thoughts or decisions for the player character.
 - When the player character leaves a group, the next active scene follows the player character, not the NPCs left behind.
 - Do not continue NPC-only scenes unless explicitly requested by the system.
+- NPC INDIVIDUAL ENGAGEMENT: Each NPC reasons from their own perspective, their own knowledge, and their own current activity — never from a global awareness of the scene. Before having an NPC react, follow the player, or initiate contact, ask: does this specific NPC have a reason to act given their current_goals, their position, and what they personally know? A character occupied with their own activity (helping someone move, studying, working) should not abandon it without a compelling reason specific to them. When the player moves away from a group, the NPC most likely to follow is the one with no active engagement, not the one with the highest relationship score.
+- NPC TASK PRIORITY: An NPC assigned to an active task (see ACTIVE TASKS) is primarily there to do that task. Their contribution to the scene is often a physical action, not a quip. They should not become a commentator on the player-NPC dynamic. A character helping with a task can exchange one or two lines with the player, but their hands keep working.
+- NPC TASK CONTINUITY: Each NPC has a "Current activity" line. This is a commitment — the NPC must continue this activity across turns. Do NOT have an NPC silently drop their task to become a passive observer or audience member for a nearby conversation. An NPC can briefly comment on the conversation while their hands keep working (e.g., Garrett sets a box down to say something, then picks up another). Only change an NPC's current_activity in world_updates.character_activity_updates when: the task genuinely advances to a new stage, the NPC explicitly decides to stop, or a significant event forces a change. A nearby interesting conversation is NOT sufficient reason to abandon a task.
+- NPC SOCIAL DISTANCE: A character who has just met the player has friendship and respect scores near zero. They do not joke at the player's expense, do not adopt a warm or teasing tone, do not express personal opinions about the player's choices or character. They are politely neutral to mildly curious at best. Familiarity is earned slowly through repeated interaction and reflected in rising relationship scores — it does not happen in the first scene.
+- NPC KNOWLEDGE BOUNDARY: Each NPC knows only what they have directly witnessed or been explicitly told within the story. They do not have access to system context, player metadata, or scenario notes. They cannot use the player's name unless they have actually learned it in the fiction.
 
 SCENE DIRECTION
 - The player_input is a trigger, not the whole scene.
@@ -161,6 +216,8 @@ SCENE DIRECTION
 - Avoid generic responses like "I will call you soon" when a character can propose something more specific and embodied.
 - Generate a scene that makes the player want to answer immediately.
 - If player_input is empty during an ongoing scene, treat it as the player waiting or observing briefly, not as permission to shift focus away from the player.
+- ACTION + CONSEQUENCE: When the player performs a physical action (handing something, carrying something, helping with a task), the scene must show a physical consequence — what changes in the world, what gets done, what moves. A joke or quip in response to a physical action is decoration, not a consequence. Show the consequence first, then allow one line of humor if the character and tone call for it.
+- Do not convert action scenes into dialogue scenes. If the player helps with a move, the move advances. If the player carries a box, something gets done. The world responds to effort.
 
 JSON RULES
 - Return valid JSON only.
@@ -177,16 +234,24 @@ JSON RULES
 - Use instagram_connected true only for a mutual Instagram connection in this MVP.
 - Do not add contact_updates just because characters talk in person.
 - dialogue.text must contain only the spoken words, without enclosing quotation marks.
+- CRITICAL — narration must NEVER quote what any character says. All spoken words belong exclusively in the dialogues array. Writing "Hannah répond : '...'" or any quoted speech inside a narration paragraph is forbidden. Narration describes only physical actions, movement, atmosphere, and environment.
 - Use the location ID for scene.location.
-- The player character ID is elina.
+- The player character ID is elina. This is a technical identifier for the JSON structure only.
 - Never include "elina" as a speaker in dialogues.
 - Never generate dialogue for elina.
 - If the player writes dialogue, treat it as already spoken by elina and only generate reactions from other characters.
+- CRITICAL — NPC name knowledge: Each participant has a "What X knows about elina" line. If it says "does NOT know their name", that NPC must NEVER use the player's name, first or last, in dialogue or narration. They must refer to the player as "tu", "elle", "la fille", a physical description, or simply by no name at all. Using the player's name before an introduction has occurred is a diegetic error.
+- When an NPC learns the player's name during the scene (e.g., the player introduces herself, someone reads her name on a box, a third character introduces her), include that NPC in npc_knowledge_updates with knows_name: true and known_name set to the name they actually heard.
 - memory_updates must use character IDs.
 - memory owner must be one of the active participants.
 - importance must be an integer between 1 and 10.
 - Only create memories for narratively meaningful moments.
 - Do not create memories for every line of dialogue.
+- Each participant's "Position in location" tells you exactly where they are within the current location. A character in their room cannot see or hear what happens in the hallway or stairwell unless they open their door. Respect these spatial constraints when writing narration and reactions.
+- character_activity_updates maps character IDs to a short free-text description of what they are now doing. Update an NPC's activity when their task genuinely advances to a new stage (e.g., "finit de porter les cartons, commence à démonter les étagères") or when they clearly start a new activity. Do not update if they are still doing the same thing as before. If no activity changed, use an empty object.
+- Use character_position_updates when a character clearly moves within the location (e.g., opens their door and steps into the hallway, moves from the hallway to the stairwell, sits down somewhere specific). Map character IDs to a short free-text description of their new position within the current location. If no character moves within the location, use an empty object.
+- task_updates maps task IDs to progress objects. Only include a task if it clearly advanced in this scene. Set progress (integer 0–100), a brief note (string) describing the current state, and optionally status: "completed" when the task reaches 100%.
+- new_scene_props is a list of short strings describing specific physical details you introduced in this scene that should persist (a named piece of furniture, a specific object, a detail of the room). Only add genuinely new and specific details — not general atmosphere. If nothing new was introduced, use an empty list.
 - world_updates.new_location must be empty unless the player clearly moves to another location.
 - If the player clearly leaves, walks toward, enters, or moves to a valid available location, set world_updates.new_location to that location ID.
 - world_updates.new_location must use a valid location ID.
@@ -200,6 +265,7 @@ JSON RULES
 - Prefer fewer dialogue lines, but allow an extra line when it creates stronger character initiative or tension.
 - At least one non-player character should usually take a concrete initiative when the player input creates an opportunity.
 - Do not end the scene with a full resolution if the player can still respond.
+- Do not fill narration with ambient descriptions (background students, general campus noise, weather, the passing crowd) unless they create direct narrative tension or introduce new information. If nothing meaningful happens in the environment, omit it.
 
 EXPECTED JSON FORMAT
 {expected_json_format}
@@ -246,6 +312,12 @@ def build_participant_lines(scene_context: Dict[str, Any]) -> str:
         lines.append(
             f"- {character_id} = {format_identity(identity)}"
         )
+        position = character.get("_position_in_location", "")
+        if position:
+            lines.append(f"  - Position in location: {position}")
+        activity = character.get("_current_activity", "")
+        if activity:
+            lines.append(f"  - Current activity: {activity}")
         lines.extend(
             build_character_detail_lines(
                 character,
@@ -321,6 +393,40 @@ def format_dict_values(values: Any) -> str:
     return ", ".join(pairs)
 
 
+def build_absent_characters_context(
+    world: Dict[str, Any],
+    scene_context: Dict[str, Any],
+) -> str:
+    """Liste les personnages absents de la scene active et leur position actuelle."""
+
+    participant_ids = {
+        p.get("id", "")
+        for p in scene_context.get("participants", [])
+        if isinstance(p, dict)
+    }
+
+    player_character_id = world.get("player_character", "")
+    character_locations = world.get("character_locations", {})
+
+    location_names: Dict[str, str] = {
+        loc["id"]: loc["name"]
+        for loc in world.get("locations", [])
+        if isinstance(loc, dict)
+    }
+
+    lines = []
+    for char_id in world.get("characters", []):
+        if char_id == player_character_id:
+            continue
+        if char_id in participant_ids:
+            continue
+        location_id = character_locations.get(char_id, "unknown")
+        location_name = location_names.get(location_id, location_id)
+        lines.append(f"- {char_id}: currently at {location_name} — not present, cannot see or hear what happens here")
+
+    return "\n".join(lines) if lines else "(none)"
+
+
 def append_optional_line(
     lines: List[str],
     label: str,
@@ -340,6 +446,12 @@ def build_character_detail_lines(
     """Construit les details narratifs utiles d'un participant."""
 
     lines: List[str] = []
+
+    append_optional_line(
+        lines,
+        "Appearance",
+        safe_string(character.get("appearance")),
+    )
 
     archetype = character.get(
         "archetype",
@@ -410,6 +522,24 @@ def build_character_detail_lines(
     )
 
     lines.extend(relationship_lines)
+
+    # What this NPC knows about the player character (diegetic knowledge only)
+    character_id = character.get("id", "")
+    if character_id and character_id != player_character_id:
+        pk = character.get("player_knowledge", {})
+        if isinstance(pk, dict):
+            knows_name = pk.get("knows_name", False)
+            known_name = pk.get("known_name")
+            if knows_name and known_name:
+                lines.append(
+                    f"  - What {character_id} knows about {player_character_id}:"
+                    f" knows their name is \"{known_name}\""
+                )
+            else:
+                lines.append(
+                    f"  - What {character_id} knows about {player_character_id}:"
+                    f" does NOT know their name yet (no introduction has occurred)"
+                )
 
     return lines
 
@@ -526,8 +656,15 @@ def build_player_intent_context(scene_context: Dict[str, Any]) -> str:
             f'world_updates.new_location to "{detected_movement}".'
         ),
         (
-            "The next scene should follow the player character at that "
-            "location unless an NPC explicitly follows."
+            "IMPORTANT: scene.location must remain the CURRENT departure location, "
+            "not the destination. "
+            "The player is still leaving — show the farewell moment here. "
+            "world_updates.new_location updates the world state for the next turn. "
+            "scene.participants should include all characters present at the departure."
+        ),
+        (
+            "The next scene (next player turn) will follow the player character at "
+            f"{detected_movement} unless an NPC explicitly follows."
         ),
     ]
 
@@ -642,27 +779,57 @@ def build_expected_json_format() -> str:
       "tags": []
     }
   ],
+  "npc_knowledge_updates": {
+    "character_id": {
+      "knows_name": true,
+      "known_name": "name they actually heard"
+    }
+  },
   "world_updates": {
     "new_location": "",
     "time_advance_minutes": 0,
     "character_movements": {
         "character_id": "location_id"
-    }
+    },
+    "character_position_updates": {
+        "character_id": "free-text position within current location"
+    },
+    "character_activity_updates": {
+        "character_id": "short description of what this NPC is now doing"
+    },
+    "task_updates": {
+        "task_id": { "progress": 0, "note": "", "status": "active" }
+    },
+    "new_scene_props": []
   }
 }
 """.strip()
 
 
-def build_scene_history_context(scene_history: str | None) -> str:
-    """Prepare l'historique de scene a envoyer au LLM."""
+def build_scene_history_context(scene_history: list[dict] | None) -> str:
+    """Prepare l'historique de scene a envoyer au LLM (max SCENE_HISTORY_MAX_PROMPT tours)."""
 
-    if scene_history:
-        return f"""
-Previous scene :
-{scene_history}
-""".strip()
+    if not scene_history:
+        return "No previous scene yet."
 
-    return "No previous scene yet."
+    recent_turns = scene_history[-SCENE_HISTORY_MAX_PROMPT:]
+    lines = []
+
+    for turn in recent_turns:
+        player_input = turn.get("player_input")
+        scene_text = turn.get("scene_text", "")
+
+        if player_input:
+            lines.append(f"Player: {player_input}")
+            lines.append("")
+
+        if scene_text:
+            lines.append(scene_text)
+            lines.append("")
+
+    result = "\n".join(lines).strip()
+
+    return result if result else "No previous scene yet."
 
 
 def build_memory_context(
@@ -768,6 +935,97 @@ def build_event_log_context(
         return "No important events recorded yet."
 
     return "\n".join(event_lines)
+
+
+def build_phone_inbox_context(world: Dict[str, Any]) -> str:
+    """Retourne les SMS non lus recus par le joueur, pour le contexte de scene."""
+
+    player_id = world.get("player_character", "")
+    messages = world.get("messages", [])
+
+    if not isinstance(messages, list):
+        return ""
+
+    unread = [
+        m for m in messages
+        if isinstance(m, dict)
+        and m.get("to") == player_id
+        and m.get("status") in ("unread", "pending_delivery", "delivered")
+    ]
+
+    if not unread:
+        return ""
+
+    lines = []
+    for m in unread[-5:]:  # 5 most recent unread
+        sender = m.get("from", "?")
+        content = m.get("content", "")
+        day = m.get("sent_at_day", "?")
+        time = m.get("sent_at_time", "")
+        lines.append(f"- From {sender} (day {day}{', ' + time if time else ''}): {content}")
+
+    return "\n".join(lines)
+
+
+def build_active_tasks_context(
+    world: Dict[str, Any],
+    scene_context: Dict[str, Any],
+) -> str:
+    """Retourne les tâches actives pertinentes pour la scène courante."""
+
+    tasks = world.get("active_tasks", [])
+    if not isinstance(tasks, list) or not tasks:
+        return "(none)"
+
+    current_location = scene_context.get("location", {}).get("id", "")
+    participant_ids = {
+        p.get("id", "")
+        for p in scene_context.get("participants", [])
+        if isinstance(p, dict)
+    }
+
+    lines = []
+    for task in tasks:
+        if not isinstance(task, dict):
+            continue
+        if task.get("status") not in ("active",):
+            continue
+        task_loc = task.get("location", "")
+        assigned = task.get("assigned_participants", [])
+        if not isinstance(assigned, list):
+            assigned = []
+
+        # Only show if task is at current location AND an assigned participant is present
+        if task_loc and task_loc != current_location:
+            continue
+        if assigned and not any(p in participant_ids for p in assigned):
+            continue
+
+        tid = task.get("id", "")
+        title = task.get("title", "")
+        desc = task.get("description", "")
+        progress = task.get("progress", 0)
+        note = task.get("note", "")
+        assigned_str = ", ".join(assigned) if assigned else "?"
+
+        line = f"- [{tid}] {title} — {assigned_str} — {progress}% done"
+        if note:
+            line += f" — {note}"
+        if desc:
+            line += f"\n  {desc}"
+        lines.append(line)
+
+    return "\n".join(lines) if lines else "(none)"
+
+
+def build_scene_props_context(world: Dict[str, Any], location_id: str) -> str:
+    """Retourne les détails physiques établis dans le lieu courant."""
+
+    props = world.get("scene_props", {}).get(location_id, [])
+    if not isinstance(props, list) or not props:
+        return "(none established yet)"
+
+    return "\n".join(f"- {p}" for p in props)
 
 
 def build_available_locations(world: Dict[str, Any]) -> str:

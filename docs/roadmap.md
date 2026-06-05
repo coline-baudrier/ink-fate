@@ -133,9 +133,9 @@ La roadmap separe ce qui existe deja, ce qui est partiel et les extensions futur
 - limiter les dialogues PNJ quand le joueur les laisse explicitement derriere ;
 - enregistrer les mouvements PNJ hors champ dans `event_log`.
 
-🚧 Reste a faire :
+🔮 Ameliorations futures :
 
-- mieux choisir les evenements de `event_log` a reinjecter dans le prompt ;
+- mieux choisir les evenements de `event_log` a reinjecter dans le prompt (scoring plutot que recence brute) ;
 - mieux simuler les consequences hors champ.
 
 ## 🌙 Phase 6 - Ellipses Et Simulation Hors Champ
@@ -172,7 +172,9 @@ La roadmap separe ce qui existe deja, ce qui est partiel et les extensions futur
 
 ## 🧼 Phase 7 - Nettoyage Et Tests
 
-**Statut : partiellement fait.**
+**Statut : majoritairement fait.**
+
+✅ Deja fait :
 
 - tests unitaires du validator ;
 - tests du world engine ;
@@ -180,6 +182,16 @@ La roadmap separe ce qui existe deja, ce qui est partiel et les extensions futur
 - tests du relationship engine ;
 - tests du time engine ;
 - tests de l'event log ;
+- cap de l'event_log a 100 entrees (evite la croissance infinie du JSON) ;
+- pruning des souvenirs a 50 par personnage (score importance * 3 - age) ;
+- scene_history refactorisee en liste de tours persistee dans le save (evite le crash LLM sur parties longues) ;
+- cap LLM de l'historique de scene a 4 tours dans le prompt ;
+- resume de partie sans regenerer la scene d'ouverture ;
+- decay relationnel passif par jour (attraction, friendship, jealousy) ;
+- constantes de stabilite documentees et ajustables (SCENE_HISTORY_MAX_STORED, MEMORY_MAX_PER_CHARACTER, EVENT_LOG_MAX_SIZE, DAILY_DECAY, DECAY_FLOOR).
+
+🔮 Reste a faire :
+
 - nettoyage des accents dans les JSON ;
 - documentation a jour.
 

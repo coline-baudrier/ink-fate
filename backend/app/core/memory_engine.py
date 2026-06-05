@@ -2,6 +2,8 @@ from typing import Any, Dict
 import re
 import unicodedata
 
+MEMORY_MAX_PER_CHARACTER = 50
+
 
 def apply_memory_updates(
     scene_result: Dict[str, Any],
@@ -108,6 +110,47 @@ def normalize_memory_content(value: Any) -> str:
         " ",
         normalized,
     ).strip()
+
+
+def _memory_retention_score(memory: Dict[str, Any]) -> int:
+    """Score de retention : importance forte et jeunesse favorisees."""
+
+    importance = memory.get("importance", 1)
+    age = memory.get("age", 0)
+
+    if not isinstance(importance, int):
+        importance = 1
+
+    if not isinstance(age, int):
+        age = 0
+
+    return importance * 3 - age
+
+
+def prune_memories(
+    characters: Dict[str, Dict[str, Any]],
+    max_per_character: int = MEMORY_MAX_PER_CHARACTER,
+) -> Dict[str, Dict[str, Any]]:
+    """Supprime les souvenirs en excès en gardant les plus importants."""
+
+    for character in characters.values():
+        memories = character.get("memories", [])
+
+        if not isinstance(memories, list):
+            continue
+
+        if len(memories) <= max_per_character:
+            continue
+
+        scored = [
+            (_memory_retention_score(m), m)
+            for m in memories
+            if isinstance(m, dict)
+        ]
+        scored.sort(key=lambda x: x[0], reverse=True)
+        character["memories"] = [m for _, m in scored[:max_per_character]]
+
+    return characters
 
 
 def increase_memory_age(

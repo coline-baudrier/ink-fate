@@ -25,11 +25,20 @@ def build_scene_context(
         if location["id"] == location_id
     )
 
+    character_positions: Dict[str, str] = world.get("character_positions", {})
+    character_activities: Dict[str, str] = world.get("character_activities", {})
+
     participants: List[Dict[str, Any]] = []
 
     for character_id in participant_ids:
         # On remplace l'id du personnage par son dictionnaire complet.
-        character = characters[character_id]
+        character = dict(characters[character_id])
+        position = character_positions.get(character_id, "")
+        if position:
+            character["_position_in_location"] = position
+        activity = character_activities.get(character_id, "")
+        if activity:
+            character["_current_activity"] = activity
         participants.append(character)
 
     scene_context = {
